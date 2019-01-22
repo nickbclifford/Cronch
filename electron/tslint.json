@@ -1,6 +1,3 @@
 {
-	"extends": ["tslint-react", "@mymicds/configs/tslint"],
-	"rules": {
-		"no-console": false
-	}
+	"extends": "@mymicds/configs/tslint"
 }
