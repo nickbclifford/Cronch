@@ -7,6 +7,7 @@ import Login from './Login';
 
 import Timer from './Timer';
 import BattlePlan from './BattlePlan';
+import Profile from './Profile';
 import About from './About';
 
 const AuthNavigator = createStackNavigator(
@@ -23,6 +24,7 @@ const AppNavigator = createDrawerNavigator(
 	{
 		Timer: Timer,
 		BattlePlan: BattlePlan,
+		Profile: Profile,
 		About: About
 	},
 	{

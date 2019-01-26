@@ -10,11 +10,6 @@ export default class Hamburger extends Component {
 		header: null
 	};
 
-	constructor(props: any) {
-		super(props);
-		console.log('props', props);
-	}
-
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>

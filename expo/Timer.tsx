@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Component } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import { FontAwesome } from '@expo/vector-icons';
 import MyMICDS, { CanvasEvent } from './MyMICDS';
 
 import Hamburger from './Hamburger';
@@ -32,12 +31,6 @@ export default class Timer extends Component {
 		this.state = { assignments: [] };
 	}
 
-	_logout() {
-		MyMICDS.auth.logout().subscribe(() => {
-			(this.props as any).navigation.navigate('Auth');
-		});
-	}
-
 	_getTodoAssignements() {
 		MyMICDS.canvas.getEvents().subscribe(assignments => {
 			this.setState({ assignments });
@@ -50,14 +43,6 @@ export default class Timer extends Component {
 				<Hamburger toggle={(this.props as any).navigation.toggleDrawer} />
 				<View style={styles.container}>
 					<Text>This is the Timer!</Text>
-					<Button title="Logout" onPress={() => this._logout()} />
-
-					<FontAwesome
-						name="bars"
-						size={32}
-						style={styles.menu}
-						onPress={() => console.log('id tap that')}
-					/>
 				</View>
 			</SafeAreaView>
 		);
