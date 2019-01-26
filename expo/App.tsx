@@ -1,21 +1,12 @@
 import * as React from 'react';
 import { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+
+import AppContainer from './AppNavigator';
 
 export default class App extends Component {
 	render() {
 		return (
-			<View style={styles.container}>
-				<Text>Your Typescript project is working!</Text>
-			</View>
+			<AppContainer/>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-});

@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@mymicds/configs": "^1.1.0",
+    "@types/react-navigation": "^3.0.1",
     "babel-preset-expo": "^5.0.0",
     "tslint": "^5.12.1",
     "tslint-react": "^3.6.0",
