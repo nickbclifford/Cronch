@@ -11,7 +11,7 @@ export default class Login extends Component {
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text>Login</Text>
+				<Text>Login to MyMICDS</Text>
 			</View>
 		);
 	}
