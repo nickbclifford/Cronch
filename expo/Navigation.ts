@@ -2,14 +2,21 @@ import { createStackNavigator, createSwitchNavigator, createAppContainer } from 
 
 import Loading from './Loading';
 
+import Welcome from './Welcome';
 import Login from './Login';
 
 import Timer from './Timer';
 import About from './About';
 
-const AuthNavigator = createStackNavigator({
-	Login: Login
-});
+const AuthNavigator = createStackNavigator(
+	{
+		Welcome: Welcome,
+		Login: Login
+	},
+	{
+		initialRouteName: 'Welcome'
+	}
+);
 
 const AppNavigator = createStackNavigator(
 	{

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import MyMICDS from './MyMICDS';
 
 export default class Timer extends Component {
 
@@ -16,10 +17,17 @@ export default class Timer extends Component {
 		header: null
 	};
 
+	_logout() {
+		MyMICDS.auth.logout().subscribe(() => {
+			(this.props as any).navigation.navigate('Auth');
+		});
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
 				<Text>This is the Timer!</Text>
+				<Button title="Logout" onPress={() => this._logout()} />
 			</View>
 		);
 	}
