@@ -19,3 +19,4 @@ const mymicdsConfig: MyMICDSOptions = {
 };
 
 export default new MyMICDS(mymicdsConfig);
+export * from '@mymicds/sdk';

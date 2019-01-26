@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Component } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
-export default class Login extends Component {
+export default class Welcome extends Component {
 
 	static navigationOptions = {
 		header: null

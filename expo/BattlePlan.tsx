@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-navigation';
 
 import Hamburger from './Hamburger';
 
-export default class About extends Component {
+export default class BattlePlan extends Component {
 
 	static navigationOptions = {
 		header: null
@@ -16,7 +16,7 @@ export default class About extends Component {
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={(this.props as any).navigation.toggleDrawer} />
 				<View style={styles.container}>
-					<Text>This was created by cool people. Want to give feedback? Email support@mymicds.gov</Text>
+					<Text>Battle Plan!</Text>
 				</View>
 			</SafeAreaView>
 		);
