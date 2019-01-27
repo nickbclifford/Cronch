@@ -1,9 +1,10 @@
+import bind from 'bind-decorator';
 import * as React from 'react';
-import { Component } from 'react';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS from './MyMICDS';
 
-export default class Login extends Component {
+export default class Login extends React.Component<NavigationScreenProps> {
 
 	static navigationOptions = {
 		header: null
@@ -11,12 +12,13 @@ export default class Login extends Component {
 
 	state: { user: string; password: string; };
 
-	constructor(props: any) {
+	constructor(props: NavigationScreenProps) {
 		super(props);
 		this.state = { user: '', password: '' };
 	}
 
-	_login() {
+	@bind
+	private login() {
 		MyMICDS.auth.login({
 			user: this.state.user,
 			password: this.state.password,
@@ -24,11 +26,21 @@ export default class Login extends Component {
 			comment: 'Cronch Integration'
 		}).subscribe(loginRes => {
 			if (loginRes.success) {
-				(this.props as any).navigation.navigate('App');
+				this.props.navigation.navigate('App');
 			} else {
 				Alert.alert('Login Error', loginRes.message);
 			}
 		});
+	}
+
+	@bind
+	private setUser(user: string) {
+		this.setState({ user });
+	}
+
+	@bind
+	private setPassword(password: string) {
+		this.setState({ password });
 	}
 
 	render() {
@@ -37,17 +49,17 @@ export default class Login extends Component {
 				<Text>Login to MyMICDS</Text>
 				<TextInput
 					value={this.state.user}
-					onChangeText={user => this.setState({ user })}
+					onChangeText={this.setUser}
 					placeholder={'Username'}
 					style={styles.input}
 				/>
 				<TextInput
 					value={this.state.password}
-					onChangeText={password => this.setState({ password })}
+					onChangeText={this.setPassword}
 					placeholder={'Password'}
 					style={styles.input}
 				/>
-				<Button title="Login" onPress={() => this._login()} />
+				<Button title='Login' onPress={this.login} />
 			</View>
 		);
 	}

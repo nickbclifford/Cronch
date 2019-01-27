@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { Component } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
+import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from './MyMICDS';
 
 import Hamburger from './Hamburger';
 
-export default class Timer extends Component {
+export default class Timer extends React.Component<NavigationScreenProps> {
 
 	static navigationOptions = {
 		title: 'Home',
@@ -18,7 +17,7 @@ export default class Timer extends Component {
 		// 	fontWeight: 'bold',
 		// }
 		// header: null
-		drawerLabel: 'Timer',
+		drawerLabel: 'Timer'
 		// drawerIcon: () => (
 		// 	<FontAwesome name="bars" style={styles.menu} />
 		// )
@@ -31,7 +30,7 @@ export default class Timer extends Component {
 		this.state = { assignments: [] };
 	}
 
-	_getTodoAssignements() {
+	private getTodoAssignments() {
 		MyMICDS.canvas.getEvents().subscribe(assignments => {
 			this.setState({ assignments });
 		});
@@ -40,7 +39,7 @@ export default class Timer extends Component {
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Hamburger toggle={(this.props as any).navigation.toggleDrawer} />
+				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.container}>
 					<Text>This is the Timer!</Text>
 				</View>

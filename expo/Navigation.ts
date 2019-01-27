@@ -1,19 +1,26 @@
-import { createDrawerNavigator, createStackNavigator, createSwitchNavigator, createAppContainer } from 'react-navigation';
+import {
+	createAppContainer,
+	createDrawerNavigator,
+	createStackNavigator,
+	createSwitchNavigator
+} from 'react-navigation';
 
 import Loading from './Loading';
 
-import Welcome from './Welcome';
 import Login from './Login';
+import Welcome from './Welcome';
 
-import Timer from './Timer';
+import About from './About';
 import BattlePlan from './BattlePlan';
 import Profile from './Profile';
-import About from './About';
+import Timer from './Timer';
+
+// tslint:disable:variable-name
 
 const AuthNavigator = createStackNavigator(
 	{
-		Welcome: Welcome,
-		Login: Login
+		Welcome,
+		Login
 	},
 	{
 		initialRouteName: 'Welcome'
@@ -22,10 +29,10 @@ const AuthNavigator = createStackNavigator(
 
 const AppNavigator = createDrawerNavigator(
 	{
-		Timer: Timer,
-		BattlePlan: BattlePlan,
-		Profile: Profile,
-		About: About
+		Timer,
+		BattlePlan,
+		Profile,
+		About
 	},
 	{
 		initialRouteName: 'Timer'
@@ -38,7 +45,7 @@ const AppNavigator = createDrawerNavigator(
 
 const AppContainer = createAppContainer(createSwitchNavigator(
 	{
-		Loading: Loading,
+		Loading,
 		App: AppNavigator,
 		Auth: AuthNavigator
 	},

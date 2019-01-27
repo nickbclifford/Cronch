@@ -1,27 +1,28 @@
 import * as React from 'react';
-import { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS from './MyMICDS';
 
-export default class Loading extends Component {
+export default class Loading extends React.Component<NavigationScreenProps> {
 
 	static navigationOptions = {
 		header: null
 	};
 
 	componentDidMount() {
-		this._listenToAuth();
+		// noinspection JSIgnoredPromiseFromCall
+		this.listenToAuth();
 	}
 
 	/**
 	 * Listen for changes to auth, then check whether user is authenticated and redirect to the appropriate views
 	 */
 
-	async _listenToAuth() {
+	private async listenToAuth() {
 		const subscription = MyMICDS.auth.$.subscribe(
 			jwt => {
 				if (jwt !== undefined) {
-					(this.props as any).navigation.navigate(jwt ? 'App' : 'Auth');
+					this.props.navigation.navigate(jwt ? 'App' : 'Auth');
 					subscription.unsubscribe();
 				}
 			}
@@ -35,6 +36,7 @@ export default class Loading extends Component {
 			</View>
 		);
 	}
+
 }
 
 const styles = StyleSheet.create({
@@ -42,5 +44,5 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center'
-	},
+	}
 });

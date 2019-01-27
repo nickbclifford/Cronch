@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Component } from 'react';
 
 import AppContainer from './Navigation';
 
-export default class App extends Component {
+export default class App extends React.Component {
 	render() {
 		return (
 			<AppContainer/>

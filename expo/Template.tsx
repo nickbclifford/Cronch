@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
+import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import Hamburger from './Hamburger';
 
-export default class Template extends Component {
+export default class Template extends React.Component<NavigationScreenProps> {
 
 	static navigationOptions = {
 		header: null
@@ -14,13 +13,14 @@ export default class Template extends Component {
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Hamburger toggle={(this.props as any).navigation.toggleDrawer} />
+				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.container}>
 					<Text>Component Works!</Text>
 				</View>
 			</SafeAreaView>
 		);
 	}
+
 }
 
 const styles = StyleSheet.create({
@@ -31,5 +31,5 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center'
-	},
+	}
 });
