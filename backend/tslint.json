@@ -1,0 +1,6 @@
+{
+	"extends": "@mymicds/configs/tslint",
+	"rules": {
+		"no-console": false
+	}
+}
