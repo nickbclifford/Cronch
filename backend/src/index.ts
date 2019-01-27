@@ -1,8 +1,19 @@
 import express from 'express';
+import { Sequelize } from 'sequelize-typescript';
 import config from './config';
 
-const app = express();
+// Initialize Sequelize
+const sequelize = new Sequelize({
+	dialect: 'postgres',
+	...config.postgres,
+	modelPaths: [__dirname + '/models']
+});
 
-app.listen(config.port, () => {
-	console.log(`Server listening on *:${config.port}`);
+sequelize.sync({ force: config.forceModelSync }).then(() => {
+	// Initialize Express
+	const app = express();
+
+	app.listen(config.port, () => {
+		console.log(`Server listening on *:${config.port}`);
+	});
 });
