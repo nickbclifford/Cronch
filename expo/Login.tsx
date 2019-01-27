@@ -4,13 +4,16 @@ import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS from './MyMICDS';
 
-export default class Login extends React.Component<NavigationScreenProps> {
+export interface LoginState {
+	user: string;
+	password: string;
+}
+
+export default class Login extends React.Component<NavigationScreenProps, LoginState> {
 
 	static navigationOptions = {
 		header: null
 	};
-
-	state: { user: string; password: string; };
 
 	constructor(props: NavigationScreenProps) {
 		super(props);
@@ -57,6 +60,7 @@ export default class Login extends React.Component<NavigationScreenProps> {
 					value={this.state.password}
 					onChangeText={this.setPassword}
 					placeholder={'Password'}
+					secureTextEntry={true}
 					style={styles.input}
 				/>
 				<Button title='Login' onPress={this.login} />

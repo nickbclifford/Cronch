@@ -10,7 +10,6 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 	};
 
 	componentDidMount() {
-		// noinspection JSIgnoredPromiseFromCall
 		this.listenToAuth();
 	}
 
@@ -18,7 +17,7 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 	 * Listen for changes to auth, then check whether user is authenticated and redirect to the appropriate views
 	 */
 
-	private async listenToAuth() {
+	private listenToAuth() {
 		const subscription = MyMICDS.auth.$.subscribe(
 			jwt => {
 				if (jwt !== undefined) {

@@ -1,11 +1,23 @@
+import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import {
+	FlatList,
+	ListRenderItemInfo,
+	StyleSheet,
+	Text,
+	TextStyle,
+	View
+} from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from './MyMICDS';
 
 import Hamburger from './Hamburger';
 
-export default class Timer extends React.Component<NavigationScreenProps> {
+export interface TimerState {
+	assignments: CanvasEvent[];
+}
+
+export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
 
 	static navigationOptions = {
 		title: 'Home',
@@ -23,17 +35,41 @@ export default class Timer extends React.Component<NavigationScreenProps> {
 		// )
 	};
 
-	state: { assignments: CanvasEvent[] };
-
 	constructor(props: any) {
 		super(props);
 		this.state = { assignments: [] };
 	}
 
+	componentDidMount() {
+		this.getTodoAssignments();
+	}
+
 	private getTodoAssignments() {
 		MyMICDS.canvas.getEvents().subscribe(assignments => {
-			this.setState({ assignments });
+			this.setState({
+				assignments: assignments.events
+					.filter(a => a.end.valueOf() > Date.now())
+					.sort((a, b) => a.end.unix() - b.end.unix())
+			});
 		});
+	}
+
+	// Allows React Native to cache each item's position in the list (not used as a sorting key though)
+	@bind
+	private getCacheKey(item: CanvasEvent) {
+		return item._id;
+	}
+
+	@bind
+	private renderListItem({ item }: ListRenderItemInfo<CanvasEvent>) {
+		const itemStyle: TextStyle = {
+			backgroundColor: item.class.color,
+			color: item.class.textDark ? '#333' : '#eee',
+			borderRadius: 5
+		};
+
+		// TODO: Change to be clickable, start timer, etc. (maybe navigates to different component?)
+		return <Text style={itemStyle}>({item.class.name}) {item.title}</Text>;
 	}
 
 	render() {
@@ -42,6 +78,7 @@ export default class Timer extends React.Component<NavigationScreenProps> {
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.container}>
 					<Text>This is the Timer!</Text>
+					<FlatList data={this.state.assignments} keyExtractor={this.getCacheKey} renderItem={this.renderListItem} />
 				</View>
 			</SafeAreaView>
 		);
