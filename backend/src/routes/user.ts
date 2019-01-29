@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import Timeslot from '../models/Timeslot';
 import User from '../models/User';
-import { errorResponse, requireLoggedIn, successResponse } from '../utils';
+import { APIError, errorResponse, requireLoggedIn, successResponse } from '../utils';
 
 const router = Router();
 
@@ -22,7 +22,7 @@ router.patch('/', requireLoggedIn, (req, res) => {
 			const dataSharing = req.body.dataSharing;
 			if (typeof dataSharing !== 'undefined') {
 				if (typeof dataSharing !== 'boolean') {
-					return Promise.reject([new Error('Invalid data sharing value'), 400]);
+					return Promise.reject(new APIError('Invalid data sharing value', 400));
 				}
 
 				user!.dataSharing = dataSharing;
@@ -33,11 +33,7 @@ router.patch('/', requireLoggedIn, (req, res) => {
 			return user!.save();
 		})
 		.then(() => successResponse(res))
-		.catch(e => {
-			if (e instanceof Error) { e = [e]; }
-			const [err, code] = e;
-			errorResponse(res, err, code);
-		});
+		.catch(err => errorResponse(res, err));
 });
 
 router.get('/timeslots', requireLoggedIn, (req, res) => {

@@ -10,7 +10,16 @@ export function successResponse(res: Response, data: object = {}) {
 	});
 }
 
-export function errorResponse(res: Response, err: Error, statusCode = 500) {
+export class APIError extends Error {
+	constructor(message: string, readonly statusCode = 500) {
+		super(message);
+	}
+}
+
+export function errorResponse(res: Response, err: Error) {
+	let statusCode = 500;
+	if (err instanceof APIError) { statusCode = err.statusCode; }
+
 	res.status(statusCode).json({
 		error: err.message,
 		data: null
@@ -39,7 +48,7 @@ export const jwtMiddleware: RequestHandler = (req, res, next) => {
 
 	// Otherwise, make sure it's in the correct format
 	if (!header.startsWith('Bearer ')) {
-		errorResponse(res, new Error('Invalid authorization header'), 400);
+		errorResponse(res, new APIError('Invalid authorization header', 400));
 		next();
 		return;
 	}
@@ -48,13 +57,13 @@ export const jwtMiddleware: RequestHandler = (req, res, next) => {
 	promisify(verify)(header.substring(7), config.mymicdsJwtSecret).then((payload: { [key: string]: any }) => {
 		req.authorizedUser = payload.user;
 	}).catch(() => {
-		errorResponse(res, new Error('Invalid authorization token'), 401);
+		errorResponse(res, new APIError('Invalid authorization token', 401));
 	}).finally(next);
 };
 
 export const requireLoggedIn: RequestHandler = (req, res, next) => {
 	if (req.authorizedUser === null) {
-		errorResponse(res, new Error('Unauthorized'), 401);
+		errorResponse(res, new APIError('Unauthorized', 401));
 	}
 
 	next();
