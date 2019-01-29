@@ -47,11 +47,9 @@ export const jwtMiddleware: RequestHandler = (req, res, next) => {
 	// Finally, do all the important verification stuff
 	promisify(verify)(header.substring(7), config.mymicdsJwtSecret).then((payload: { [key: string]: any }) => {
 		req.authorizedUser = payload.user;
-		next();
 	}).catch(() => {
 		errorResponse(res, new Error('Invalid authorization token'), 401);
-		next();
-	});
+	}).finally(next);
 };
 
 export const requireLoggedIn: RequestHandler = (req, res, next) => {

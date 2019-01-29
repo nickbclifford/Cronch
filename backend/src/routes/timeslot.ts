@@ -31,22 +31,24 @@ router.post('/end', requireLoggedIn, (req, res) => {
 	Timeslot.findById(id)
 		.then(timeslot => {
 			if (timeslot === null) {
-				errorResponse(res, new Error('Timeslot not found'), 404);
-				return;
+				return Promise.reject([new Error('Timeslot not found'), 404]);
 			}
 			if (timeslot.user !== req.authorizedUser!) {
-				errorResponse(res, new Error('Unauthorized'), 401);
-				return;
+				return Promise.reject([new Error('Unauthorized'), 401]);
 			}
 			if (timeslot.end !== null) {
-				errorResponse(res, new Error('Timeslot already ended'), 409);
-				return;
+				return Promise.reject([new Error('Timeslot already ended'), 409]);
 			}
 
 			timeslot.end = end;
-			return timeslot.save().then(() => successResponse(res));
+			return timeslot.save();
 		})
-		.catch(err => errorResponse(res, err));
+		.then(() => successResponse(res))
+		.catch(e => {
+			if (e instanceof Error) { e = [e]; }
+			const [err, code] = e;
+			errorResponse(res, err, code);
+		});
 });
 
 router.get('/:id', requireLoggedIn, (req, res) => {
