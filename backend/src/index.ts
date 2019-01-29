@@ -10,12 +10,18 @@ const sequelize = new Sequelize({
 });
 
 import timeslotRouter from './routes/timeslot';
+import userRouter from './routes/user';
+
+import { jwtMiddleware } from './utils';
 
 sequelize.sync({ force: config.forceModelSync }).then(() => {
 	// Initialize Express
 	const app = express();
 
+	app.use(jwtMiddleware);
+
 	app.use('/timeslot', timeslotRouter);
+	app.use('/user', userRouter);
 
 	app.listen(config.port, () => {
 		console.log(`Server listening on *:${config.port}`);
