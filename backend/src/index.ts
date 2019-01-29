@@ -9,9 +9,13 @@ const sequelize = new Sequelize({
 	modelPaths: [__dirname + '/models']
 });
 
+import timeslotRouter from './routes/timeslot';
+
 sequelize.sync({ force: config.forceModelSync }).then(() => {
 	// Initialize Express
 	const app = express();
+
+	app.use('/timeslot', timeslotRouter);
 
 	app.listen(config.port, () => {
 		console.log(`Server listening on *:${config.port}`);

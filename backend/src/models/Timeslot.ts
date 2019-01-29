@@ -1,4 +1,5 @@
-import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import User from './User';
 
 @Table
 export default class Timeslot extends Model<Timeslot> {
@@ -7,12 +8,19 @@ export default class Timeslot extends Model<Timeslot> {
 	@Column
 	id!: number;
 
-	@Column(DataType.DATE)
+	@Column
 	start!: Date;
 
-	@Column(DataType.DATE)
-	end!: Date; // TODO: Should this be nullable?
+	@Column
+	end!: Date | null;
 
 	@Column
 	canvasId!: string; // Object ID from MyMICDS
+
+	@ForeignKey(() => User)
+	@Column
+	user!: string;
+
+	@BelongsTo(() => User)
+	userObject!: User;
 }

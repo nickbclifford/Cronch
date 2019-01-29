@@ -7,5 +7,6 @@ export default {
 		username: '',
 		password: ''
 	},
-	port: 4500
+	port: 4500,
+	mymicdsJwtSecret: ''
 };
