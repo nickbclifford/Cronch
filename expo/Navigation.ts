@@ -13,7 +13,9 @@ import Welcome from './Welcome';
 import About from './About';
 import BattlePlan from './BattlePlan';
 import Profile from './Profile';
+import TimerSelection from './TimerSelection';
 import Timer from './Timer';
+
 
 // tslint:disable:variable-name
 
@@ -27,9 +29,20 @@ const AuthNavigator = createStackNavigator(
 	}
 );
 
+// Use custom trasition in the future
+const TimerNavigator = createStackNavigator(
+	{
+		TimerSelection,
+		Timer
+	},
+	{
+		initialRouteName: 'TimerSelection'
+	}
+);
+
 const AppNavigator = createDrawerNavigator(
 	{
-		Timer,
+		Timer: TimerNavigator,
 		BattlePlan,
 		Profile,
 		About
