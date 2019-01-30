@@ -14,6 +14,7 @@ import About from './About';
 import BattlePlan from './BattlePlan';
 import Profile from './Profile';
 import TimerSelection from './TimerSelection';
+import createQuestionnaire from './QuestionnaireFactory';
 import Timer from './Timer';
 
 
@@ -38,6 +39,25 @@ const TimerNavigator = createStackNavigator(
 	{
 		initialRouteName: 'TimerSelection'
 	}
+)
+
+// tslint:disable-next-line:variable-name
+const Questionnaire = createQuestionnaire(
+	'About',
+	[
+		{
+			question: 'question 1',
+			responses: ['response a', 'response b', 'response c', 'response d', 'response e']
+		},
+		{
+			question: 'buh?',
+			responses: ['buh.', '¿buh?', 'buh!', '...buh']
+		},
+		{
+			question: 'foo',
+			responses: ['bar', 'baz', 'quux']
+		}
+	]
 );
 
 const AppNavigator = createDrawerNavigator(
@@ -45,7 +65,8 @@ const AppNavigator = createDrawerNavigator(
 		Timer: TimerNavigator,
 		BattlePlan,
 		Profile,
-		About
+		About,
+		Questionnaire
 	},
 	{
 		initialRouteName: 'Timer'
