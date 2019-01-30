@@ -1,4 +1,4 @@
-import { AutoIncrement, BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import User from './User';
 
 @Table
@@ -11,7 +11,7 @@ export default class Timeslot extends Model<Timeslot> {
 	@Column
 	start!: Date;
 
-	@Column
+	@Column(DataType.DATE)
 	end!: Date | null;
 
 	@Column
