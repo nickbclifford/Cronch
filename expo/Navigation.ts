@@ -13,7 +13,7 @@ import Welcome from './Welcome';
 import About from './About';
 import BattlePlan from './BattlePlan';
 import Profile from './Profile';
-import createQuestionnaire from './questionnaire';
+import createQuestionnaire from './QuestionnaireFactory';
 import Timer from './Timer';
 
 // tslint:disable:variable-name
