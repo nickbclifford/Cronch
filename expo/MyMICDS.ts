@@ -4,7 +4,7 @@ import { AsyncStorage } from 'react-native';
 export const jwtKey = '@MyMICDS:jwt';
 
 const mymicdsConfig: MyMICDSOptions = {
-	baseURL: 'https://api.mymicds.net/v3',
+	baseURL: 'http://192.168.7.37:1420',
 	async jwtGetter() {
 		return AsyncStorage.getItem(jwtKey);
 	},

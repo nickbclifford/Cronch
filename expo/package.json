@@ -19,6 +19,7 @@
     "expo": "^31.0.2",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
+    "react-native-elements": "^1.0.0",
     "react-navigation": "^3.0.9",
     "rxjs": "^6.3.3"
   },
