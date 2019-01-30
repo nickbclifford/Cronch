@@ -46,11 +46,13 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	private getTodoAssignments() {
 		MyMICDS.canvas.getEvents().subscribe(assignments => {
-			this.setState({
-				assignments: assignments.events
-					.filter(a => a.end.valueOf() > Date.now())
-					.sort((a, b) => a.end.unix() - b.end.unix())
-			});
+			if (assignments.events) {
+				this.setState({
+					assignments: assignments.events
+						.filter(a => a.end.valueOf() > Date.now())
+						.sort((a, b) => a.end.unix() - b.end.unix())
+				});
+			}
 		});
 	}
 
