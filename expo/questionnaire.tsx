@@ -50,6 +50,7 @@ export default function createQuestionnaire(submitRoute: string, questions: Ques
 							onSelectResponse={this.onSelectResponse}
 						/>
 						<Button
+							color='#96db36'
 							title={lastQuestion ? 'Submit' : 'Next Question'}
 							onPress={lastQuestion ? this.onSubmit : this.onNextQuestion}
 							disabled={this.state.responseIndex === null}
@@ -72,8 +73,5 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center'
-	},
-	button: {
-		color: 'green'
 	}
 });
