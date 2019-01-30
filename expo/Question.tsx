@@ -3,29 +3,25 @@ import * as React from 'react';
 import { Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 
-export interface QuestionProps {
+export interface QuestionInfo {
 	question: string;
 	responses: string[];
+}
+
+export interface QuestionProps extends QuestionInfo {
+	selectedIndex: number | null;
 	onSelectResponse(index: number): void;
 }
 
-export interface QuestionState {
-	selectedIndex: number | null;
-}
-
-export default class Question extends React.Component<QuestionProps, QuestionState> {
+export default class Question extends React.Component<QuestionProps> {
 
 	constructor(props: QuestionProps) {
 		super(props);
-		this.state = {
-			selectedIndex: null
-		};
 	}
 
 	@bind
 	private onRadioPress(index: number) {
 		return () => {
-			this.setState({ selectedIndex: index });
 			this.props.onSelectResponse(index);
 		};
 	}
@@ -35,7 +31,7 @@ export default class Question extends React.Component<QuestionProps, QuestionSta
 			<CheckBox
 				center={true}
 				title={res}
-				checked={this.state.selectedIndex === i}
+				checked={this.props.selectedIndex === i}
 				checkedIcon='dot-circle-o'
 				uncheckedIcon='circle-o'
 				onPress={this.onRadioPress(i)}

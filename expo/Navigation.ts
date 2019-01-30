@@ -13,6 +13,7 @@ import Welcome from './Welcome';
 import About from './About';
 import BattlePlan from './BattlePlan';
 import Profile from './Profile';
+import createQuestionnaire from './questionnaire';
 import Timer from './Timer';
 
 // tslint:disable:variable-name
@@ -27,12 +28,32 @@ const AuthNavigator = createStackNavigator(
 	}
 );
 
+// tslint:disable-next-line:variable-name
+const Questionnaire = createQuestionnaire(
+	'About',
+	[
+		{
+			question: 'question 1',
+			responses: ['response a', 'response b', 'response c', 'response d', 'response e']
+		},
+		{
+			question: 'buh?',
+			responses: ['buh.', '¿buh?', 'buh!', '...buh']
+		},
+		{
+			question: 'foo',
+			responses: ['bar', 'baz', 'quux']
+		}
+	]
+);
+
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer,
 		BattlePlan,
 		Profile,
-		About
+		About,
+		Questionnaire
 	},
 	{
 		initialRouteName: 'Timer'
