@@ -2,18 +2,23 @@ import { StyleSheet } from 'react-native';
 
 export const typography = StyleSheet.create({
 	h1: {
+		fontFamily: 'Nunito-Regular',
 		fontSize: 30
 	},
 	h2: {
+		fontFamily: 'Nunito-Regular',
 		fontSize: 24
 	},
 	h3: {
+		fontFamily: 'Nunito-Regular',
 		fontSize: 16
 	},
 	body: {
+		fontFamily: 'Nunito-Regular',
 		fontSize: 16
 	},
 	small: {
+		fontFamily: 'Nunito-Regular',
 		fontSize: 12
 	}
 });
