@@ -5,16 +5,16 @@ import {
 	createSwitchNavigator
 } from 'react-navigation';
 
-import Loading from './pages/Loading';
-
-import Login from './pages/Login';
-import Welcome from './pages/Welcome';
-
 import createQuestionnaire from './components/QuestionnaireFactory';
+
 import About from './pages/About';
+import AssignmentDetails from './pages/AssignmentDetails';
 import BattlePlan from './pages/BattlePlan';
+import Loading from './pages/Loading';
+import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Timer from './pages/Timer';
+import Welcome from './pages/Welcome';
 
 // tslint:disable:variable-name
 
@@ -28,11 +28,22 @@ const AuthNavigator = createStackNavigator(
 	}
 );
 
+const BattlePlanNavigator = createStackNavigator(
+	{
+		BattlePlan,
+		AssignmentDetails
+	},
+	{
+		mode: 'modal',
+		headerMode: 'none'
+	}
+);
+
 // Use custom trasition in the future
 const TimerNavigator = createStackNavigator(
 	{
 		Timer,
-		BattlePlan
+		BattlePlan: BattlePlanNavigator
 	},
 	{
 		initialRouteName: 'Timer'

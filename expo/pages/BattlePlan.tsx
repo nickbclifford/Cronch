@@ -140,7 +140,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 		});
 
 		return (
-			<TouchableOpacity activeOpacity={0.8}>
+			<TouchableOpacity activeOpacity={0.8} onPress={this.navigateToAssignmentDetails}>
 				<View style={itemStyles.container}>
 					<View style={itemStyles.assignmentContainer}>
 						<Text
@@ -169,6 +169,11 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 		// 	/>
 		// 	<Text>Swipe{'\n'}to Add</Text>
 		// </View>
+	}
+
+	@bind
+	private navigateToAssignmentDetails() {
+		this.props.navigation.navigate('AssignmentDetails');
 	}
 
 	render() {
