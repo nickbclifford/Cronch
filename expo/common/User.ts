@@ -6,26 +6,26 @@ export interface User {
 	dataSharing: boolean;
 }
 
-export function register() {
+export function registerUser() {
 	return fetchWithJwt('/user', {
 		method: 'POST'
 	});
 }
 
-export function getInfo() {
+export function getUserInfo() {
 	return fetchWithJwt<User>('/user', {
 		method: 'GET'
 	});
 }
 
-export function changeInfo(info: Omit<Partial<User>, 'username'>) {
+export function changeUserInfo(info: Omit<Partial<User>, 'username'>) {
 	return fetchWithJwt('/user', {
 		method: 'PATCH',
 		body: JSON.stringify(info)
 	});
 }
 
-export function getTimeslots() {
+export function getUserTimeslots() {
 	return fetchWithJwt<Timeslot[]>('/user/timeslots', {
 		method: 'GET'
 	}).then(ts => ts.map(convertJSONDates));
