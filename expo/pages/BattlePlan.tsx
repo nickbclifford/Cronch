@@ -12,6 +12,7 @@ import {
 	View
 } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 
@@ -26,6 +27,9 @@ interface GroupedAssignments {
 }
 
 export default class BattlePlan extends React.Component<NavigationScreenProps, BattlePlanState> {
+
+	static contextType = AssignmentContext;
+	context!: AssignmentContextType;
 
 	static navigationOptions = {
 		// header: null
@@ -55,7 +59,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 				.sort((a, b) => a.end.unix() - b.end.unix());
 
 			// Group assignments by the date they are due
-			const groupedByDue: GroupedAssignments = assignments.reduce((accumulator: GroupedAssignments, currentValue) => {
+			const groupedByDue = assignments.reduce<GroupedAssignments>((accumulator, currentValue) => {
 				const due = currentValue.end.startOf('day').valueOf();
 				if (!accumulator[due]) {
 					accumulator[due] = [];

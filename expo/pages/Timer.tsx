@@ -4,12 +4,16 @@ import { StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
+import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import Hamburger from '../components/Hamburger';
 
 export interface TimerState {
 }
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
+
+	static contextType = AssignmentContext;
+	context!: AssignmentContextType;
 
 	static navigationOptions = {
 		header: null
