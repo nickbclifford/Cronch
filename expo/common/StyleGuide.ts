@@ -58,30 +58,30 @@ export const DANGER: ColorPalette = {
 	900: '#'
 };
 
+export const DEFAULT_TYPOGRAPHY_STYLES = {
+	color: NEUTRAL[900],
+	fontFamily: 'Nunito-Regular'
+};
+
 export const typography = StyleSheet.create({
 	h1: {
-		color: NEUTRAL[900],
-		fontFamily: 'Nunito-Regular',
+		...DEFAULT_TYPOGRAPHY_STYLES,
 		fontSize: 30
 	},
 	h2: {
-		color: NEUTRAL[900],
-		fontFamily: 'Nunito-Regular',
+		...DEFAULT_TYPOGRAPHY_STYLES,
 		fontSize: 24
 	},
 	h3: {
-		color: NEUTRAL[900],
-		fontFamily: 'Nunito-Regular',
+		...DEFAULT_TYPOGRAPHY_STYLES,
 		fontSize: 16
 	},
 	body: {
-		color: NEUTRAL[900],
-		fontFamily: 'Nunito-Regular',
+		...DEFAULT_TYPOGRAPHY_STYLES,
 		fontSize: 16
 	},
 	small: {
-		color: NEUTRAL[900],
-		fontFamily: 'Nunito-Regular',
+		...DEFAULT_TYPOGRAPHY_STYLES,
 		fontSize: 12
 	}
 });
