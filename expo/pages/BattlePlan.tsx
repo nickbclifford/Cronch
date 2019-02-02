@@ -1,7 +1,16 @@
 import bind from 'bind-decorator';
 import moment from 'moment';
 import * as React from 'react';
-import { Button, SectionList, SectionListData, SectionListRenderItemInfo, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+	Button,
+	SectionList,
+	SectionListData,
+	SectionListRenderItemInfo,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View
+} from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
@@ -21,7 +30,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 	static navigationOptions = {
 		// header: null
 		title: 'Battle Plan',
-		headerRight: <Button title='Attack' onPress={() => console.log('buh')} />
+		headerRight: <Button title='Attack' onPress={BattlePlan.attack} />
 	};
 
 	@bind
@@ -72,8 +81,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 	}
 
 	@bind
-	private renderAssignmentTitle({ section }: SectionListData<string>) {
-
+	private renderAssignmentTitle({ section }: { section: SectionListData<string> }) {
 		const itemStyles = StyleSheet.create({
 			container: {
 				// backgroundColor: PRIMARY[500]
@@ -81,7 +89,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 		});
 
 		const due = moment(section.title);
-		const humanDate = due.calendar(null, {
+		const humanDate = due.calendar(undefined, {
 			sameDay: '[Today]',
 			nextDay: '[Tomorrow]',
 			nextWeek: 'dddd',
