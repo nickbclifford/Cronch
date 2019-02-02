@@ -20,12 +20,18 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		this.state = {};
 	}
 
+	@bind
+	private navigateToBattlePlan() {
+		this.props.navigation.navigate('BattlePlan');
+	}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<Button
 					title='Create Battle Plan'
+					onPress={this.navigateToBattlePlan}
 				/>
 				<Button
 					title='Start'
