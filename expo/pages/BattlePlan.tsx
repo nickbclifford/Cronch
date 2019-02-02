@@ -12,6 +12,7 @@ import {
 	View
 } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { Icon } from 'react-native-elements';
 import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
@@ -33,8 +34,8 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 
 	static navigationOptions = {
 		// header: null
-		title: 'Battle Plan',
-		headerRight: <Button title='Attack' onPress={BattlePlan.attack} />
+		title: 'Battle Plan'
+		// headerRight: <Button title='Attack' onPress={BattlePlan.attack} />
 	};
 
 	@bind
@@ -68,8 +69,6 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 				return accumulator;
 			}, {});
 
-			console.log('grouped by date', groupedByDue);
-
 			const sections = Object.keys(groupedByDue).map(i => parseInt(i, 10)).map(due => {
 				return { title: due, data: groupedByDue[due] };
 			});
@@ -88,6 +87,10 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 	private renderAssignmentTitle({ section }: { section: SectionListData<string> }) {
 		const itemStyles = StyleSheet.create({
 			container: {
+				marginTop: 48,
+				marginLeft: 16,
+				marginRight: 16,
+				marginBottom: 16
 				// backgroundColor: PRIMARY[500]
 			}
 		});
@@ -114,35 +117,58 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 
 		const itemStyles = StyleSheet.create({
 			container: {
+				display: 'flex',
+				flexDirection: 'row',
+				marginLeft: 16,
+				marginRight: 16,
+				marginBottom: 16,
+				padding: 16,
+				borderRadius: 5,
 				backgroundColor: assignment.class.color
+			},
+			assignmentContainer: {
+				width: '100%'
 			},
 			title: {},
 			class: {
 				color: NEUTRAL[700]
 			},
-			button: {}
+			addContainer: {
+				display: 'flex',
+				flexDirection: 'column'
+			}
 		});
 
 		return (
 			<TouchableOpacity activeOpacity={0.8}>
 				<View style={itemStyles.container}>
-					<Text
-						style={[typography.h3, itemStyles.class]}
-						numberOfLines={1}
-						ellipsizeMode='tail'
-					>
-						{assignment.class.name}
-					</Text>
-					<Text
-						style={typography.h2}
-						numberOfLines={1}
-						ellipsizeMode='tail'
-					>
-						{assignment.title}
-					</Text>
+					<View style={itemStyles.assignmentContainer}>
+						<Text
+							style={[typography.h3, itemStyles.class]}
+							numberOfLines={1}
+							ellipsizeMode='tail'
+						>
+							{assignment.class.name}
+						</Text>
+						<Text
+							style={typography.h2}
+							numberOfLines={1}
+							ellipsizeMode='tail'
+						>
+							{assignment.title}
+						</Text>
+					</View>
 				</View>
 			</TouchableOpacity>
 		);
+		// <View style={itemStyles.addContainer}>
+		// 	<Icon
+		// 		name='plus'
+		// 		type='font-awesome'
+		// 		size={16}
+		// 	/>
+		// 	<Text>Swipe{'\n'}to Add</Text>
+		// </View>
 	}
 
 	render() {
@@ -168,6 +194,7 @@ const styles = StyleSheet.create({
 		height: '100%'
 	},
 	container: {
+		paddingBottom: 64
 		// height: '100%'
 		// flex: 1,
 		// justifyContent: 'center',

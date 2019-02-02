@@ -1,6 +1,7 @@
-import { FontAwesome } from '@expo/vector-icons';
+// import { FontAwesome } from '@expo/vector-icons';
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { SafeAreaView } from 'react-navigation';
 
 export interface HamburgerProps {
@@ -17,10 +18,11 @@ export default class Hamburger extends React.Component<HamburgerProps> {
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<View>
-					<FontAwesome
+					<Icon
 						name='bars'
+						type='font-awesome'
 						size={32}
-						style={styles.menu}
+						containerStyle={styles.menu}
 						onPress={this.props.toggle}
 					/>
 				</View>

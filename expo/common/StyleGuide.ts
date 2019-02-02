@@ -2,13 +2,13 @@ import { StyleSheet } from 'react-native';
 
 export const typography = StyleSheet.create({
 	h1: {
-		fontSize: 36
-	},
-	h2: {
 		fontSize: 30
 	},
-	h3: {
+	h2: {
 		fontSize: 24
+	},
+	h3: {
+		fontSize: 16
 	},
 	body: {
 		fontSize: 16
