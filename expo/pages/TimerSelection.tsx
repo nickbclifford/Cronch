@@ -5,14 +5,14 @@ import {
 	ListRenderItemInfo,
 	StyleSheet,
 	Text,
-	TouchableOpacity,
 	TextStyle,
+	TouchableOpacity,
 	View
 } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import MyMICDS, { CanvasEvent } from './MyMICDS';
+import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 
-import Hamburger from './Hamburger';
+import Hamburger from '../components/Hamburger';
 
 export interface TimerSelectionState {
 	assignments: CanvasEvent[];
@@ -21,7 +21,7 @@ export interface TimerSelectionState {
 export default class TimerSelection extends React.Component<NavigationScreenProps, TimerSelectionState> {
 
 	static navigationOptions = {
-		title: 'Home',
+		// title: 'Home',
 		// headerStyle: {
 		// 	backgroundColor: '#f4511e',
 		// },
@@ -29,8 +29,8 @@ export default class TimerSelection extends React.Component<NavigationScreenProp
 		// headerTitleStyle: {
 		// 	fontWeight: 'bold',
 		// }
-		// header: null
-		drawerLabel: 'Timer'
+		header: null
+		// drawerLabel: 'Timer'
 		// drawerIcon: () => (
 		// 	<FontAwesome name="bars" style={styles.menu} />
 		// )
@@ -72,9 +72,11 @@ export default class TimerSelection extends React.Component<NavigationScreenProp
 		};
 
 		// TODO: Change to be clickable, start timer, etc. (maybe navigates to different component?)
-		return <TouchableOpacity style={itemStyle} onPress={this.startTimer}>
-			<Text>({item.class.name}) {item.title}</Text>
-		</TouchableOpacity>;
+		return (
+			<TouchableOpacity style={itemStyle} onPress={this.startTimer}>
+				<Text>({item.class.name}) {item.title}</Text>
+			</TouchableOpacity>
+		);
 	}
 
 	@bind

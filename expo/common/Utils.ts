@@ -1,4 +1,4 @@
-import Config from './Config';
+import Config from '../Config';
 import MyMICDS from './MyMICDS';
 
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;

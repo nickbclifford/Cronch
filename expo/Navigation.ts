@@ -5,18 +5,16 @@ import {
 	createSwitchNavigator
 } from 'react-navigation';
 
-import Loading from './Loading';
+import Loading from './pages/Loading';
 
-import Login from './Login';
-import Welcome from './Welcome';
+import Login from './pages/Login';
+import Welcome from './pages/Welcome';
 
-import About from './About';
-import BattlePlan from './BattlePlan';
-import Profile from './Profile';
-import TimerSelection from './TimerSelection';
-import createQuestionnaire from './QuestionnaireFactory';
-import Timer from './Timer';
-
+import createQuestionnaire from './components/QuestionnaireFactory';
+import About from './pages/About';
+import BattlePlan from './pages/BattlePlan';
+import Profile from './pages/Profile';
+import Timer from './pages/Timer';
 
 // tslint:disable:variable-name
 
@@ -33,15 +31,14 @@ const AuthNavigator = createStackNavigator(
 // Use custom trasition in the future
 const TimerNavigator = createStackNavigator(
 	{
-		TimerSelection,
-		Timer
+		Timer,
+		BattlePlan
 	},
 	{
-		initialRouteName: 'TimerSelection'
+		initialRouteName: 'Timer'
 	}
-)
+);
 
-// tslint:disable-next-line:variable-name
 const Questionnaire = createQuestionnaire(
 	'About',
 	[
@@ -63,7 +60,6 @@ const Questionnaire = createQuestionnaire(
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer: TimerNavigator,
-		BattlePlan,
 		Profile,
 		About,
 		Questionnaire
@@ -72,10 +68,6 @@ const AppNavigator = createDrawerNavigator(
 		initialRouteName: 'Timer'
 	}
 );
-
-// const DrawerNavigator = createDrawerNavigator({
-//
-// });
 
 const AppContainer = createAppContainer(createSwitchNavigator(
 	{

@@ -1,26 +1,38 @@
+import bind from 'bind-decorator';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import Hamburger from './Hamburger';
+import Hamburger from '../components/Hamburger';
 
-export default class Template extends React.Component<NavigationScreenProps> {
+export interface TimerState {
+}
+
+export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
 
 	static navigationOptions = {
 		header: null
 	};
 
+	constructor(props: any) {
+		super(props);
+		this.state = {};
+	}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
-				<View style={styles.container}>
-					<Text>Component Works!</Text>
-				</View>
+				<Button
+					title='Create Battle Plan'
+				/>
+				<Button
+					title='Start'
+				/>
 			</SafeAreaView>
 		);
 	}
-
 }
 
 const styles = StyleSheet.create({

@@ -2,7 +2,7 @@ import bind from 'bind-decorator';
 import * as React from 'react';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
-import MyMICDS from './MyMICDS';
+import MyMICDS from '../common/MyMICDS';
 
 export interface LoginState {
 	user: string;

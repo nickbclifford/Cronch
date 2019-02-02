@@ -2,9 +2,9 @@ import bind from 'bind-decorator';
 import * as React from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import MyMICDS from './MyMICDS';
+import MyMICDS from '../common/MyMICDS';
 
-import Hamburger from './Hamburger';
+import Hamburger from '../components/Hamburger';
 
 export default class Profile extends React.Component<NavigationScreenProps> {
 

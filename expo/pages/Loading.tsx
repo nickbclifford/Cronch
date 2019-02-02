@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
-import MyMICDS from './MyMICDS';
+import MyMICDS from '../common/MyMICDS';
 
 export default class Loading extends React.Component<NavigationScreenProps> {
 
@@ -18,14 +18,12 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 	 */
 
 	private listenToAuth() {
-		const subscription = MyMICDS.auth.$.subscribe(
-			jwt => {
-				if (jwt !== undefined) {
-					this.props.navigation.navigate(jwt ? 'App' : 'Auth');
-					subscription.unsubscribe();
-				}
+		const subscription = MyMICDS.auth.$.subscribe(jwt => {
+			if (jwt !== undefined) {
+				this.props.navigation.navigate(jwt ? 'App' : 'Auth');
+				subscription.unsubscribe();
 			}
-		);
+		});
 	}
 
 	render() {

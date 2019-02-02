@@ -2,9 +2,9 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import Hamburger from './Hamburger';
+import Hamburger from '../components/Hamburger';
 
-export default class BattlePlan extends React.Component<NavigationScreenProps> {
+export default class About extends React.Component<NavigationScreenProps> {
 
 	static navigationOptions = {
 		header: null
@@ -15,7 +15,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps> {
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.container}>
-					<Text>Battle Plan!</Text>
+					<Text>This was created by cool people. Want to give feedback? Email support@mymicds.gov</Text>
 				</View>
 			</SafeAreaView>
 		);
