@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import Config from '../Config';
 import MyMICDS from './MyMICDS';
 
@@ -26,4 +28,15 @@ export async function fetchWithJwt<T>(route: string, options: RequestInit) {
 	} else {
 		return res.data!;
 	}
+}
+
+export function humanReadableTimeUntil(date: moment.Moment) {
+	return date.calendar(undefined, {
+		sameDay: '[Today]',
+		nextDay: '[Tomorrow]',
+		nextWeek: 'dddd',
+		lastDay: '[Yesterday]',
+		lastWeek: '[Last] dddd',
+		sameElse: 'MM/DD'
+	});
 }
