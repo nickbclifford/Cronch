@@ -16,6 +16,12 @@ router.post('/', requireLoggedIn, (req, res) => {
 		.catch(err => errorResponse(res, err));
 });
 
+router.get('/', requireLoggedIn, (req, res) => {
+	User.findByPk(req.authorizedUser!)
+		.then(user => successResponse(res, user!.toJSON()))
+		.catch(err => errorResponse(res, err));
+});
+
 router.patch('/', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!)
 		.then(user => {
