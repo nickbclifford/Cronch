@@ -12,6 +12,7 @@
 		"moduleResolution": "node",
 		"strict": true,
 		"experimentalDecorators": true,
-		"allowSyntheticDefaultImports": true
+		"allowSyntheticDefaultImports": true,
+		"typeRoots": ["node_modules/@types", "./custom-types"]
 	}
 }

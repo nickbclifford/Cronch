@@ -2,7 +2,6 @@ import bind from 'bind-decorator';
 import moment from 'moment';
 import * as React from 'react';
 import {
-	Button,
 	SectionList,
 	SectionListData,
 	SectionListRenderItemInfo,
@@ -11,9 +10,12 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
-import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
-import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
+import { NEUTRAL, typography } from '../common/StyleGuide';
+import { humanReadableTimeUntil } from '../common/Utils';
+
+import Hamburger from '../components/Hamburger';
 
 interface BattlePlanState {
 	sectionedAssignments: SectionedAssignments;
@@ -28,8 +30,8 @@ interface GroupedAssignments {
 export default class BattlePlan extends React.Component<NavigationScreenProps, BattlePlanState> {
 
 	static navigationOptions = {
-		// header: null
-		title: 'Battle Plan'
+		header: null
+		// title: 'Battle Plan'
 		// headerRight: <Button title='Attack' onPress={BattlePlan.attack} />
 	};
 
@@ -56,7 +58,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 
 			// Group assignments by the date they are due
 			const groupedByDue = assignments.reduce<GroupedAssignments>((accumulator, currentValue) => {
-				const due = currentValue.end.startOf('day').valueOf();
+				const due = currentValue.end.clone().startOf('day').valueOf();
 				if (!accumulator[due]) {
 					accumulator[due] = [];
 				}
@@ -86,19 +88,11 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 				marginLeft: 16,
 				marginRight: 16,
 				marginBottom: 16
-				// backgroundColor: PRIMARY[500]
 			}
 		});
 
 		const due = moment(section.title);
-		const humanDate = due.calendar(undefined, {
-			sameDay: '[Today]',
-			nextDay: '[Tomorrow]',
-			nextWeek: 'dddd',
-			lastDay: '[Yesterday]',
-			lastWeek: '[Last] dddd',
-			sameElse: 'MM/DD'
-		});
+		const humanDate = humanReadableTimeUntil(due);
 
 		return (
 			<View style={itemStyles.container}>
@@ -175,17 +169,16 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 
 	render() {
 		return (
-			// <SafeAreaView style={styles.safeArea}>
-				<View style={styles.container}>
-					<SectionList
-						renderItem={this.renderAssignment}
-						renderSectionHeader={this.renderAssignmentTitle}
-						sections={this.state.sectionedAssignments}
-						stickySectionHeadersEnabled={false}
-						keyExtractor={this.getCacheKey}
-					/>
-				</View>
-			// </SafeAreaView>
+			<View style={styles.container}>
+				<Hamburger toggle={this.props.navigation.toggleDrawer} />
+				<SectionList
+					renderItem={this.renderAssignment}
+					renderSectionHeader={this.renderAssignmentTitle}
+					sections={this.state.sectionedAssignments}
+					stickySectionHeadersEnabled={false}
+					keyExtractor={this.getCacheKey}
+				/>
+			</View>
 		);
 	}
 
@@ -197,9 +190,5 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		paddingBottom: 64
-		// height: '100%'
-		// flex: 1,
-		// justifyContent: 'center',
-		// alignItems: 'center'
 	}
 });

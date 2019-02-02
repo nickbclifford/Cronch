@@ -1,37 +1,74 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button } from 'react-native-elements';
+import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+
+import { NEUTRAL, typography } from '../common/StyleGuide';
+import { humanReadableTimeUntil } from '../common/Utils';
 
 interface NavigationParameters {
 	assignment: CanvasEvent;
 }
 
-export default class AssignmentDetails extends React.Component<NavigationScreenProps<NavigationParameters>> {
+interface AssignmentDetailsState {
+	assignment: CanvasEvent;
+}
 
-	static navigationOptions = {
-		header: null
-	};
+export default class AssignmentDetails extends React.Component<
+	NavigationScreenProps<NavigationParameters>,
+	AssignmentDetailsState
+> {
+
+	static navigationOptions = ({ navigation }: NavigationScreenProps<NavigationParameters>) => {
+		const assignment = navigation.getParam('assignment');
+		return {
+			title: 'Assignment Details',
+			headerStyle: {
+				backgroundColor: assignment.class.color
+			},
+			headerTintColor: assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]
+		};
+	}
+
+	constructor(props: any) {
+		super(props);
+		this.state = { assignment: this.props.navigation.getParam('assignment') };
+	}
 
 	render() {
+		const humanDate = humanReadableTimeUntil(this.state.assignment.end);
+		const time = this.state.assignment.end.format('h:mm A');
+		// const time = this.state.assignment.
+		console.log(this.state.assignment.class.color);
+
 		return (
-			<SafeAreaView style={styles.safeArea}>
-				<View style={styles.container}>
-					<Text>{this.props.navigation.getParam('assignment').title}</Text>
-				</View>
-			</SafeAreaView>
+			<View style={styles.container}>
+				<ScrollView style={styles.detailsContainer}>
+					<Text style={typography.h1}>{this.state.assignment.title}</Text>
+					<Text style={typography.h2}>Due {humanDate} at {time}</Text>
+					<HTML html={this.state.assignment.desc} imagesMaxWidth={Dimensions.get('window').width} />
+				</ScrollView>
+				{/*<Button title='Work!' style={styles.workButton} />*/}
+			</View>
 		);
 	}
 
 }
 
 const styles = StyleSheet.create({
-	safeArea: {
-		height: '100%'
+	safeArea:  {
+		position: 'absolute'
 	},
 	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
+		display: 'flex',
+		flexDirection: 'column'
+	},
+	workButton: {
+		zIndex: 100
+	},
+	detailsContainer: {
+		padding:  16
 	}
 });
