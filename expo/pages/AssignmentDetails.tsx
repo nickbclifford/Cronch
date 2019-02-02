@@ -44,6 +44,11 @@ export default class AssignmentDetails extends React.Component<
 		WebBrowser.openBrowserAsync(href);
 	}
 
+	@bind
+	private navigateToTimer() {
+		this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
+	}
+
 	render() {
 		const humanDate = humanReadableTimeUntil(this.state.assignment.end);
 		const time = this.state.assignment.end.format('h:mm A');
@@ -61,7 +66,7 @@ export default class AssignmentDetails extends React.Component<
 							onLinkPress={this.onLinkPress}
 						/>
 					</ScrollView>
-					<Button title='Work!' buttonStyle={styles.workButton} />
+					<Button title='Work!' onPress={this.navigateToTimer} buttonStyle={styles.workButton} />
 				</SafeAreaView>
 			</View>
 		);
