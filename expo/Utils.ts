@@ -19,11 +19,11 @@ export async function fetchWithJwt<T>(route: string, options: RequestInit) {
 	});
 
 	const body = await fetch(Config.backendUrl + route, injectedOptions);
-	const res = await body.json();
+	const res: APIResponse<T> = await body.json();
 
 	if (typeof res.error === 'string') {
 		throw new Error(res.error);
 	} else {
-		return res.data! as APIResponse<T>;
+		return res.data!;
 	}
 }
