@@ -1,11 +1,10 @@
+import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { CanvasEvent } from '@mymicds/sdk';
 
-import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import Hamburger from '../components/Hamburger';
 
 export interface TimerState {
@@ -15,12 +14,9 @@ let mockAssignment: {
 	canvasEvent: CanvasEvent,
 	timeLength: number,
 	done: boolean
-}
+};
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
-
-	static contextType = AssignmentContext;
-	context!: AssignmentContextType;
 
 	static navigationOptions = {
 		header: null
@@ -31,6 +27,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		this.state = {};
 
 		mockAssignment = {
+			// tslint:disable:max-line-length
 			canvasEvent: JSON.parse(`{
                 "_id": "event-assignment-5872379",
                 "canvas": true,
@@ -59,9 +56,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
                 "desc": "hehexd",
                 "descPlaintext": "Our goals today are to find the arc length of a space curve and to find the curvature of a curve at a point on the curve.\\nArc Length (s)=\\nCurvature is the measure of how sharply a curve bends.\\nFormal Definition     We don't want to use the formal definition. :)\\n\\n"
             }`),
+			// tslint:enable:max-line-length
 			timeLength: 45 * 60,
 			done: false
-		}
+		};
 	}
 
 	@bind
@@ -82,8 +80,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				<Button title='+ Cycle'/>
 				<Button title='- Cycle'/>
 				<Text>{mockAssignment.canvasEvent.title}</Text>
-
-				<Text></Text>
 			</SafeAreaView>
 		);
 	}
