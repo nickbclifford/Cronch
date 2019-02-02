@@ -10,13 +10,14 @@ import Hamburger from '../components/Hamburger';
 export interface TimerState {
 	workTimeLeft: number,
 	breakTimeLeft: number,
-	cyclesLeft: number,
-	onBreak: boolean
+	onBreak: boolean,
+	paused: boolean,
 }
 
 let mockAssignment: {
 	canvasEvent: CanvasEvent,
-	recommendedTime: number,
+	// recommendedTime: number,
+	timeSpent: number,
 	done: boolean
 };
 
@@ -31,7 +32,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		header: null
 	};
 
-	private interval: NodeJS.Timer;
+	private interval: NodeJS.Timer | null = null;
 
 	constructor(props: any) {
 		super(props);
@@ -66,7 +67,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
                 "desc": "hehexd",
                 "descPlaintext": "Our goals today are to find the arc length of a space curve and to find the curvature of a curve at a point on the curve.\\nArc Length (s)=\\nCurvature is the measure of how sharply a curve bends.\\nFormal Definition     We don't want to use the formal definition. :)\\n\\n"
             }`),
-			recommendedTime: 0.2 * 60 * 1000,
+			// recommendedTime: 0.2 * 60 * 1000,
+			timeSpent: 0,
 			done: false
 		};
 
@@ -78,20 +80,22 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		this.state = {
 			workTimeLeft: userPreferredCycles.work,
 			breakTimeLeft: userPreferredCycles.break,
-			cyclesLeft: Math.floor(mockAssignment.recommendedTime / userPreferredCycles.work),
-			onBreak: false
+			onBreak: false,
+			paused: true
 		};
+	}
 
+	componentDidMount() {
 		this.interval = setInterval(() => {
 			if (this.state.onBreak) {
 				this.setState({
 					breakTimeLeft: this.state.breakTimeLeft - 1000
 				});
+
 				if (this.state.breakTimeLeft <= 0) {
 					this.setState({
 						breakTimeLeft: userPreferredCycles.break,
-						onBreak: false,
-						cyclesLeft: this.state.cyclesLeft - 1
+						onBreak: false
 					});
 				}
 			} else {
@@ -101,18 +105,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				if (this.state.workTimeLeft <= 0) {
 					this.setState({
 						workTimeLeft: userPreferredCycles.work,
-						onBreak: true,
-						cyclesLeft: this.state.cyclesLeft - 1
+						onBreak: true
 					});
 				}
 			}
-
-			if (this.state.cyclesLeft <= 0) {
-				Alert.alert('Times up!');
-				clearInterval(this.interval);
-				this.navigateToBattlePlan();
-			}
 		}, 1000);
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.interval)
 	}
 
 	@bind
@@ -121,12 +122,12 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private changeCycle(n: number) {
-		return () => {
-			this.setState({
-				cyclesLeft: this.state.cyclesLeft + n
-			})
-		}
+	private addCustom() {
+	}
+
+	@bind
+	private pause() {
+
 	}
 
 	render() {
@@ -138,14 +139,12 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					onPress={this.navigateToBattlePlan}
 				/>
 				<Button title='Start'/>
-				<Button title='Pause'/>
-				<Button title='+ Cycle' onPress={this.changeCycle(1)}/>
-				<Button title='- Cycle' onPress={this.changeCycle(-1)}/>
+				<Button title='Pause' onPress={this.pause}/>
+				<Button title='Add Custom' onPress={this.addCustom}/>
 				<Text>{mockAssignment.canvasEvent.title}</Text>
 
-				<Text>Work Timer: {Math.floor(this.state.workTimeLeft / 60000)}</Text>
-				<Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}</Text>
-				<Text>Cycles Left: {this.state.cyclesLeft}</Text>
+				<Text>Work Timer: {Math.floor(this.state.workTimeLeft / 60000)}:{Math.floor(this.state.workTimeLeft % 60000)}</Text>
+				<Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text>
 			</SafeAreaView>
 		);
 	}
