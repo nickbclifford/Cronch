@@ -1,28 +1,5 @@
 import { StyleSheet } from 'react-native';
 
-export const typography = StyleSheet.create({
-	h1: {
-		fontFamily: 'Nunito-Regular',
-		fontSize: 30
-	},
-	h2: {
-		fontFamily: 'Nunito-Regular',
-		fontSize: 24
-	},
-	h3: {
-		fontFamily: 'Nunito-Regular',
-		fontSize: 16
-	},
-	body: {
-		fontFamily: 'Nunito-Regular',
-		fontSize: 16
-	},
-	small: {
-		fontFamily: 'Nunito-Regular',
-		fontSize: 12
-	}
-});
-
 export interface ColorPalette {
 	100: string;
 	300: string;
@@ -80,3 +57,31 @@ export const DANGER: ColorPalette = {
 	700: '#',
 	900: '#'
 };
+
+export const typography = StyleSheet.create({
+	h1: {
+		color: NEUTRAL[900],
+		fontFamily: 'Nunito-Regular',
+		fontSize: 30
+	},
+	h2: {
+		color: NEUTRAL[900],
+		fontFamily: 'Nunito-Regular',
+		fontSize: 24
+	},
+	h3: {
+		color: NEUTRAL[900],
+		fontFamily: 'Nunito-Regular',
+		fontSize: 16
+	},
+	body: {
+		color: NEUTRAL[900],
+		fontFamily: 'Nunito-Regular',
+		fontSize: 16
+	},
+	small: {
+		color: NEUTRAL[900],
+		fontFamily: 'Nunito-Regular',
+		fontSize: 12
+	}
+});

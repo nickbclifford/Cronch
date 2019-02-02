@@ -28,25 +28,15 @@ const AuthNavigator = createStackNavigator(
 	}
 );
 
-const BattlePlanNavigator = createStackNavigator(
-	{
-		BattlePlan,
-		AssignmentDetails
-	},
-	{
-		mode: 'modal',
-		headerMode: 'none'
-	}
-);
-
 // Use custom trasition in the future
 const TimerNavigator = createStackNavigator(
 	{
-		Timer,
-		BattlePlan: BattlePlanNavigator
+		BattlePlan,
+		AssignmentDetails,
+		Timer
 	},
 	{
-		initialRouteName: 'Timer'
+		initialRouteName: 'BattlePlan'
 	}
 );
 
