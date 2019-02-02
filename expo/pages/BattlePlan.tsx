@@ -12,8 +12,6 @@ import {
 	View
 } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { Icon } from 'react-native-elements';
-import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 
@@ -28,9 +26,6 @@ interface GroupedAssignments {
 }
 
 export default class BattlePlan extends React.Component<NavigationScreenProps, BattlePlanState> {
-
-	static contextType = AssignmentContext;
-	context!: AssignmentContextType;
 
 	static navigationOptions = {
 		// header: null
@@ -140,7 +135,7 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 		});
 
 		return (
-			<TouchableOpacity activeOpacity={0.8} onPress={this.navigateToAssignmentDetails}>
+			<TouchableOpacity activeOpacity={0.8} onPress={this.navigateToAssignmentDetails(assignment)}>
 				<View style={itemStyles.container}>
 					<View style={itemStyles.assignmentContainer}>
 						<Text
@@ -172,8 +167,10 @@ export default class BattlePlan extends React.Component<NavigationScreenProps, B
 	}
 
 	@bind
-	private navigateToAssignmentDetails() {
-		this.props.navigation.navigate('AssignmentDetails');
+	private navigateToAssignmentDetails(assignment: CanvasEvent) {
+		return () => {
+			this.props.navigation.navigate('AssignmentDetails', { assignment });
+		};
 	}
 
 	render() {

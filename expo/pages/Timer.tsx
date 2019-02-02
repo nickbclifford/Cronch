@@ -1,11 +1,10 @@
+import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { CanvasEvent } from '@mymicds/sdk';
 
-import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import Hamburger from '../components/Hamburger';
 
 export interface TimerState {
@@ -19,7 +18,7 @@ let mockAssignment: {
 	canvasEvent: CanvasEvent,
 	recommendedTime: number,
 	done: boolean
-}
+};
 
 let userPreferredCycles: {
 	work: number,
@@ -27,9 +26,6 @@ let userPreferredCycles: {
 }
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
-
-	static contextType = AssignmentContext;
-	context!: AssignmentContextType;
 
 	static navigationOptions = {
 		header: null
@@ -41,6 +37,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		super(props);
 
 		mockAssignment = {
+			// tslint:disable:max-line-length
 			canvasEvent: JSON.parse(`{
                 "_id": "event-assignment-5872379",
                 "canvas": true,
