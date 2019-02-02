@@ -40,8 +40,6 @@ export default class AssignmentDetails extends React.Component<
 	render() {
 		const humanDate = humanReadableTimeUntil(this.state.assignment.end);
 		const time = this.state.assignment.end.format('h:mm A');
-		// const time = this.state.assignment.
-		console.log(this.state.assignment.class.color);
 
 		return (
 			<View style={styles.container}>
