@@ -1,7 +1,7 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Alert, StyleSheet, Text } from 'react-native';
+import { Alert, StyleSheet, Text, Picker } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
@@ -13,7 +13,7 @@ export interface TimerState {
 	breakTimeLeft: number;
 	onBreak: boolean;
 	paused: boolean;
-	manual: boolean;
+	modeSelection: number;
 }
 
 let mockAssignment: {
@@ -23,11 +23,6 @@ let mockAssignment: {
 	done: boolean
 };
 
-let userPreferredCycles: {
-	work: number,
-	break: number
-};
-
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
 
 	static navigationOptions = {
@@ -35,6 +30,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	};
 
 	private interval = 0;
+
+	private userCycles: {
+		work: number,
+		break: number
+	}[]
 
 	constructor(props: any) {
 		super(props);
@@ -74,24 +74,31 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			done: false
 		};
 
-		userPreferredCycles = {
+		this.userCycles = [{
 			work: 0.1 * 60 * 1000,
 			break: 0.1 * 60 * 1000
-		};
+		}, {
+			work: 0.5 * 60 * 1000,
+			break: 0.5 * 60 * 1000
+		}];
 
 		this.state = {
-			workTimeLeft: userPreferredCycles.work,
-			breakTimeLeft: userPreferredCycles.break,
+			workTimeLeft: this.userCycles[0].work,
+			breakTimeLeft: this.userCycles[0].break,
 			onBreak: false,
 			paused: false,
-			manual: false
-		};
+			modeSelection: 0
+		}
 	}
 
 	componentDidMount() {
 		this.interval = setInterval(() => {
-			if (!this.state.paused && !this.state.onBreak) {
-				this.tick();
+			if (!this.state.paused) {
+				if (this.state.modeSelection === -1) {
+					this.tickManual();
+				} else {
+					this.tick();
+				}
 			}
 		}, 1000);
 	}
@@ -118,8 +125,28 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private toggleManual() {
-
+	private setTimerModeFactory(n: number) {
+		if (n === -1) {
+			return () => {
+				this.setState({
+					workTimeLeft: 0,
+					breakTimeLeft: 0,
+					onBreak: false,
+					paused: false,
+					modeSelection: n
+				});
+			}
+		} else {
+			return () => {
+				this.setState({
+					workTimeLeft: this.userCycles[n].work,
+					breakTimeLeft: this.userCycles[n].break,
+					onBreak: false,
+					paused: false,
+					modeSelection: n
+				})
+			}
+		}
 	}
 
 	@bind
@@ -131,7 +158,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 			if (this.state.breakTimeLeft <= 0) {
 				this.setState({
-					breakTimeLeft: userPreferredCycles.break,
+					breakTimeLeft: this.userCycles[this.state.modeSelection].break,
 					onBreak: false
 				});
 			}
@@ -141,10 +168,24 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			});
 			if (this.state.workTimeLeft <= 0) {
 				this.setState({
-					workTimeLeft: userPreferredCycles.work,
+					workTimeLeft: this.userCycles[this.state.modeSelection].work,
 					onBreak: true
 				});
 			}
+		}
+	}
+
+	@bind
+	tickManual() {
+		if (this.state.onBreak) {
+			this.setState({
+				breakTimeLeft: this.state.breakTimeLeft + 1000
+			});
+			
+		} else {
+			this.setState({
+				workTimeLeft: this.state.workTimeLeft + 1000
+			});
 		}
 	}
 
@@ -159,6 +200,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				<Button title='Start'/>
 				<Button title='Pause' onPress={this.pause}/>
 				<Button title='Add Custom' onPress={this.addCustom}/>
+				<Picker
+					selectedValue={this.state.modeSelection}
+					onValueChange={(itemValue) => this.setTimerModeFactory(itemValue)()}
+				>
+					{this.userCycles.map((cycle, i) =>
+						<Picker.Item key={i} label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`} value={i}/>
+					)}
+					<Picker.Item key={-1} label="Manual Timer" value={-1}/>
+				</Picker>
 				<Text>{mockAssignment.canvasEvent.title}</Text>
 
 				<Text>Work Timer: {Math.floor(this.state.workTimeLeft / 60000)}:{Math.floor(this.state.workTimeLeft % 60000)}</Text>
