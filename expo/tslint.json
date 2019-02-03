@@ -1,6 +1,7 @@
 {
 	"extends": ["tslint-react", "@mymicds/configs/tslint"],
 	"rules": {
-		"no-console": false
+		"no-console": false,
+		"jsx-no-multiline-js": false
 	}
 }

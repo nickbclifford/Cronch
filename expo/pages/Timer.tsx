@@ -1,7 +1,7 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Alert, StyleSheet, Text, Picker } from 'react-native';
+import { Alert, Picker, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
@@ -31,10 +31,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	private interval = 0;
 
-	private userCycles: {
+	private userCycles: Array<{
 		work: number,
 		break: number
-	}[]
+	}>;
 
 	private shouldAddCycles = false;
 
@@ -90,7 +90,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			onBreak: false,
 			paused: false,
 			modeSelection: 0
-		}
+		};
 	}
 
 	componentDidMount() {
@@ -108,11 +108,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			if (flipped && !this.state.onBreak) {
 				this.setState({
 					paused: true
-				})
+				});
 			} else {
 				this.setState({
 					paused: false
-				})
+				});
 			}
 		});
 	}
@@ -140,7 +140,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	@bind
 	private addCustom() {
-		this.props.navigation.navigate('ModeSelection');;
+		this.props.navigation.navigate('ModeSelection');
 	}
 
 	@bind
@@ -161,7 +161,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					paused: false,
 					modeSelection: n
 				});
-			}
+			};
 		} else {
 			return () => {
 				this.setState({
@@ -170,8 +170,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					onBreak: false,
 					paused: false,
 					modeSelection: n
-				})
-			}
+				});
+			};
 		}
 	}
 
@@ -209,7 +209,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			this.setState({
 				breakTimeLeft: this.state.breakTimeLeft + 1000
 			});
-			
+
 		} else {
 			this.setState({
 				workTimeLeft: this.state.workTimeLeft + 1000
@@ -230,12 +230,12 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				<Button title='Add Custom' onPress={this.addCustom}/>
 				<Picker
 					selectedValue={this.state.modeSelection}
-					onValueChange={(itemValue) => this.setTimerModeFactory(itemValue)()}
+					onValueChange={this.setTimerModeFactory}
 				>
 					{this.userCycles.map((cycle, i) =>
 						<Picker.Item key={i} label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`} value={i}/>
 					)}
-					<Picker.Item key={-1} label="Manual Timer" value={-1}/>
+					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
 				</Picker>
 				<Text>{mockAssignment.canvasEvent.title}</Text>
 
