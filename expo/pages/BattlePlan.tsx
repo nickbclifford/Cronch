@@ -1,3 +1,4 @@
+import bind from 'bind-decorator';
 import * as React from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
@@ -17,20 +18,16 @@ interface BattlePlanState {
 
 export default class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 
-	static navigationOptions = createNavigationOptions<BattlePlanProps>('Battle Plan', ({ navigation }) => {
-		const get: () => boolean = navigation.getParam('getEditMode') || (() => false);
-		const onPress = () => {
-			const toggle = navigation.getParam('toggleEditMode');
-			console.log('should we toggle?');
-			if (toggle) {
-				console.log('yes!!!');
-				toggle();
-			}
-		};
+	static navigationOptions = createNavigationOptions<BattlePlanProps>(null, ({ navigation }) => {
 		return {
-			headerRight: <Button title={get() ? 'Done' : 'Edit'} onPress={onPress} />
+			title: navigation.getParam('title'),
+			headerRight: navigation.getParam('editButton')
 		};
 	});
+
+	// static navigationOptions = {
+	// 	headerRight: <Button title='Edit' onPress={() => undefined} />
+	// };
 
 	// static navigationOptions = {
 	// 	// header: null
@@ -45,17 +42,7 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 	}
 
 	componentDidMount() {
-
-		const getEditMode = () => {
-			return this.state.editMode;
-		}
-
-		const toggleEditMode = () => {
-			console.log('toggle edit mode!!!');
-			this.setState({ editMode: !this.state.editMode });
-		};
-
-		this.props.navigation.setParams({ getEditMode, toggleEditMode });
+		this.updateHeader();
 
 		MyMICDS.canvas.getEvents().subscribe(events => {
 			this.setState({
@@ -64,18 +51,43 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 		});
 	}
 
+	@bind
+	private toggleEditMode() {
+		this.setState({ editMode: !this.state.editMode });
+		setTimeout(this.updateHeader);
+	}
+
+	@bind
+	private updateHeader() {
+		this.props.navigation.setParams({
+			title: this.state.editMode ? 'Edit Battle Plan' : 'Battle Plan',
+			editButton: <Button title={this.state.editMode ? 'Done' : 'Edit'} onPress={this.toggleEditMode} />
+		});
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text>{this.state.editMode.toString()}</Text>
-				<DisplayAssignments
-					navigation={this.props.navigation}
-					assignments={this.state.assignments}
-					headers={false}
-					sort={false}
-					reorder={this.state.editMode}
-					containerStyle={styles.assignmentListContainer}
-				/>
+				{!this.state.editMode && (
+					<DisplayAssignments
+						navigation={this.props.navigation}
+						assignments={this.state.assignments}
+						headers={false}
+						sort={false}
+						reorder={false}
+						containerStyle={styles.assignmentListContainer}
+					/>
+				)}
+				{this.state.editMode && (
+					<DisplayAssignments
+						navigation={this.props.navigation}
+						assignments={this.state.assignments}
+						headers={false}
+						sort={false}
+						reorder={true}
+						containerStyle={styles.assignmentListContainer}
+					/>
+				)}
 			</View>
 		);
 	}

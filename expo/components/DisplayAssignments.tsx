@@ -87,10 +87,6 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 			this.setState({ sectionedAssignments: sections });
 		}
-
-		if (prevProps.reorder !== this.props.reorder) {
-			this.forceUpdate();
-		}
 	}
 
 	private sortAssignments(assignments: CanvasEvent[]) {
@@ -177,8 +173,6 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 			moveEndHandler = (props as RenderItemInfo<CanvasEvent>).moveEnd;
 		}
 
-		console.log('should reordre?', this.shouldReorder);
-
 		return (
 			<TouchableOpacity
 				activeOpacity={0.8}
@@ -232,7 +226,6 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	render() {
-		console.log('rerender display assignment list');
 		if (this.props.headers) {
 			return (
 				<SectionList

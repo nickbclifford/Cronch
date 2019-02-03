@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
 export default function generateNavigationOptions<Props extends NavigationScreenProps>(
-	title: string,
+	title: string | null,
 	additionalInfo?: (props: Props) => { [key: string]: any }
 ): (props: Props) => { [key: string]: any } {
 	return props => {
@@ -23,14 +23,15 @@ export default function generateNavigationOptions<Props extends NavigationScreen
 
 		const options = {
 			title,
-			headerLeft: (
-				<Icon
-					name='bars'
-					type='font-awesome'
-					containerStyle={menuStyles.hamburger}
-					onPress={onPressLeft}
-				/>
-			)
+			// headerLeft: (
+			// 	<Icon
+			// 		name='bars'
+			// 		type='font-awesome'
+			// 		containerStyle={menuStyles.hamburger}
+			// 		onPress={onPressLeft}
+			// 	/>
+			// )
+			headerLeft: <Button title='Menu' onPress={onPressLeft} />
 		};
 
 		if (additionalInfo) {
