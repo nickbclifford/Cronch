@@ -5,7 +5,7 @@ import { Alert, StyleSheet, Text, Picker } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import { gyro$ } from '../common/PhoneAcrobatics';
+import gyro$ from '../common/PhoneAcrobatics';
 import Hamburger from '../components/Hamburger';
 
 export interface TimerState {
@@ -35,6 +35,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		work: number,
 		break: number
 	}[]
+
+	private shouldAddCycles = false;
 
 	constructor(props: any) {
 		super(props);
@@ -101,6 +103,18 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				}
 			}
 		}, 1000);
+
+		gyro$.subscribe(flipped => {
+			if (flipped && !this.state.onBreak) {
+				this.setState({
+					paused: true
+				})
+			} else {
+				this.setState({
+					paused: false
+				})
+			}
+		});
 	}
 
 	componentWillUnmount() {
@@ -109,8 +123,13 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	componentDidUpdate() {
 		if (this.props.navigation.getParam('shouldAddCycle')) {
-			this.userCycles.push(this.props.navigation.getParam('addCycle'));
 			this.props.navigation.setParams({ shouldAddCycle: false });
+			this.shouldAddCycles = true;
+		} else {
+			if (this.shouldAddCycles) {
+				this.userCycles.push(this.props.navigation.getParam('addCycle'));
+			}
+			this.shouldAddCycles = false;
 		}
 	}
 
@@ -163,6 +182,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				breakTimeLeft: this.state.breakTimeLeft - 1000
 			});
 
+			// Reset and switch when timer reaches 0
 			if (this.state.breakTimeLeft <= 0) {
 				this.setState({
 					breakTimeLeft: this.userCycles[this.state.modeSelection].break,
@@ -173,6 +193,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			this.setState({
 				workTimeLeft: this.state.workTimeLeft - 1000
 			});
+
 			if (this.state.workTimeLeft <= 0) {
 				this.setState({
 					workTimeLeft: this.userCycles[this.state.modeSelection].work,
