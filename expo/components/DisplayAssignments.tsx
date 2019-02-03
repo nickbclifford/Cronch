@@ -5,11 +5,13 @@ import {
 	SectionList,
 	SectionListData,
 	SectionListRenderItemInfo,
+	StyleProp,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
 	TouchableWithoutFeedback,
-	View
+	View,
+	ViewStyle
 } from 'react-native';
 import DraggableFlatList, { RenderItemInfo } from 'react-native-draggable-flatlist';
 import { Icon } from 'react-native-elements';
@@ -22,8 +24,9 @@ type SectionedAssignments = Array<{ title: number, data: CanvasEvent[] }>;
 
 interface DisplayAssignmentsProps extends NavigationScreenProps {
 	assignments: CanvasEvent[];
+	containerStyle?: StyleProp<ViewStyle>;
 	headers: boolean;
-	onAssignmentTap?: (assignment: CanvasEvent) => void;
+	onAssignmentPress?: (assignment: CanvasEvent) => void;
 	sort?: boolean;
 	reorder?: boolean;
 	onReorder?: (assignments: CanvasEvent[]) => void;
@@ -83,6 +86,10 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 			});
 
 			this.setState({ sectionedAssignments: sections });
+		}
+
+		if (prevProps.reorder !== this.props.reorder) {
+			this.forceUpdate();
 		}
 	}
 
@@ -170,16 +177,17 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 			moveEndHandler = (props as RenderItemInfo<CanvasEvent>).moveEnd;
 		}
 
+		console.log('should reordre?', this.shouldReorder);
+
 		return (
 			<TouchableOpacity
 				activeOpacity={0.8}
-				onPress={this.navigateToAssignmentDetails(assignment)}
-				onLongPress={moveHandler}
-				onPressOut={moveEndHandler}
+				onPress={this.handleAssignmentPress(assignment)}
 			>
 				<View style={itemStyles.container}>
 					{this.shouldReorder && (
 						<TouchableWithoutFeedback
+							hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
 							onPressIn={moveHandler}
 							onPressOut={moveEndHandler}
 						>
@@ -215,13 +223,16 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	@bind
-	private navigateToAssignmentDetails(assignment: CanvasEvent) {
+	private handleAssignmentPress(assignment: CanvasEvent) {
 		return () => {
-			this.props.navigation.navigate('AssignmentDetails', { assignment });
+			if (this.props.onAssignmentPress) {
+				this.props.onAssignmentPress(assignment);
+			}
 		};
 	}
 
 	render() {
+		console.log('rerender display assignment list');
 		if (this.props.headers) {
 			return (
 				<SectionList
@@ -230,6 +241,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 					sections={this.state.sectionedAssignments}
 					stickySectionHeadersEnabled={false}
 					keyExtractor={this.getCacheKey}
+					style={this.props.containerStyle}
 				/>
 			);
 		} else {
@@ -243,6 +255,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 					data={renderAssignments}
 					renderItem={this.renderAssignment}
 					keyExtractor={this.getCacheKey}
+					style={this.props.containerStyle}
 				/>
 			);
 		}

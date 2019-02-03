@@ -6,11 +6,11 @@ import DisplayAssignments from '../components/DisplayAssignments';
 
 import Hamburger from '../components/Hamburger';
 
-interface BattlePlanState {
+interface CreatePlanState {
 	assignments: CanvasEvent[];
 }
 
-export default class CreatePlan extends React.Component<NavigationScreenProps, BattlePlanState> {
+export default class CreatePlan extends React.Component<NavigationScreenProps, CreatePlanState> {
 
 	static navigationOptions = {
 		header: null
