@@ -107,6 +107,13 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		clearInterval(this.interval);
 	}
 
+	componentDidUpdate() {
+		if (this.props.navigation.getParam('shouldAddCycle')) {
+			this.userCycles.push(this.props.navigation.getParam('addCycle'));
+			this.props.navigation.setParams({ shouldAddCycle: false });
+		}
+	}
+
 	@bind
 	private navigateToBattlePlan() {
 		this.props.navigation.navigate('BattlePlan');
@@ -114,7 +121,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	@bind
 	private addCustom() {
-		return;
+		this.props.navigation.navigate('ModeSelection');;
 	}
 
 	@bind
