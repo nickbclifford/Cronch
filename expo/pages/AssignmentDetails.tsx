@@ -70,7 +70,7 @@ export default class AssignmentDetails extends React.Component<
 						<Text style={typography.h2}>Due {humanDate} at {time}</Text>
 						<Divider />
 						<HTML
-							html={this.state.assignment.desc}
+							html={this.state.assignment.desc || '<p>No content for this assignment.</p>'}
 							imagesMaxWidth={Dimensions.get('window').width}
 							onLinkPress={this.onLinkPress}
 						/>

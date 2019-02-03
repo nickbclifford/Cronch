@@ -10,6 +10,7 @@ import createQuestionnaire from './components/QuestionnaireFactory';
 import About from './pages/About';
 import AssignmentDetails from './pages/AssignmentDetails';
 import BattlePlan from './pages/BattlePlan';
+import CreatePlan from './pages/CreatePlan';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -60,6 +61,7 @@ const Questionnaire = createQuestionnaire(
 
 const AppNavigator = createDrawerNavigator(
 	{
+		CreatePlan,
 		Timer: TimerNavigator,
 		Profile,
 		About,

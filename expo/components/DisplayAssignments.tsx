@@ -8,8 +8,11 @@ import {
 	StyleSheet,
 	Text,
 	TouchableOpacity,
+	TouchableWithoutFeedback,
 	View
 } from 'react-native';
+import DraggableFlatList, { RenderItemInfo } from 'react-native-draggable-flatlist';
+import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import { CanvasEvent } from '../common/MyMICDS';
 import { NEUTRAL, typography } from '../common/StyleGuide';
@@ -19,6 +22,11 @@ type SectionedAssignments = Array<{ title: number, data: CanvasEvent[] }>;
 
 interface DisplayAssignmentsProps extends NavigationScreenProps {
 	assignments: CanvasEvent[];
+	headers: boolean;
+	onAssignmentTap?: (assignment: CanvasEvent) => void;
+	sort?: boolean;
+	reorder?: boolean;
+	onReorder?: (assignments: CanvasEvent[]) => void;
 }
 
 interface DisplayAssignmentsState {
@@ -35,6 +43,22 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 		header: null
 	};
 
+	get shouldSort() {
+		if (typeof this.props.sort === 'undefined') {
+			return true;
+		} else {
+			return this.props.sort;
+		}
+	}
+
+	get shouldReorder() {
+		if (this.props.headers || typeof this.props.reorder === 'undefined') {
+			return false;
+		} else {
+			return this.props.reorder;
+		}
+	}
+
 	constructor(props: any) {
 		super(props);
 		this.state = { sectionedAssignments: [] };
@@ -42,11 +66,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 	componentDidUpdate(prevProps: any) {
 		if (prevProps.assignments !== this.props.assignments) {
-			let assignments = this.props.assignments;
-
-			assignments = assignments
-				.filter(a => a.end.valueOf() > Date.now())
-				.sort((a, b) => a.end.unix() - b.end.unix());
+			const assignments = this.sortAssignments(this.props.assignments);
 
 			// Group assignments by the date they are due
 			const groupedByDue = assignments.reduce<GroupedAssignments>((accumulator, currentValue) => {
@@ -66,6 +86,12 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 		}
 	}
 
+	private sortAssignments(assignments: CanvasEvent[]) {
+		return assignments
+			.filter(a => a.end.valueOf() > Date.now())
+			.sort((a, b) => a.end.unix() - b.end.unix());
+	}
+
 	// Allows React Native to cache each item's position in the list (not used as a sorting key though)
 	@bind
 	private getCacheKey(item: CanvasEvent) {
@@ -73,7 +99,10 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	@bind
-	private renderAssignmentTitle({ section }: { section: SectionListData<string> }) {
+	private renderSectionHeader({ section }: { section: SectionListData<string> }) {
+		if (!this.props.headers) {
+			return null;
+		}
 		const itemStyles = StyleSheet.create({
 			container: {
 				marginTop: 48,
@@ -94,8 +123,8 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	@bind
-	private renderAssignment({ item: assignment }: SectionListRenderItemInfo<CanvasEvent>) {
-
+	private renderAssignment(props: SectionListRenderItemInfo<CanvasEvent> | RenderItemInfo<CanvasEvent>) {
+		const assignment = props.item;
 		const itemStyles = StyleSheet.create({
 			container: {
 				display: 'flex',
@@ -103,12 +132,21 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 				marginLeft: 16,
 				marginRight: 16,
 				marginBottom: 16,
-				padding: 16,
+				padding: 8,
 				borderRadius: 5,
 				backgroundColor: assignment.class.color
 			},
+			moveIconContainer: {
+				// flexGrow: 0,
+				// height: '100%',
+				display: 'flex',
+				// alignItems: 'center',
+				// flexDirection: 'column',
+				justifyContent: 'center',
+				marginRight: 8
+			},
 			assignmentContainer: {
-				width: '100%'
+				// flexGrow: 1
 			},
 			title: {
 				color: assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]
@@ -122,9 +160,39 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 			}
 		});
 
+		// tslint:disable:no-unnecessary-initializer
+		let moveHandler: (() => void) | undefined = undefined;
+		// tslint:disable:no-unnecessary-initializer
+		let moveEndHandler: (() => void) | undefined = undefined;
+
+		if (this.shouldReorder) {
+			moveHandler = (props as RenderItemInfo<CanvasEvent>).move;
+			moveEndHandler = (props as RenderItemInfo<CanvasEvent>).moveEnd;
+		}
+
 		return (
-			<TouchableOpacity activeOpacity={0.8} onPress={this.navigateToAssignmentDetails(assignment)}>
+			<TouchableOpacity
+				activeOpacity={0.8}
+				onPress={this.navigateToAssignmentDetails(assignment)}
+				onLongPress={moveHandler}
+				onPressOut={moveEndHandler}
+			>
 				<View style={itemStyles.container}>
+					{this.shouldReorder && (
+						<TouchableWithoutFeedback
+							onPressIn={moveHandler}
+							onPressOut={moveEndHandler}
+						>
+							<View style={itemStyles.moveIconContainer}>
+								<Icon
+									name='bars'
+									type='font-awesome'
+									size={20}
+									color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
+								/>
+							</View>
+						</TouchableWithoutFeedback>
+					)}
 					<View style={itemStyles.assignmentContainer}>
 						<Text
 							style={[typography.h3, itemStyles.class]}
@@ -154,15 +222,30 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	render() {
-		return (
-			<SectionList
-				renderItem={this.renderAssignment}
-				renderSectionHeader={this.renderAssignmentTitle}
-				sections={this.state.sectionedAssignments}
-				stickySectionHeadersEnabled={false}
-				keyExtractor={this.getCacheKey}
-			/>
-		);
+		if (this.props.headers) {
+			return (
+				<SectionList
+					renderItem={this.renderAssignment}
+					renderSectionHeader={this.renderSectionHeader}
+					sections={this.state.sectionedAssignments}
+					stickySectionHeadersEnabled={false}
+					keyExtractor={this.getCacheKey}
+				/>
+			);
+		} else {
+			let renderAssignments = this.props.assignments;
+			if (this.shouldSort) {
+				renderAssignments = this.sortAssignments(this.props.assignments);
+			}
+
+			return (
+				<DraggableFlatList
+					data={renderAssignments}
+					renderItem={this.renderAssignment}
+					keyExtractor={this.getCacheKey}
+				/>
+			);
+		}
 	}
 
 }
