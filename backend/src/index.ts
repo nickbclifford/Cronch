@@ -9,6 +9,7 @@ const sequelize = new Sequelize({
 	modelPaths: [__dirname + '/models']
 });
 
+import questionnaireRouter from './routes/questionnaireResponse';
 import timeslotRouter from './routes/timeslot';
 import userRouter from './routes/user';
 
@@ -22,6 +23,7 @@ sequelize.sync({ force: config.forceModelSync }).then(() => {
 	app.use(json());
 	app.use(jwtMiddleware);
 
+	app.use('/questionnaire-response', questionnaireRouter);
 	app.use('/timeslot', timeslotRouter);
 	app.use('/user', userRouter);
 

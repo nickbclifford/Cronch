@@ -1,4 +1,5 @@
 import { Column, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import Response from './QuestionnaireResponse';
 import Timeslot from './Timeslot';
 
 @Table
@@ -13,4 +14,7 @@ export default class User extends Model<User> {
 
 	@HasMany(() => Timeslot)
 	timeslots!: Timeslot[];
+
+	@HasMany(() => Response)
+	responses!: Response[];
 }
