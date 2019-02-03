@@ -2,12 +2,12 @@ import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import { WebBrowser } from 'expo';
 import * as React from 'react';
-import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, GestureResponderEvent, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
+import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import { humanReadableTimeUntil } from '../common/Utils';
 
 interface NavigationParameters {
@@ -49,12 +49,21 @@ export default class AssignmentDetails extends React.Component<
 		this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
 	}
 
+	@bind
+	private markAsCompleted() {
+		console.log('Completed assignment!');
+	}
+
 	render() {
 		const humanDate = humanReadableTimeUntil(this.state.assignment.end);
 		const time = this.state.assignment.end.format('h:mm A');
 
 		return (
 			<View style={styles.container}>
+				<StatusBar
+					barStyle={this.state.assignment.class.textDark ? 'dark-content' : 'light-content'}
+					backgroundColor={this.state.assignment.class.color}
+				/>
 				<SafeAreaView style={styles.safeArea}>
 					<ScrollView style={styles.detailsContainer}>
 						<Text style={typography.h1}>{this.state.assignment.title}</Text>
@@ -67,6 +76,7 @@ export default class AssignmentDetails extends React.Component<
 						/>
 					</ScrollView>
 					<Button title='Work!' onPress={this.navigateToTimer} buttonStyle={styles.workButton} />
+					<Button title='Mark as Completed' onPress={this.markAsCompleted} buttonStyle={styles.checkButton} />
 				</SafeAreaView>
 			</View>
 		);
@@ -90,7 +100,14 @@ const styles = StyleSheet.create({
 		// backgroundColor: NEUTRAL[300]
 	},
 	workButton: {
-		backgroundColor: PRIMARY[500]
+		backgroundColor: PRIMARY[500],
+		borderBottomLeftRadius: 0,
+		borderBottomRightRadius: 0
+	},
+	checkButton: {
+		backgroundColor: SUCCESS[500],
+		borderTopLeftRadius: 0,
+		borderTopRightRadius: 0
 	}
 });
 
