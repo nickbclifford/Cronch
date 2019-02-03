@@ -2,9 +2,8 @@ import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
+import createNavigationOptions from '../common/NavigationOptionsFactory';
 import DisplayAssignments from '../components/DisplayAssignments';
-
-import Hamburger from '../components/Hamburger';
 
 interface CreatePlanState {
 	assignments: CanvasEvent[];
@@ -12,11 +11,7 @@ interface CreatePlanState {
 
 export default class CreatePlan extends React.Component<NavigationScreenProps, CreatePlanState> {
 
-	static navigationOptions = {
-		header: null
-		// title: 'Battle Plan'
-		// headerRight: <Button title='Attack' onPress={BattlePlan.attack} />
-	};
+	static navigationOptions = createNavigationOptions('Create Battle Plan');
 
 	constructor(props: any) {
 		super(props);
@@ -34,7 +29,6 @@ export default class CreatePlan extends React.Component<NavigationScreenProps, C
 	render() {
 		return (
 			<View style={styles.container}>
-				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<DisplayAssignments
 					navigation={this.props.navigation}
 					assignments={this.state.assignments}

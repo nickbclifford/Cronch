@@ -1,9 +1,11 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button as NativeButton, StyleSheet, Text, View } from 'react-native';
+import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
+import { NEUTRAL, PRIMARY, SUCCESS } from '../common/StyleGuide';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 interface BattlePlanProps extends NavigationScreenProps {
@@ -61,35 +63,60 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 	private updateHeader() {
 		this.props.navigation.setParams({
 			title: this.state.editMode ? 'Edit Battle Plan' : 'Battle Plan',
-			editButton: <Button title={this.state.editMode ? 'Done' : 'Edit'} onPress={this.toggleEditMode} />
+			editButton: (
+				<NativeButton
+					title={this.state.editMode ? 'Done' : 'Edit'}
+					color={NEUTRAL[300]}
+					onPress={this.toggleEditMode}
+				/>
+			)
 		});
 	}
 
+	@bind
+	private navigateToCreatePlan() {
+		this.props.navigation.navigate('CreatePlan');
+	}
+
 	render() {
-		return (
-			<View style={styles.container}>
-				{!this.state.editMode && (
-					<DisplayAssignments
-						navigation={this.props.navigation}
-						assignments={this.state.assignments}
-						headers={false}
-						sort={false}
-						reorder={false}
-						containerStyle={styles.assignmentListContainer}
-					/>
-				)}
-				{this.state.editMode && (
+		if (this.state.editMode) {
+			const topPaddingStyle = { paddingTop: 72 };
+			return (
+				<View style={styles.container}>
+					<View style={styles.addAssignmentsContainer}>
+						<Button
+							title='Add Assignments'
+							buttonStyle={styles.addAssignmentsButton}
+							onPress={this.navigateToCreatePlan}
+						/>
+					</View>
 					<DisplayAssignments
 						navigation={this.props.navigation}
 						assignments={this.state.assignments}
 						headers={false}
 						sort={false}
 						reorder={true}
-						containerStyle={styles.assignmentListContainer}
+						containerStyle={[styles.assignmentListContainer, topPaddingStyle]}
+						itemStyle={styles.assignmentListItem}
 					/>
-				)}
-			</View>
-		);
+				</View>
+			);
+		} else {
+			const topPaddingStyle = { paddingTop: 16 };
+			return (
+				<View style={styles.container}>
+					<DisplayAssignments
+						navigation={this.props.navigation}
+						assignments={this.state.assignments}
+						headers={false}
+						sort={false}
+						reorder={false}
+						containerStyle={[styles.assignmentListContainer, topPaddingStyle]}
+						itemStyle={styles.assignmentListItem}
+					/>
+				</View>
+			);
+		}
 	}
 
 }
@@ -100,7 +127,22 @@ const styles = StyleSheet.create({
 		// paddingBottom: 64
 	},
 	assignmentListContainer: {
-		paddingTop: 16,
-		marginBottom: 32
+		paddingBottom: 32
+	},
+	assignmentListItem: {
+		marginLeft: 8,
+		marginRight: 8
+	},
+	addAssignmentsContainer: {
+		width: '100%',
+		position: 'absolute',
+		zIndex: 1000,
+		top: 16,
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center'
+	},
+	addAssignmentsButton: {
+		backgroundColor: SUCCESS[500]
 	}
 });

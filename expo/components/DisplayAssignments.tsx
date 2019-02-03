@@ -25,6 +25,7 @@ type SectionedAssignments = Array<{ title: number, data: CanvasEvent[] }>;
 interface DisplayAssignmentsProps extends NavigationScreenProps {
 	assignments: CanvasEvent[];
 	containerStyle?: StyleProp<ViewStyle>;
+	itemStyle?: StyleProp<ViewStyle>;
 	headers: boolean;
 	onAssignmentPress?: (assignment: CanvasEvent) => void;
 	sort?: boolean;
@@ -132,19 +133,13 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 			container: {
 				display: 'flex',
 				flexDirection: 'row',
-				marginLeft: 16,
-				marginRight: 16,
 				marginBottom: 16,
 				padding: 8,
 				borderRadius: 5,
 				backgroundColor: assignment.class.color
 			},
 			moveIconContainer: {
-				// flexGrow: 0,
-				// height: '100%',
 				display: 'flex',
-				// alignItems: 'center',
-				// flexDirection: 'column',
 				justifyContent: 'center',
 				marginRight: 8
 			},
@@ -174,45 +169,47 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 		}
 
 		return (
-			<TouchableOpacity
-				activeOpacity={0.8}
-				onPress={this.handleAssignmentPress(assignment)}
-			>
-				<View style={itemStyles.container}>
-					{this.shouldReorder && (
-						<TouchableWithoutFeedback
-							hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
-							onPressIn={moveHandler}
-							onPressOut={moveEndHandler}
-						>
-							<View style={itemStyles.moveIconContainer}>
-								<Icon
-									name='bars'
-									type='font-awesome'
-									size={20}
-									color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
-								/>
-							</View>
-						</TouchableWithoutFeedback>
-					)}
-					<View style={itemStyles.assignmentContainer}>
-						<Text
-							style={[typography.h3, itemStyles.class]}
-							numberOfLines={1}
-							ellipsizeMode='tail'
-						>
-							{assignment.class.name}
-						</Text>
-						<Text
-							style={[typography.h2, itemStyles.title]}
-							numberOfLines={1}
-							ellipsizeMode='tail'
-						>
-							{assignment.title}
-						</Text>
+			<View style={this.props.itemStyle}>
+				<TouchableOpacity
+					activeOpacity={0.8}
+					onPress={this.handleAssignmentPress(assignment)}
+				>
+					<View style={itemStyles.container}>
+						{this.shouldReorder && (
+							<TouchableWithoutFeedback
+								hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
+								onPressIn={moveHandler}
+								onPressOut={moveEndHandler}
+							>
+								<View style={itemStyles.moveIconContainer}>
+									<Icon
+										name='bars'
+										type='font-awesome'
+										size={20}
+										color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
+									/>
+								</View>
+							</TouchableWithoutFeedback>
+						)}
+						<View style={itemStyles.assignmentContainer}>
+							<Text
+								style={[typography.h3, itemStyles.class]}
+								numberOfLines={1}
+								ellipsizeMode='tail'
+							>
+								{assignment.class.name}
+							</Text>
+							<Text
+								style={[typography.h2, itemStyles.title]}
+								numberOfLines={1}
+								ellipsizeMode='tail'
+							>
+								{assignment.title}
+							</Text>
+						</View>
 					</View>
-				</View>
-			</TouchableOpacity>
+				</TouchableOpacity>
+			</View>
 		);
 	}
 

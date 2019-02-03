@@ -19,6 +19,10 @@ import Welcome from './pages/Welcome';
 
 // tslint:disable:variable-name
 
+function createSingleStackNavigator(Component: any) {
+	return createStackNavigator({ Component });
+}
+
 const AuthNavigator = createStackNavigator(
 	{
 		Welcome,
@@ -33,6 +37,7 @@ const AuthNavigator = createStackNavigator(
 const TimerNavigator = createStackNavigator(
 	{
 		BattlePlan,
+		CreatePlan,
 		AssignmentDetails,
 		Timer
 	},
@@ -61,10 +66,9 @@ const Questionnaire = createQuestionnaire(
 
 const AppNavigator = createDrawerNavigator(
 	{
-		CreatePlan,
 		Timer: TimerNavigator,
-		Profile,
-		About,
+		Profile: createSingleStackNavigator(Profile),
+		About: createSingleStackNavigator(About),
 		Questionnaire
 	},
 	{
