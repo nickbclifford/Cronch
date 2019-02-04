@@ -89,7 +89,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			workTimeLeft: this.userCycles[0].work,
 			breakTimeLeft: this.userCycles[0].break,
 			onBreak: false,
-			paused: false,
+			paused: true,
 			modeSelection: 0,
 			flipped: false
 		};
@@ -140,9 +140,9 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private pause() {
+	private togglePause() {
 		this.setState({
-			paused: true
+			paused: !this.state.paused
 		});
 	}
 
@@ -241,8 +241,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					title='Create Battle Plan'
 					onPress={this.navigateToBattlePlan}
 				/>
-				<Button title='Start'/>
-				<Button title='Pause' onPress={this.pause}/>
+				{ this.state.paused ? (
+					<Button title='Start' onPress={this.togglePause}/>
+				) : (
+					<Button title='Pause' onPress={this.togglePause}/>
+				)}
 				<Button title='Add Custom' onPress={this.addCustom}/>
 				<Picker
 					selectedValue={this.state.modeSelection}
