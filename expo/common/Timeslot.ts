@@ -9,7 +9,7 @@ export interface Timeslot {
 }
 
 export function createTimeslot(start: Date, canvasId: string) {
-	return fetchWithJwt('/timeslot', {
+	return fetchWithJwt<Timeslot>('/timeslot', {
 		method: 'POST',
 		body: JSON.stringify({ start, canvasId })
 	});

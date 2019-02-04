@@ -114,12 +114,14 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 			// Only pause when user is not on break
 			if (!this.state.onBreak) {
-				console.log('buh');
+				console.log('buh', flipped);
 				this.setState({ paused: flipped });
 			}
 
 			this.recordTimeSlot().then(() => {
 				console.log('buh sent');
+			}).catch((e: any) => {
+				Alert.alert('Error saving time slot.', e.message);
 			});
 		});
 	}
