@@ -14,6 +14,7 @@ export interface TimerState {
 	onBreak: boolean;
 	paused: boolean;
 	modeSelection: number;
+	flipped: boolean;
 }
 
 let mockAssignment: {
@@ -89,7 +90,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			breakTimeLeft: this.userCycles[0].break,
 			onBreak: false,
 			paused: false,
-			modeSelection: 0
+			modeSelection: 0,
+			flipped: false
 		};
 	}
 
@@ -106,7 +108,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 		flipped$.subscribe(flipped => {
 			this.setState({
-				paused: flipped && !this.state.onBreak
+				flipped: flipped && !this.state.onBreak
 			});
 		});
 	}
@@ -208,7 +210,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 							this.setState({
 								workTimeLeft: this.userCycles[this.state.modeSelection].work,
 								onBreak: true,
-								paused: true
+								paused: false
 							});
 						} }
 					]
@@ -256,6 +258,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				<Text>Work Timer: {Math.floor(this.state.workTimeLeft / 60000)}:{Math.floor(this.state.workTimeLeft % 60000)}</Text>
 				<Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text>
 				<Text>{this.state.paused.toString()}</Text>
+				<Text>{this.state.flipped.toString()}</Text>
 			</SafeAreaView>
 		);
 	}
