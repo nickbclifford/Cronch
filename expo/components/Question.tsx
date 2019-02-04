@@ -1,6 +1,6 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 
 export interface QuestionInfo {
@@ -48,11 +48,11 @@ export default class Question extends React.Component<QuestionProps> {
 
 }
 
-const styles = {
+const styles = StyleSheet.create({
 	container: {
 		flex: 1
 	},
 	text: {
 		alignSelf: 'center'
 	}
-}
+});

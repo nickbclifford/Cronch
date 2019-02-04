@@ -1,10 +1,10 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { Alert, Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS from '../common/MyMICDS';
+import { changeUserInfo, getUserInfo } from '../common/User';
 import Question from '../components/Question';
-import { changeUserInfo } from '../common/User';
 
 import Hamburger from '../components/Hamburger';
 
@@ -27,6 +27,11 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 		};
 	}
 
+	async componentDidMount() {
+		const { dataSharing } = await getUserInfo();
+		this.setState({ selectedIndex: dataSharing });
+	}
+
 	@bind
 	private logout() {
 		MyMICDS.auth.logout().subscribe(() => {
@@ -36,16 +41,17 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	@bind
 	private optChoose(index: number) {
-		changeUserInfo({ dataSharing: index })
-		.then(() => {
-			console.log('henlo');
-			this.setState({ selectedIndex: index });
+		this.setState({ selectedIndex: index });
+		changeUserInfo({ dataSharing: index }).then(() => {
 			Alert.alert(
 				'Info',
 				'Data sharing option updated!'
 			);
-		})
-		.catch(err => console.log(err));
+		}).catch(err => {
+			// Un-select on error, so the user knows to re-select
+			this.setState({ selectedIndex: null });
+			console.error(err);
+		});
 	}
 
 	questionNames = [

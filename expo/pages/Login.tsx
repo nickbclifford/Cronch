@@ -3,6 +3,8 @@ import * as React from 'react';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS from '../common/MyMICDS';
+import { switchMap } from 'rxjs/operators';
+import { registerUser } from '../common/User';
 
 export interface LoginState {
 	user: string;
@@ -27,13 +29,18 @@ export default class Login extends React.Component<NavigationScreenProps, LoginS
 			password: this.state.password,
 			remember: true,
 			comment: 'Cronch Integration'
-		}).subscribe(loginRes => {
-			if (loginRes.success) {
-				this.props.navigation.navigate('App');
-			} else {
-				Alert.alert('Login Error', loginRes.message);
-			}
-		});
+		}).pipe(
+			switchMap(({ success, message }) => {
+				if (!success) {
+					throw new Error(message);
+				}
+
+				return registerUser();
+			})
+		).subscribe(
+			() => this.props.navigation.navigate('App'),
+			err => Alert.alert('Login Error', err.message)
+		);
 	}
 
 	@bind
