@@ -175,9 +175,21 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			// Reset and switch when timer reaches 0
 			if (this.state.breakTimeLeft <= 0) {
 				this.setState({
-					breakTimeLeft: this.userCycles[this.state.modeSelection].break,
-					onBreak: false
+					paused: true
 				});
+				Alert.alert(
+					'Time for a break!',
+					'Yuhyuhyuh',
+					[
+						{ text: 'Continue', onPress: () => {
+							this.setState({
+								breakTimeLeft: this.userCycles[this.state.modeSelection].break,
+								onBreak: false,
+								paused: false
+							});
+						} }
+					]
+				);
 			}
 		} else {
 			this.setState({
@@ -186,9 +198,21 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 			if (this.state.workTimeLeft <= 0) {
 				this.setState({
-					workTimeLeft: this.userCycles[this.state.modeSelection].work,
-					onBreak: true
+					paused: true
 				});
+				Alert.alert(
+					'Time for work!',
+					'Please select an option',
+					[
+						{ text: 'Continue', onPress: () => {
+							this.setState({
+								workTimeLeft: this.userCycles[this.state.modeSelection].work,
+								onBreak: true,
+								paused: true
+							});
+						} }
+					]
+				);
 			}
 		}
 	}
