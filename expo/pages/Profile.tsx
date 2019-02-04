@@ -4,6 +4,7 @@ import { Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS from '../common/MyMICDS';
 import Question from '../components/Question';
+import { changeUserInfo } from '../common/User';
 
 import Hamburger from '../components/Hamburger';
 
@@ -35,13 +36,22 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	@bind
 	private optChoose(index: number) {
-		this.setState({ selectedIndex: index });
+		changeUserInfo({ dataSharing: index })
+		.then(() => {
+			console.log('henlo');
+			this.setState({ selectedIndex: index });
+			Alert.alert(
+				'Info',
+				'Data sharing option updated!'
+			);
+		})
+		.catch(err => console.log(err));
 	}
 
 	questionNames = [
-		'Send data to teachers',
+		"Don't send teachers data at all",
 		'Send data to teachers anonymously',
-		"Don't send teachers data at all"
+		'Send data to teachers as yourself'
 	];
 
 	render() {
