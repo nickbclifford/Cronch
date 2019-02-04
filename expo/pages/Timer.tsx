@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { createTimeslot } from '../common/Timeslot';
 
 import flipped$ from '../common/PhoneAcrobatics';
 import Hamburger from '../components/Hamburger';
@@ -108,7 +109,17 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 		flipped$.subscribe(flipped => {
 			this.setState({
-				flipped: flipped && !this.state.onBreak
+				flipped
+			});
+
+			// Only pause when user is not on break
+			if (!this.state.onBreak) {
+				console.log('buh');
+				this.setState({ paused: flipped });
+			}
+
+			this.recordTimeSlot().then(() => {
+				console.log('buh sent');
 			});
 		});
 	}
@@ -231,6 +242,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				workTimeLeft: this.state.workTimeLeft + 1000
 			});
 		}
+	}
+
+	private recordTimeSlot() {
+		return createTimeslot(new Date(), mockAssignment.canvasEvent._id);
 	}
 
 	render() {
