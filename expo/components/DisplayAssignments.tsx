@@ -214,7 +214,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 								{assignment.title}
 							</Text>
 						</View>
-						{this.shouldReorder && (
+						{/*this.shouldReorder && (
 							<TouchableWithoutFeedback
 								hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
 								onPressIn={moveHandler}
@@ -229,7 +229,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 									/>
 								</View>
 							</TouchableWithoutFeedback>
-						)}
+						)*/}
 					</View>
 				</TouchableOpacity>
 			</View>
