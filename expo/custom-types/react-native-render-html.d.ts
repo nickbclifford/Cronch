@@ -1,7 +1,7 @@
 // tslint:disable
 declare module 'react-native-render-html' {
 	import { ComponentType, ReactNode } from 'react';
-	import { Falsy, GestureResponderEvent, RecursiveArray, StyleProp, Text, View } from 'react-native';
+	import { Falsy, GestureResponderEvent, RecursiveArray, StyleProp, TextStyle, View } from 'react-native';
 	namespace HTML {
 		type HTMLNode = any;
 		type NonRegisteredStylesProp<T> = T | Falsy | RecursiveArray<T | Falsy>;
