@@ -2,12 +2,12 @@ import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import { WebBrowser } from 'expo';
 import * as React from 'react';
-import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, GestureResponderEvent, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
+import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import { humanReadableTimeUntil } from '../common/Utils';
 
 interface NavigationParameters {
@@ -45,8 +45,13 @@ export default class AssignmentDetails extends React.Component<
 	}
 
 	@bind
-	private navigateToTimer() {
-		this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
+	private addToBattlePlan() {
+		// this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
+	}
+
+	@bind
+	private markAsCompleted() {
+		console.log('Completed assignment!');
 	}
 
 	render() {
@@ -55,18 +60,23 @@ export default class AssignmentDetails extends React.Component<
 
 		return (
 			<View style={styles.container}>
+				<StatusBar
+					barStyle={this.state.assignment.class.textDark ? 'dark-content' : 'light-content'}
+					backgroundColor={this.state.assignment.class.color}
+				/>
 				<SafeAreaView style={styles.safeArea}>
 					<ScrollView style={styles.detailsContainer}>
 						<Text style={typography.h1}>{this.state.assignment.title}</Text>
 						<Text style={typography.h2}>Due {humanDate} at {time}</Text>
 						<Divider />
 						<HTML
-							html={this.state.assignment.desc}
+							html={this.state.assignment.desc || '<p>No content for this assignment.</p>'}
 							imagesMaxWidth={Dimensions.get('window').width}
 							onLinkPress={this.onLinkPress}
 						/>
 					</ScrollView>
-					<Button title='Work!' onPress={this.navigateToTimer} buttonStyle={styles.workButton} />
+					<Button title='Add to Battle Plan' onPress={this.addToBattlePlan} buttonStyle={styles.workButton} />
+					<Button title='Mark as Completed' onPress={this.markAsCompleted} buttonStyle={styles.checkButton} />
 				</SafeAreaView>
 			</View>
 		);
@@ -90,7 +100,14 @@ const styles = StyleSheet.create({
 		// backgroundColor: NEUTRAL[300]
 	},
 	workButton: {
-		backgroundColor: PRIMARY[500]
+		backgroundColor: PRIMARY[500],
+		borderBottomLeftRadius: 0,
+		borderBottomRightRadius: 0
+	},
+	checkButton: {
+		backgroundColor: SUCCESS[500],
+		borderTopLeftRadius: 0,
+		borderTopRightRadius: 0
 	}
 });
 

@@ -10,6 +10,7 @@ import createQuestionnaire from './components/QuestionnaireFactory';
 import About from './pages/About';
 import AssignmentDetails from './pages/AssignmentDetails';
 import BattlePlan from './pages/BattlePlan';
+import CreatePlan from './pages/CreatePlan';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -18,6 +19,10 @@ import Welcome from './pages/Welcome';
 import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
 
 // tslint:disable:variable-name
+
+function createSingleStackNavigator(Component: any) {
+	return createStackNavigator({ Component });
+}
 
 const AuthNavigator = createStackNavigator(
 	{
@@ -44,6 +49,7 @@ const TimerAndModal = createStackNavigator(
 const TimerNavigator = createStackNavigator(
 	{
 		BattlePlan,
+		CreatePlan,
 		AssignmentDetails,
 		Timer: TimerAndModal
 	},
@@ -73,8 +79,8 @@ const Questionnaire = createQuestionnaire(
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer: TimerNavigator,
-		Profile,
-		About,
+		Profile: createSingleStackNavigator(Profile),
+		About: createSingleStackNavigator(About),
 		Questionnaire
 	},
 	{

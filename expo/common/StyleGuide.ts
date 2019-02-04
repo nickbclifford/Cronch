@@ -27,35 +27,35 @@ export const NEUTRAL: ColorPalette = {
 /** @todo  */
 
 export const INFO: ColorPalette = {
-	100: '#',
-	300: '#',
-	500: '#',
-	700: '#',
-	900: '#'
+	100: '#E6FFFE',
+	300: '#78E5DB',
+	500: '#35AEA3',
+	700: '#177169',
+	900: '#0F4443'
 };
 
 export const SUCCESS: ColorPalette = {
-	100: '#',
-	300: '#',
-	500: '#',
-	700: '#',
-	900: '#'
+	100: '#E2FCEC',
+	300: '#86D1A3',
+	500: '#2EC26F',
+	700: '#269651',
+	900: '#0F5036'
 };
 
 export const WARNING: ColorPalette = {
-	100: '#',
-	300: '#',
-	500: '#',
-	700: '#',
-	900: '#'
+	100: '#FFFCF4',
+	300: '#FFE49C',
+	500: '#F5CB5B',
+	700: '#BE9017',
+	900: '#54420B'
 };
 
 export const DANGER: ColorPalette = {
-	100: '#',
-	300: '#',
-	500: '#',
-	700: '#',
-	900: '#'
+	100: '#FCE8E8',
+	300: '#F49895',
+	500: '#DE2E28',
+	700: '#95120E',
+	900: '#571413'
 };
 
 export const DEFAULT_TYPOGRAPHY_STYLES = {
