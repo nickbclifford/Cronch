@@ -27,7 +27,7 @@ interface DisplayAssignmentsProps extends NavigationScreenProps {
 	containerStyle?: StyleProp<ViewStyle>;
 	itemStyle?: StyleProp<ViewStyle>;
 	headers: boolean;
-	onAssignmentPress?: (assignment: CanvasEvent) => void;
+	onAssignmentClick?: (assignment: CanvasEvent) => void;
 	sort?: boolean;
 	reorder?: boolean;
 	onReorder?: (assignments: CanvasEvent[]) => void;
@@ -216,8 +216,8 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	@bind
 	private handleAssignmentPress(assignment: CanvasEvent) {
 		return () => {
-			if (this.props.onAssignmentPress) {
-				this.props.onAssignmentPress(assignment);
+			if (this.props.onAssignmentClick) {
+				this.props.onAssignmentClick(assignment);
 			}
 		};
 	}

@@ -1,3 +1,4 @@
+import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
@@ -26,6 +27,11 @@ export default class CreatePlan extends React.Component<NavigationScreenProps, C
 		});
 	}
 
+	@bind
+	private navigateToAssignmentDetails(assignment: CanvasEvent) {
+		this.props.navigation.navigate('AssignmentDetails', { assignment });
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
@@ -33,6 +39,7 @@ export default class CreatePlan extends React.Component<NavigationScreenProps, C
 					navigation={this.props.navigation}
 					assignments={this.state.assignments}
 					headers={true}
+					onAssignmentClick={this.navigateToAssignmentDetails}
 				/>
 			</View>
 		);
