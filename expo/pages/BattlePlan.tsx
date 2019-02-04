@@ -1,11 +1,11 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button as NativeButton, StyleSheet, Text, View } from 'react-native';
+import { Button as NativeButton, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { NEUTRAL, PRIMARY, SUCCESS } from '../common/StyleGuide';
+import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 interface BattlePlanProps extends NavigationScreenProps {
@@ -78,45 +78,45 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 		this.props.navigation.navigate('CreatePlan');
 	}
 
+	@bind
+	private navigateToTimer(assignment: CanvasEvent) {
+		this.props.navigation.navigate('Timer', { assignment });
+	}
+
 	render() {
-		if (this.state.editMode) {
-			const topPaddingStyle = { paddingTop: 72 };
-			return (
-				<View style={styles.container}>
-					<View style={styles.addAssignmentsContainer}>
-						<Button
-							title='Add Assignments'
-							buttonStyle={styles.addAssignmentsButton}
-							onPress={this.navigateToCreatePlan}
-						/>
-					</View>
+		return (
+			<View style={styles.container}>
+				<View style={styles.addAssignmentsContainer}>
+					<Button
+						title='Add Assignments'
+						raised={true}
+						buttonStyle={styles.addAssignmentsButton}
+						onPress={this.navigateToCreatePlan}
+					/>
+				</View>
+				{this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
 						assignments={this.state.assignments}
 						headers={false}
 						sort={false}
 						reorder={true}
-						containerStyle={[styles.assignmentListContainer, topPaddingStyle]}
-						itemStyle={styles.assignmentListItem}
+						containerStyle={styles.assignmentListContainer}
 					/>
-				</View>
-			);
-		} else {
-			const topPaddingStyle = { paddingTop: 16 };
-			return (
-				<View style={styles.container}>
+				)}
+				{!this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
 						assignments={this.state.assignments}
 						headers={false}
 						sort={false}
 						reorder={false}
-						containerStyle={[styles.assignmentListContainer, topPaddingStyle]}
-						itemStyle={styles.assignmentListItem}
+						containerStyle={styles.assignmentListContainer}
+						onAssignmentClick={this.navigateToTimer}
 					/>
-				</View>
-			);
-		}
+				)}
+			</View>
+		);
 	}
 
 }
@@ -124,14 +124,12 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 const styles = StyleSheet.create({
 	container: {
 		height: '100%'
-		// paddingBottom: 64
 	},
 	assignmentListContainer: {
+		paddingTop: 72,
+		paddingLeft: 8,
+		paddingRight: 8,
 		paddingBottom: 32
-	},
-	assignmentListItem: {
-		marginLeft: 8,
-		marginRight: 8
 	},
 	addAssignmentsContainer: {
 		width: '100%',

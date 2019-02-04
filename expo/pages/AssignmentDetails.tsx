@@ -45,8 +45,8 @@ export default class AssignmentDetails extends React.Component<
 	}
 
 	@bind
-	private navigateToTimer() {
-		this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
+	private addToBattlePlan() {
+		// this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
 	}
 
 	@bind
@@ -75,7 +75,7 @@ export default class AssignmentDetails extends React.Component<
 							onLinkPress={this.onLinkPress}
 						/>
 					</ScrollView>
-					<Button title='Work!' onPress={this.navigateToTimer} buttonStyle={styles.workButton} />
+					<Button title='Add to Battle Plan' onPress={this.navigateToTimer} buttonStyle={styles.workButton} />
 					<Button title='Mark as Completed' onPress={this.markAsCompleted} buttonStyle={styles.checkButton} />
 				</SafeAreaView>
 			</View>

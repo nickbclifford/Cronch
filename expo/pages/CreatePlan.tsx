@@ -40,6 +40,7 @@ export default class CreatePlan extends React.Component<NavigationScreenProps, C
 					assignments={this.state.assignments}
 					headers={true}
 					onAssignmentClick={this.navigateToAssignmentDetails}
+					containerStyle={styles.assignmentListContainer}
 				/>
 			</View>
 		);
@@ -49,7 +50,11 @@ export default class CreatePlan extends React.Component<NavigationScreenProps, C
 
 const styles = StyleSheet.create({
 	container: {
-		height: '100%',
+		height: '100%'
+	},
+	assignmentListContainer: {
+		paddingLeft: 8,
+		paddingRight: 8,
 		paddingBottom: 64
 	}
 });

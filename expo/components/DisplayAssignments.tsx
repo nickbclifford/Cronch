@@ -103,20 +103,19 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	@bind
-	private renderSectionHeader({ section }: { section: SectionListData<string> }) {
+	private renderSectionHeader(info: { section: SectionListData<string> }) {
+		console.log('buh', info);
 		if (!this.props.headers) {
 			return null;
 		}
 		const itemStyles = StyleSheet.create({
 			container: {
-				marginTop: 48,
-				marginLeft: 16,
-				marginRight: 16,
+				marginTop: 32,
 				marginBottom: 16
 			}
 		});
 
-		const due = moment(section.title);
+		const due = moment(info.section.title);
 		const humanDate = humanReadableTimeUntil(due);
 
 		return (
@@ -133,7 +132,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 			container: {
 				display: 'flex',
 				flexDirection: 'row',
-				marginBottom: 16,
+				marginBottom: 8,
 				padding: 8,
 				borderRadius: 5,
 				backgroundColor: assignment.class.color
