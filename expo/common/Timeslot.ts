@@ -8,21 +8,21 @@ export interface Timeslot {
 	user: string;
 }
 
-export function create(start: Date, canvasId: string) {
+export function createTimeslot(start: Date, canvasId: string) {
 	return fetchWithJwt('/timeslot', {
 		method: 'POST',
 		body: JSON.stringify({ start, canvasId })
 	});
 }
 
-export function end(id: number, endDate: Date) {
+export function endTimeslot(id: number, endDate: Date) {
 	return fetchWithJwt('/timeslot/end', {
 		method: 'POST',
 		body: JSON.stringify({ id, end: endDate })
 	});
 }
 
-export function get(id: number) {
+export function getTimeslot(id: number) {
 	return fetchWithJwt<Timeslot>(`/timeslot/${id}`, {
 		method: 'GET'
 	}).then(convertJSONDates);

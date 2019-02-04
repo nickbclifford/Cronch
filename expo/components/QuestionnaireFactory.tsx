@@ -2,6 +2,8 @@ import bind from 'bind-decorator';
 import * as React from 'react';
 import { Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { submitResponse } from '../common/QuestionnaireResponse';
+import { PRIMARY } from '../common/StyleGuide';
 import Question, { QuestionInfo} from './Question';
 
 export interface QuestionnaireState {
@@ -10,7 +12,6 @@ export interface QuestionnaireState {
 }
 
 export default function createQuestionnaire(submitRoute: string, questions: QuestionInfo[]) {
-	// TODO: Save questionnaire responses somewhere
 	class Questionnaire extends React.Component<NavigationScreenProps, QuestionnaireState> {
 
 		static navigationOptions = {
@@ -29,12 +30,16 @@ export default function createQuestionnaire(submitRoute: string, questions: Ques
 		}
 
 		@bind
-		private onNextQuestion() {
+		private async onNextQuestion() {
+			const question = questions[this.state.questionIndex];
+			await submitResponse(question.question, question.responses[this.state.responseIndex!]);
 			this.setState(prev => ({ questionIndex: prev.questionIndex + 1, responseIndex: null }));
 		}
 
 		@bind
-		private onSubmit() {
+		private async onSubmit() {
+			const question = questions[this.state.questionIndex];
+			await submitResponse(question.question, question.responses[this.state.responseIndex!]);
 			this.props.navigation.navigate(submitRoute);
 			this.setState({ questionIndex: 0, responseIndex: null });
 		}
@@ -50,7 +55,7 @@ export default function createQuestionnaire(submitRoute: string, questions: Ques
 							onSelectResponse={this.onSelectResponse}
 						/>
 						<Button
-							color='#96db36'
+							color={PRIMARY[700]}
 							title={lastQuestion ? 'Submit' : 'Next Question'}
 							onPress={lastQuestion ? this.onSubmit : this.onNextQuestion}
 							disabled={this.state.responseIndex === null}

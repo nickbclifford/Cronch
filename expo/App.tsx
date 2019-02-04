@@ -2,9 +2,23 @@ import * as React from 'react';
 import { Alert } from 'react-native';
 import MyMICDS from './common/MyMICDS';
 
+import AssignmentContext, { AssignmentContextType } from './common/AssignmentContext';
 import AppContainer from './Navigation';
 
-export default class App extends React.Component {
+interface GlobalAppState extends AssignmentContextType { }
+
+export default class App extends React.Component<{}, GlobalAppState> {
+
+	constructor(props: {}) {
+		super(props);
+
+		this.state = {
+			assignments: [],
+			updateAssignments: newAssignments => {
+				this.setState({ assignments: newAssignments });
+			}
+		};
+	}
 
 	componentDidMount() {
 		MyMICDS.errors.subscribe(err => {
@@ -15,7 +29,9 @@ export default class App extends React.Component {
 
 	render() {
 		return (
-			<AppContainer/>
+			<AssignmentContext.Provider value={this.state}>
+				<AppContainer />
+			</AssignmentContext.Provider>
 		);
 	}
 }
