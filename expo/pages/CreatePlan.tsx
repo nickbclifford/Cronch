@@ -12,7 +12,7 @@ interface CreatePlanState {
 
 export default class CreatePlan extends React.Component<NavigationScreenProps, CreatePlanState> {
 
-	static navigationOptions = createNavigationOptions('Create Battle Plan');
+	static navigationOptions = createNavigationOptions('Create Battle Plan', false);
 
 	constructor(props: any) {
 		super(props);
@@ -39,8 +39,10 @@ export default class CreatePlan extends React.Component<NavigationScreenProps, C
 					navigation={this.props.navigation}
 					assignments={this.state.assignments}
 					headers={true}
+					paddingLeft={8}
+					paddingRight={8}
+					paddingBottom={64}
 					onAssignmentClick={this.navigateToAssignmentDetails}
-					containerStyle={styles.assignmentListContainer}
 				/>
 			</View>
 		);
@@ -51,10 +53,5 @@ export default class CreatePlan extends React.Component<NavigationScreenProps, C
 const styles = StyleSheet.create({
 	container: {
 		height: '100%'
-	},
-	assignmentListContainer: {
-		paddingLeft: 8,
-		paddingRight: 8,
-		paddingBottom: 64
 	}
 });

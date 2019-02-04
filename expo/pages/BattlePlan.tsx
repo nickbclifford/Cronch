@@ -20,7 +20,7 @@ interface BattlePlanState {
 
 export default class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 
-	static navigationOptions = createNavigationOptions<BattlePlanProps>(null, ({ navigation }) => {
+	static navigationOptions = createNavigationOptions<BattlePlanProps>(null, true, ({ navigation }) => {
 		return {
 			title: navigation.getParam('title'),
 			headerRight: navigation.getParam('editButton')
@@ -101,7 +101,10 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 						headers={false}
 						sort={false}
 						reorder={true}
-						containerStyle={styles.assignmentListContainer}
+						paddingTop={72}
+						paddingRight={8}
+						paddingLeft={8}
+						paddingBottom={32}
 					/>
 				)}
 				{!this.state.editMode && (
@@ -111,7 +114,10 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 						headers={false}
 						sort={false}
 						reorder={false}
-						containerStyle={styles.assignmentListContainer}
+						paddingTop={72}
+						paddingRight={8}
+						paddingLeft={8}
+						paddingBottom={32}
 						onAssignmentClick={this.navigateToTimer}
 					/>
 				)}
@@ -124,12 +130,6 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 const styles = StyleSheet.create({
 	container: {
 		height: '100%'
-	},
-	assignmentListContainer: {
-		paddingTop: 72,
-		paddingLeft: 8,
-		paddingRight: 8,
-		paddingBottom: 32
 	},
 	addAssignmentsContainer: {
 		width: '100%',

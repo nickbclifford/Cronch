@@ -26,6 +26,10 @@ interface DisplayAssignmentsProps extends NavigationScreenProps {
 	assignments: CanvasEvent[];
 	containerStyle?: StyleProp<ViewStyle>;
 	itemStyle?: StyleProp<ViewStyle>;
+	paddingTop?: number;
+	paddingRight?: number;
+	paddingBottom?: number;
+	paddingLeft?: number;
 	headers: boolean;
 	onAssignmentClick?: (assignment: CanvasEvent) => void;
 	sort?: boolean;
@@ -111,6 +115,8 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 		const itemStyles = StyleSheet.create({
 			container: {
 				marginTop: 32,
+				marginRight: this.props.paddingRight,
+				marginLeft: this.props.paddingLeft,
 				marginBottom: 16
 			}
 		});
@@ -132,6 +138,8 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 			container: {
 				display: 'flex',
 				flexDirection: 'row',
+				marginRight: this.props.paddingRight,
+				marginLeft: this.props.paddingLeft,
 				marginBottom: 8,
 				padding: 8,
 				borderRadius: 5,
@@ -206,6 +214,22 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 								{assignment.title}
 							</Text>
 						</View>
+						{this.shouldReorder && (
+							<TouchableWithoutFeedback
+								hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
+								onPressIn={moveHandler}
+								onPressOut={moveEndHandler}
+							>
+								<View style={itemStyles.moveIconContainer}>
+									<Icon
+										name='trash'
+										type='font-awesome'
+										size={20}
+										color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
+									/>
+								</View>
+							</TouchableWithoutFeedback>
+						)}
 					</View>
 				</TouchableOpacity>
 			</View>
@@ -222,6 +246,10 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	render() {
+		const padding = {
+			paddingTop: this.props.paddingTop,
+			paddingBottom: this.props.paddingBottom
+		};
 		if (this.props.headers) {
 			return (
 				<SectionList
@@ -230,7 +258,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 					sections={this.state.sectionedAssignments}
 					stickySectionHeadersEnabled={false}
 					keyExtractor={this.getCacheKey}
-					style={this.props.containerStyle}
+					style={[this.props.containerStyle, padding]}
 				/>
 			);
 		} else {
@@ -244,7 +272,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 					data={renderAssignments}
 					renderItem={this.renderAssignment}
 					keyExtractor={this.getCacheKey}
-					style={this.props.containerStyle}
+					style={[this.props.containerStyle, padding]}
 				/>
 			);
 		}

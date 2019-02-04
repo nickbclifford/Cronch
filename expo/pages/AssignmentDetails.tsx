@@ -75,7 +75,7 @@ export default class AssignmentDetails extends React.Component<
 							onLinkPress={this.onLinkPress}
 						/>
 					</ScrollView>
-					<Button title='Add to Battle Plan' onPress={this.navigateToTimer} buttonStyle={styles.workButton} />
+					<Button title='Add to Battle Plan' onPress={this.addToBattlePlan} buttonStyle={styles.workButton} />
 					<Button title='Mark as Completed' onPress={this.markAsCompleted} buttonStyle={styles.checkButton} />
 				</SafeAreaView>
 			</View>
