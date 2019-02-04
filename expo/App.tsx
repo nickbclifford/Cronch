@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Alert } from 'react-native';
 import MyMICDS from './common/MyMICDS';
 
-import AssignmentContext, { AssignmentContextType } from './common/AssignmentContext';
+import { AssignmentContext, AssignmentContextType } from './common/AssignmentContext';
 import AppContainer from './Navigation';
 
 interface GlobalAppState extends AssignmentContextType { }

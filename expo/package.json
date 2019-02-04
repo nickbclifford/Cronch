@@ -18,7 +18,7 @@
     "bind-decorator": "^1.0.11",
     "expo": "^31.0.2",
     "moment": "^2.24.0",
-    "react": "16.5.0",
+    "react": "^16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
     "react-native-draggable-flatlist": "^1.1.7",
     "react-native-elements": "^1.0.0",

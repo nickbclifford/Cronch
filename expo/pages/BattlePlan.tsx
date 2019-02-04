@@ -3,13 +3,13 @@ import * as React from 'react';
 import { Button as NativeButton, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
-import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
+import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
 import DisplayAssignments from '../components/DisplayAssignments';
 
-interface BattlePlanProps extends NavigationScreenProps {
+interface BattlePlanProps extends NavigationScreenProps, WithAssignmentContextProps {
 	getEditMode: () => boolean;
 	toggleEditMode: () => void;
 }
@@ -19,7 +19,7 @@ interface BattlePlanState {
 	editMode: boolean;
 }
 
-export default class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
+class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 
 	static navigationOptions = createNavigationOptions<BattlePlanProps>(null, true, ({ navigation }) => {
 		return {
@@ -27,9 +27,6 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 			headerRight: navigation.getParam('editButton')
 		};
 	});
-
-	static contextType = AssignmentContext;
-	context!: AssignmentContextType;
 
 	constructor(props: any) {
 		super(props);
@@ -39,7 +36,7 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 	componentDidMount() {
 		this.updateHeader();
 		setTimeout(() => {
-			console.log('context', this.context);
+			console.log('context', this.props.assignmentContext);
 
 			MyMICDS.canvas.getEvents().subscribe(events => {
 				this.setState({
@@ -130,6 +127,8 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 	}
 
 }
+
+export default withAssignmentContext(BattlePlan);
 
 const styles = StyleSheet.create({
 	container: {
