@@ -1,17 +1,21 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import createNavigationOptions from '../common/NavigationOptionsFactory';
 
-export default class About extends React.Component<NavigationScreenProps> {
+import Hamburger from '../components/Hamburger';
 
-	static navigationOptions = createNavigationOptions('About');
+export default class Template extends React.Component<NavigationScreenProps> {
+
+	static navigationOptions = {
+		header: null
+	};
 
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
+				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.container}>
-					<Text>This was created by cool people. Want to give feedback? Email support@mymicds.gov</Text>
+					<Text>Component Works!</Text>
 				</View>
 			</SafeAreaView>
 		);

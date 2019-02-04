@@ -20,6 +20,7 @@
     "moment": "^2.24.0",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
+    "react-native-draggable-flatlist": "^1.1.7",
     "react-native-elements": "^1.0.0",
     "react-native-render-html": "^3.10.0",
     "react-navigation": "^3.0.9",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@mymicds/configs": "^1.1.0",
+    "@types/react-native-draggable-flatlist": "^1.1.0",
     "@types/react-navigation": "^3.0.1",
     "babel-preset-expo": "^5.0.0",
     "expo-cli": "^2.7.0",
