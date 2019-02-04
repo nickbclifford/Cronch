@@ -1,6 +1,6 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS from '../common/MyMICDS';
 import Question from '../components/Question';
@@ -15,7 +15,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	static navigationOptions = {
 		header: null,
-		title: "Profile"
+		title: 'Profile'
 	};
 
 	constructor(props: any) {
@@ -38,11 +38,11 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 		this.setState({ selectedIndex: index });
 	}
 
-	questionnames = [
+	questionNames = [
 		'Send data to teachers',
 		'Send data to teachers anonymously',
 		"Don't send teachers data at all"
-	]
+	];
 
 	render() {
 		return (
@@ -50,8 +50,8 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.container}>
 					<Question
-						question="How should we handle your timer data?"
-						responses={this.questionnames}
+						question='How should we handle your timer data?'
+						responses={this.questionNames}
 						onSelectResponse={this.optChoose}
 						selectedIndex={this.state.selectedIndex}
 					/>

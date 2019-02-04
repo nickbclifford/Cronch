@@ -1,9 +1,10 @@
+import { DataSharing } from '../../backend/src/models/User';
 import { convertJSONDates, Timeslot } from './Timeslot';
 import { fetchWithJwt, Omit } from './Utils';
 
 export interface User {
 	username: string;
-	dataSharing: boolean;
+	dataSharing: DataSharing;
 }
 
 export function registerUser() {
