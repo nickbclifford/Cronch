@@ -6,7 +6,7 @@ import { Dimensions, GestureResponderEvent, ScrollView, StatusBar, StyleSheet, T
 import { Button, Divider } from 'react-native-elements';
 import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-
+import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import { humanReadableTimeUntil } from '../common/Utils';
 
@@ -34,6 +34,9 @@ export default class AssignmentDetails extends React.Component<
 		};
 	}
 
+	static contextType = AssignmentContext;
+	context!: AssignmentContextType;
+
 	constructor(props: any) {
 		super(props);
 		this.state = { assignment: this.props.navigation.getParam('assignment') };
@@ -47,6 +50,10 @@ export default class AssignmentDetails extends React.Component<
 	@bind
 	private addToBattlePlan() {
 		// this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
+		// this.context.updateAssignments();
+		console.log('context', this.context);
+		// this.context.appendAssignment(this.state.assignment);
+		this.props.navigation.navigate('BattlePlan');
 	}
 
 	@bind

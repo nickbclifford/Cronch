@@ -16,6 +16,11 @@ export default class App extends React.Component<{}, GlobalAppState> {
 			assignments: [],
 			updateAssignments: newAssignments => {
 				this.setState({ assignments: newAssignments });
+			},
+			appendAssignment: newAssignment => {
+				const newAssignments = this.state.assignments;
+				newAssignments.push(newAssignment);
+				this.setState({ assignments: newAssignments });
 			}
 		};
 	}

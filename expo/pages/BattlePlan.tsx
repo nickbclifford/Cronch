@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Button as NativeButton, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
+import AssignmentContext, { AssignmentContextType } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
@@ -27,16 +28,8 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 		};
 	});
 
-	// static navigationOptions = {
-	// 	headerRight: <Button title='Edit' onPress={() => undefined} />
-	// };
-
-	// static navigationOptions = {
-	// 	// header: null
-	// 	title: 'Battle Plan'
-	// 	headerLeft: ()
-	// 	// headerRight: <Button title='Attack' onPress={BattlePlan.attack} />
-	// };
+	static contextType = AssignmentContext;
+	context!: AssignmentContextType;
 
 	constructor(props: any) {
 		super(props);
@@ -45,11 +38,16 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 
 	componentDidMount() {
 		this.updateHeader();
+		setTimeout(() => {
+			console.log('context', this.context);
 
-		MyMICDS.canvas.getEvents().subscribe(events => {
-			this.setState({
-				assignments: events.hasURL ? events.events : []
+			MyMICDS.canvas.getEvents().subscribe(events => {
+				this.setState({
+					assignments: events.hasURL ? events.events : []
+				});
 			});
+
+			// this.setState({ assignments: this.context.assignments });
 		});
 	}
 
