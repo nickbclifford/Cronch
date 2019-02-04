@@ -81,6 +81,11 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 		this.props.navigation.navigate('Timer', { assignment });
 	}
 
+	@bind
+	private onReorder(newAssignments: CanvasEvent[]) {
+		this.setState({ assignments: newAssignments });
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
@@ -103,6 +108,7 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 						paddingRight={8}
 						paddingLeft={8}
 						paddingBottom={32}
+						onReorder={this.onReorder}
 					/>
 				)}
 				{!this.state.editMode && (
