@@ -16,6 +16,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Timer from './pages/Timer';
 import Welcome from './pages/Welcome';
+import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
 
 // tslint:disable:variable-name
 
@@ -33,13 +34,24 @@ const AuthNavigator = createStackNavigator(
 	}
 );
 
+const TimerAndModal = createStackNavigator(
+	{
+		Timer,
+		ModeSelection: TimerModeSelectionModal
+	},
+	{
+		mode: 'modal',
+		headerMode: 'none'
+	}
+)
+
 // Use custom trasition in the future
 const TimerNavigator = createStackNavigator(
 	{
 		BattlePlan,
 		CreatePlan,
 		AssignmentDetails,
-		Timer
+		Timer: TimerAndModal
 	},
 	{
 		initialRouteName: 'BattlePlan'
