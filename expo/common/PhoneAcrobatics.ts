@@ -1,15 +1,14 @@
-import { Gyroscope } from 'expo';
-import { Observable } from 'rxjs';
+// @ts-ignore
+import { DangerZone } from 'expo';
+const { DeviceMotion } = DangerZone;
+import { BehaviorSubject } from 'rxjs';
 
-const gyro$ = new Observable<boolean>(subscriber => {
-	Gyroscope.setUpdateInterval(250);
-	Gyroscope.addListener(result => {
-		if (result.y > 5.11 || result.y < -5.11) { // this value is the threshold of a 'flip'
-			subscriber.next(true);
-		} else {
-			subscriber.next(false);
-		}
-	});
+const flipped$ = new BehaviorSubject(false);
+
+DeviceMotion.setUpdateInterval(150);
+DeviceMotion.addListener((result: any) => {
+	const { alpha, beta, gamma } = result.rotation;
+	flipped$.next(Math.abs(gamma) > 2.7);
 });
 
-export default gyro$;
+export default flipped$;

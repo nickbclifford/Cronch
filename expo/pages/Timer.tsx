@@ -5,7 +5,7 @@ import { Alert, Picker, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import gyro$ from '../common/PhoneAcrobatics';
+import flipped$ from '../common/PhoneAcrobatics';
 import Hamburger from '../components/Hamburger';
 
 export interface TimerState {
@@ -29,7 +29,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		header: null
 	};
 
-	private interval = 0;
+	private interval!: NodeJS.Timer;
 
 	private userCycles: Array<{
 		work: number,
@@ -104,16 +104,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			}
 		}, 1000);
 
-		gyro$.subscribe(flipped => {
-			if (flipped && !this.state.onBreak) {
-				this.setState({
-					paused: true
-				});
-			} else {
-				this.setState({
-					paused: false
-				});
-			}
+		flipped$.subscribe(flipped => {
+			this.setState({
+				paused: flipped && !this.state.onBreak
+			});
 		});
 	}
 
@@ -151,27 +145,23 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private setTimerModeFactory(n: number) {
+	private setTimerMode(n: number) {
 		if (n === -1) {
-			return () => {
-				this.setState({
-					workTimeLeft: 0,
-					breakTimeLeft: 0,
-					onBreak: false,
-					paused: false,
-					modeSelection: n
-				});
-			};
+			this.setState({
+				workTimeLeft: 0,
+				breakTimeLeft: 0,
+				onBreak: false,
+				paused: false,
+				modeSelection: n
+			});
 		} else {
-			return () => {
-				this.setState({
-					workTimeLeft: this.userCycles[n].work,
-					breakTimeLeft: this.userCycles[n].break,
-					onBreak: false,
-					paused: false,
-					modeSelection: n
-				});
-			};
+			this.setState({
+				workTimeLeft: this.userCycles[n].work,
+				breakTimeLeft: this.userCycles[n].break,
+				onBreak: false,
+				paused: false,
+				modeSelection: n
+			});
 		}
 	}
 
@@ -230,7 +220,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				<Button title='Add Custom' onPress={this.addCustom}/>
 				<Picker
 					selectedValue={this.state.modeSelection}
-					onValueChange={this.setTimerModeFactory}
+					onValueChange={this.setTimerMode}
 				>
 					{this.userCycles.map((cycle, i) =>
 						<Picker.Item key={i} label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`} value={i}/>
