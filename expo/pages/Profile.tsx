@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Alert, Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS from '../common/MyMICDS';
-import { changeUserInfo, getUserInfo } from '../common/User';
+import { changeUserInfo, getUser } from '../common/User';
 import Question from '../components/Question';
 
 import Hamburger from '../components/Hamburger';
@@ -28,7 +28,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	}
 
 	async componentDidMount() {
-		const { dataSharing } = await getUserInfo();
+		const { dataSharing } = await getUser();
 		this.setState({ selectedIndex: dataSharing });
 	}
 

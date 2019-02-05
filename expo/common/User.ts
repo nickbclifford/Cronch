@@ -13,7 +13,7 @@ export function registerUser() {
 	});
 }
 
-export function getUserInfo() {
+export function getUser() {
 	return fetchWithJwt<User>('/user', {
 		method: 'GET'
 	});
