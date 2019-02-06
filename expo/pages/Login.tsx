@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import MyMICDS from '../common/MyMICDS';
 import { getUser, registerUser } from '../common/User';
+import { oxfordCommaList } from '../common/Utils';
 
 export interface LoginState {
 	user: string;
@@ -47,17 +48,18 @@ export default class Login extends React.Component<NavigationScreenProps, LoginS
 			// Make sure that the user has all their URLs intact
 			switchMap(() => MyMICDS.user.getInfo()),
 			switchMap(({ canvasURL, portalURLCalendar, portalURLClasses }) => {
-				if (canvasURL === null) {
-					return throwError(new Error('Missing Canvas URL on MyMICDS'));
-				}
-				if (portalURLCalendar === null) {
-					return throwError(new Error('Missing Portal calendar URL on MyMICDS'));
-				}
-				if (portalURLClasses === null) {
-					return throwError(new Error('Missing Portal classes URL on MyMICDS'));
-				}
+				const missingURLs: string[] = [];
+				if (canvasURL === null)         { missingURLs.push('Canvas');          }
+				if (portalURLCalendar === null) { missingURLs.push('Portal calendar'); }
+				if (portalURLClasses === null)  { missingURLs.push('Portal classes');  }
 
-				console.log('done logging in');
+				if (missingURLs.length > 0) {
+					return throwError(new Error(
+						`Looks like you haven't saved your ${oxfordCommaList(missingURLs)} ` +
+						`feed${missingURLs.length === 1 ? '' : 's'} on MyMICDS. Please go to your settings on MyMICDS.net ` +
+						`and configure ${missingURLs.length === 1 ? 'it' : 'them'} in order to use Cronch.`
+					));
+				}
 
 				// It didn't like when I used the EMPTY constant for some reason
 				return of({});
