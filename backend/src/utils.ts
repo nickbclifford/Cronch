@@ -49,21 +49,22 @@ export const jwtMiddleware: RequestHandler = (req, res, next) => {
 	// Otherwise, make sure it's in the correct format
 	if (!header.startsWith('Bearer ')) {
 		errorResponse(res, new APIError('Invalid authorization header', 400));
-		next();
 		return;
 	}
 
 	// Finally, do all the important verification stuff
 	promisify(verify)(header.substring(7), config.mymicdsJwtSecret).then((payload: { [key: string]: any }) => {
 		req.authorizedUser = payload.user;
+		next();
 	}).catch(() => {
 		errorResponse(res, new APIError('Invalid authorization token', 401));
-	}).finally(next);
+	});
 };
 
 export const requireLoggedIn: RequestHandler = (req, res, next) => {
 	if (req.authorizedUser === null) {
 		errorResponse(res, new APIError('Unauthorized', 401));
+		return;
 	}
 
 	next();
