@@ -15,8 +15,8 @@ import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Timer from './pages/Timer';
-import Welcome from './pages/Welcome';
 import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
+import Welcome from './pages/Welcome';
 
 // tslint:disable:variable-name
 
@@ -43,7 +43,7 @@ const TimerAndModal = createStackNavigator(
 		mode: 'modal',
 		headerMode: 'none'
 	}
-)
+);
 
 // Use custom trasition in the future
 const TimerNavigator = createStackNavigator(
