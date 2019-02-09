@@ -1,16 +1,20 @@
 import {
 	createAppContainer,
+	createBottomTabNavigator,
 	createDrawerNavigator,
 	createStackNavigator,
-	createSwitchNavigator
+	createSwitchNavigator,
+	StackNavigatorConfig
 } from 'react-navigation';
 
+import createNavigationOptions from './common/NavigationOptionsFactory';
 import createQuestionnaire from './components/QuestionnaireFactory';
 
 import About from './pages/About';
 import AssignmentDetails from './pages/AssignmentDetails';
 import BattlePlan from './pages/BattlePlan';
-import CreatePlan from './pages/CreatePlan';
+import CanvasAssignments from './pages/create-plan/CanvasAssignments';
+import CustomAssignments from './pages/create-plan/CustomAssignments';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -20,8 +24,8 @@ import Welcome from './pages/Welcome';
 
 // tslint:disable:variable-name
 
-function createSingleStackNavigator(Component: any) {
-	return createStackNavigator({ Component });
+function createSingleStackNavigator(Component: any, config?: StackNavigatorConfig) {
+	return createStackNavigator({ Component }, config);
 }
 
 const AuthNavigator = createStackNavigator(
@@ -31,6 +35,16 @@ const AuthNavigator = createStackNavigator(
 	},
 	{
 		initialRouteName: 'Welcome'
+	}
+);
+
+const CreatePlan = createBottomTabNavigator(
+	{
+		CanvasAssignments,
+		CustomAssignments
+	},
+	{
+		initialRouteName: 'CanvasAssignments'
 	}
 );
 
@@ -49,7 +63,10 @@ const TimerAndModal = createStackNavigator(
 const TimerNavigator = createStackNavigator(
 	{
 		BattlePlan,
-		CreatePlan,
+		CreatePlan: {
+			screen: CreatePlan,
+			navigationOptions: createNavigationOptions('Create Plan', false)
+		},
 		AssignmentDetails,
 		Timer: TimerAndModal
 	},

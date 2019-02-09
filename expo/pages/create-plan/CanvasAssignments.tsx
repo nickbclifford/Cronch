@@ -2,17 +2,20 @@ import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
-import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
-import createNavigationOptions from '../common/NavigationOptionsFactory';
-import DisplayAssignments from '../components/DisplayAssignments';
+import MyMICDS, { CanvasEvent } from '../../common/MyMICDS';
+import createNavigationOptions from '../../common/NavigationOptionsFactory';
+import DisplayAssignments from '../../components/DisplayAssignments';
 
-interface CreatePlanState {
+interface CanvasAssignmentsState {
 	assignments: CanvasEvent[];
 }
 
-export default class CreatePlan extends React.Component<NavigationScreenProps, CreatePlanState> {
+export default class CanvasAssignments extends React.Component<NavigationScreenProps, CanvasAssignmentsState> {
 
-	static navigationOptions = createNavigationOptions('Create Battle Plan', false);
+	static navigationOptions = {
+		title: 'Canvas',
+		header: null
+	};
 
 	constructor(props: any) {
 		super(props);
