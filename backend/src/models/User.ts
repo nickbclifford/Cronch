@@ -1,6 +1,12 @@
-import { Column, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import Response from './QuestionnaireResponse';
 import Timeslot from './Timeslot';
+
+export enum DataSharing {
+	NO_SEND,
+	FULL_SEND_ANONYMOUS,
+	FULL_SEND
+}
 
 @Table
 export default class User extends Model<User> {
@@ -8,9 +14,8 @@ export default class User extends Model<User> {
 	@Column
 	username!: string; // MyMICDS username
 
-	@Default(false)
-	@Column
-	dataSharing!: boolean;
+	@Column(DataType.INTEGER)
+	dataSharing!: DataSharing;
 
 	@HasMany(() => Timeslot)
 	timeslots!: Timeslot[];

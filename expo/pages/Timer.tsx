@@ -245,6 +245,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	private recordTimeSlot() {
+		// TODO: Custom events
 		return createTimeslot(new Date(), mockAssignment.canvasEvent._id);
 	}
 

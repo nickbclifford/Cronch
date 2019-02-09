@@ -1,6 +1,6 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 
 export interface QuestionInfo {
@@ -29,7 +29,7 @@ export default class Question extends React.Component<QuestionProps> {
 	render() {
 		const responseRadios = this.props.responses.map((res, i) => (
 			<CheckBox
-				center={true}
+				center={false}
 				title={res}
 				checked={this.props.selectedIndex === i}
 				checkedIcon='dot-circle-o'
@@ -39,11 +39,20 @@ export default class Question extends React.Component<QuestionProps> {
 			/>
 		));
 		return (
-			<View>
-				<Text>{this.props.question}</Text>
+			<View style={styles.container}>
+				<Text style={styles.text}>{this.props.question}</Text>
 				{responseRadios}
 			</View>
 		);
 	}
 
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1
+	},
+	text: {
+		alignSelf: 'center'
+	}
+});

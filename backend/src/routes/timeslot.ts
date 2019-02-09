@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Timeslot from '../models/Timeslot';
+import Timeslot, { TaskType } from '../models/Timeslot';
 import { APIError, errorResponse, requireLoggedIn, successResponse } from '../utils';
 
 const router = Router();
@@ -8,14 +8,33 @@ router.post('/', requireLoggedIn, (req, res) => {
 	const start = new Date(req.body.start);
 	if (isNaN(start.getTime())) { errorResponse(res, new APIError('Invalid start time', 400)); return; }
 
-	const canvasId = req.body.canvasId;
+	const taskType: TaskType = req.body.taskType;
+	if (typeof taskType !== 'number' && (taskType < TaskType.CANVAS_ASSIGNMENT || taskType > TaskType.CUSTOM)) {
+		errorResponse(res, new APIError('Invalid task type', 400));
+	}
+
+	const canvasId = req.body.canvasId as string || null;
+	if (taskType !== TaskType.CUSTOM && canvasId === null) {
+		errorResponse(res, new APIError('Missing required Canvas assignment/class object ID', 400));
+		return;
+	}
 	// Object IDs have to be 24 chars long
 	if (typeof canvasId !== 'string' || canvasId.length !== 24) {
-		errorResponse(res, new APIError('Invalid Canvas event object ID', 400));
+		errorResponse(res, new APIError('Invalid Canvas assignment/class object ID', 400));
 		return;
 	}
 
-	const timeslot = new Timeslot({ start, canvasId, user: req.authorizedUser! });
+	const customTitle = req.body.customTitle as string || null;
+	if (taskType !== TaskType.CANVAS_CLASS && customTitle === null) {
+		errorResponse(res, new APIError('Missing required custom task title', 400));
+		return;
+	}
+	if (typeof customTitle !== 'string') {
+		errorResponse(res, new APIError('Invalid custom task title', 400));
+		return;
+	}
+
+	const timeslot = new Timeslot({ start, taskType, canvasId, customTitle, user: req.authorizedUser! });
 	timeslot.save()
 		.then(() => successResponse(res))
 		.catch(err => errorResponse(res, err));

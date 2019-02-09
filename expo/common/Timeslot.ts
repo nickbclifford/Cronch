@@ -1,17 +1,20 @@
-import { fetchWithJwt } from './Utils';
+import { TaskType } from '../../backend/src/models/Timeslot';
+import { fetchWithJwt, Omit } from './Utils';
 
 export interface Timeslot {
 	id: number;
 	start: Date;
 	end: Date | null;
-	canvasId: string;
+	taskType: TaskType;
+	canvasId: string | null;
+	customTitle: string | null;
 	user: string;
 }
 
-export function createTimeslot(start: Date, canvasId: string) {
+export function createTimeslot(timeslot: Omit<Timeslot, 'id' | 'end' | 'user'>) {
 	return fetchWithJwt('/timeslot', {
 		method: 'POST',
-		body: JSON.stringify({ start, canvasId })
+		body: JSON.stringify(timeslot)
 	});
 }
 

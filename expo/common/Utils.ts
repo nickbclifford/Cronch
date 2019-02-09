@@ -1,7 +1,8 @@
 import moment from 'moment';
 
+import { AsyncStorage } from 'react-native';
 import Config from '../Config';
-import MyMICDS from './MyMICDS';
+import { jwtKey } from './MyMICDS';
 
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 
@@ -12,7 +13,7 @@ export interface APIResponse<T> {
 
 export async function fetchWithJwt<T>(route: string, options: RequestInit) {
 	// These will only be called when the user is logged in, so we can safely say that JWT will always be defined
-	const jwt = await MyMICDS.auth.$.toPromise();
+	const jwt = await AsyncStorage.getItem(jwtKey)!;
 	const injectedOptions = Object.assign(options, {
 		headers: {
 			'Authorization': `Bearer ${jwt}`,
@@ -39,4 +40,9 @@ export function humanReadableTimeUntil(date: moment.Moment) {
 		lastWeek: '[Last] dddd',
 		sameElse: 'MM/DD'
 	});
+}
+
+export function oxfordCommaList(arr: string[]): string {
+	const last = arr.pop();
+	return `${arr.join(', ')}, and ${last}`;
 }
