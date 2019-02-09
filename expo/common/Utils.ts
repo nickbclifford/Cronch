@@ -14,7 +14,6 @@ export interface APIResponse<T> {
 export async function fetchWithJwt<T>(route: string, options: RequestInit) {
 	// These will only be called when the user is logged in, so we can safely say that JWT will always be defined
 	const jwt = await AsyncStorage.getItem(jwtKey)!;
-	console.log(jwt);
 	const injectedOptions = Object.assign(options, {
 		headers: {
 			'Authorization': `Bearer ${jwt}`,

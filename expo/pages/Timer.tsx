@@ -5,7 +5,8 @@ import { Alert, Picker, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { TaskType } from '../common/TaskType';
-import { createTimeslot, endTimeslot } from '../common/Timeslot';
+import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
+import { Omit } from '../common/Utils';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 import flipped$ from '../common/PhoneAcrobatics';
@@ -221,12 +222,25 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	private recordTimeSlot() {
-		return createTimeslot({
-			start: new Date(),
-			canvasId: this.state.assignment ? this.state.assignment._id : null,
-			taskType: this.state.assignment ? TaskType.CANVAS_ASSIGNMENT : TaskType.CUSTOM,
-			customTitle: null
-		}).then(res => {
+		console.log(JSON.stringify(this.state.assignment));
+		const isCanvasAssignment = !this.state.assignment;
+		let timeslot: Omit<Timeslot, 'id' | 'end' | 'user'>;
+		if (isCanvasAssignment) {
+			timeslot = {
+				start: new Date(),
+				canvasId: this.state.assignment._id,
+				taskType: TaskType.CANVAS_ASSIGNMENT,
+				customTitle: null
+			};
+		} else {
+			timeslot = {
+				start: new Date(),
+				canvasId: null,
+				taskType: TaskType.CUSTOM,
+				customTitle: 'Custom Study Time'
+			};
+		}
+		return createTimeslot(timeslot).then(res => {
 			this.setState({ currentTimeslotId: res.id });
 		});
 	}

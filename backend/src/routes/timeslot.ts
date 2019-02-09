@@ -19,13 +19,13 @@ router.post('/', requireLoggedIn, (req, res) => {
 		return;
 	}
 	// Object IDs have to be 24 chars long
-	if (typeof canvasId !== 'string' || canvasId.length !== 24) {
+	if (taskType !== TaskType.CUSTOM && (typeof canvasId !== 'string' || canvasId.length !== 24)) {
 		errorResponse(res, new APIError('Invalid Canvas assignment/class object ID', 400));
 		return;
 	}
 
 	const customTitle = req.body.customTitle as string || null;
-	if (taskType !== TaskType.CANVAS_CLASS && customTitle === null) {
+	if (taskType !== TaskType.CANVAS_ASSIGNMENT && customTitle === null) {
 		errorResponse(res, new APIError('Missing required custom task title', 400));
 		return;
 	}
