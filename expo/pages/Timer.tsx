@@ -4,8 +4,8 @@ import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { createTimeslot, endTimeslot } from '../common/Timeslot';
 import { TaskType } from '../common/TaskType';
+import { createTimeslot, endTimeslot } from '../common/Timeslot';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 import flipped$ from '../common/PhoneAcrobatics';
@@ -92,9 +92,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
-		// TODO: Custom events
+		// TODO: Custom events bb
 		if (this.state.currentTimeslotId) {
-			return endTimeslot(this.state.currentTimeslotId, new Date());
+			return endTimeslot(this.state.currentTimeslotId, new Date())
+				.then(() => {
+					console.log('buh sent');
+				})
+				.catch((e: any) => {
+					Alert.alert('Error ending time slot.', e.message);
+				});
 		}
 	}
 

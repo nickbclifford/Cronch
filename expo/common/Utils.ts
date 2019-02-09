@@ -1,7 +1,8 @@
 import moment from 'moment';
 
+import { AsyncStorage } from 'react-native';
 import Config from '../Config';
-import MyMICDS from './MyMICDS';
+import { jwtKey } from './MyMICDS';
 
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 
@@ -12,7 +13,8 @@ export interface APIResponse<T> {
 
 export async function fetchWithJwt<T>(route: string, options: RequestInit) {
 	// These will only be called when the user is logged in, so we can safely say that JWT will always be defined
-	const jwt = MyMICDS.auth.snapshot;
+	const jwt = await AsyncStorage.getItem(jwtKey)!;
+	console.log(jwt);
 	const injectedOptions = Object.assign(options, {
 		headers: {
 			'Authorization': `Bearer ${jwt}`,
