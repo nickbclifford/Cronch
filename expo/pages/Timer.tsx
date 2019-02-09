@@ -80,29 +80,17 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			// Only pause when user is not on break
 			if (!this.state.onBreak) {
 				console.log('buh', flipped);
-				this.setState({ paused: flipped });
+				this.setState({ paused: !flipped });
 			}
-
-			this.recordTimeSlot().then(() => {
-				console.log('buh sent');
-			}).catch((e: any) => {
-				Alert.alert('Error saving time slot.', e.message);
-			});
 		});
+
+		this.startRecordTimeslot();
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
 		// TODO: Custom events bb
-		if (this.state.currentTimeslotId) {
-			return endTimeslot(this.state.currentTimeslotId, new Date())
-				.then(() => {
-					console.log('buh sent');
-				})
-				.catch((e: any) => {
-					Alert.alert('Error ending time slot.', e.message);
-				});
-		}
+		this.endRecordTimeslot();
 	}
 
 	componentDidUpdate() {
@@ -168,14 +156,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					paused: true
 				});
 				Alert.alert(
-					'Time for a break!',
+					'Time for work!',
 					'Yuhyuhyuh',
 					[
 						{ text: 'Continue', onPress: () => {
+							this.startRecordTimeslot();
 							this.setState({
 								breakTimeLeft: this.userCycles[this.state.modeSelection].break,
 								onBreak: false,
-								paused: false
+								paused: true
 							});
 						} }
 					]
@@ -191,10 +180,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					paused: true
 				});
 				Alert.alert(
-					'Time for work!',
+					'Time for a break!',
 					'Please select an option',
 					[
 						{ text: 'Continue', onPress: () => {
+							this.endRecordTimeslot();
 							this.setState({
 								workTimeLeft: this.userCycles[this.state.modeSelection].work,
 								onBreak: true,
@@ -220,10 +210,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			});
 		}
 	}
-
-	private recordTimeSlot() {
-		console.log(JSON.stringify(this.state.assignment));
-		const isCanvasAssignment = !this.state.assignment;
+	private startRecordTimeslot() {
+		const isCanvasAssignment = this.state.assignment;
 		let timeslot: Omit<Timeslot, 'id' | 'end' | 'user'>;
 		if (isCanvasAssignment) {
 			timeslot = {
@@ -242,8 +230,32 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		}
 		return createTimeslot(timeslot).then(res => {
 			this.setState({ currentTimeslotId: res.id });
+		})
+		.then(() => {
+			console.log('buh started');
+		}).catch((e: any) => {
+			Alert.alert('Error saving time slot.', e.message);
 		});
 	}
+
+	private endRecordTimeslot() {
+		if (this.state.currentTimeslotId) {
+			return endTimeslot(this.state.currentTimeslotId, new Date())
+			.then(() => {
+				console.log('buh ended');
+				this.setState({ currentTimeslotId: null });
+			})
+			.catch((e: any) => {
+				Alert.alert('Error ending time slot.', e.message);
+			});
+		}
+	}
+
+	// private toggleRecordTimeslot() {
+	// 	if (!this.state.currentTimeslotId) {
+	// 	} else {
+	// 	}
+	// }
 
 	@bind
 	private navigateToAssignmentDetails(assignment: CanvasEvent) {
@@ -257,9 +269,13 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				<DisplayAssignments
 					navigation={this.props.navigation}
 					assignments={[this.state.assignment]}
-					headers={true}
-					paddingLeft={8}
+					headers={false}
+					sort={false}
+					reorder={false}
+					paddingTop={72}
 					paddingRight={8}
+					paddingLeft={8}
+					paddingBottom={32}
 					onAssignmentClick={this.navigateToAssignmentDetails}
 				/>
 				<Button

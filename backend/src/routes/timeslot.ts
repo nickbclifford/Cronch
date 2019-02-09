@@ -29,7 +29,7 @@ router.post('/', requireLoggedIn, (req, res) => {
 		errorResponse(res, new APIError('Missing required custom task title', 400));
 		return;
 	}
-	if (typeof customTitle !== 'string') {
+	if (taskType !== TaskType.CANVAS_ASSIGNMENT && typeof customTitle !== 'string') {
 		errorResponse(res, new APIError('Invalid custom task title', 400));
 		return;
 	}
