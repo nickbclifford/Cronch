@@ -5,6 +5,10 @@ export interface WithAssignmentContextProps {
 	assignmentContext: AssignmentContextType;
 }
 
+interface WithNavigationOptions {
+	navigationOptions?: any;
+}
+
 export interface AssignmentContextType {
 	assignments: CanvasEvent[];
 	updateAssignments(newAssignments: CanvasEvent[]): void;
@@ -22,11 +26,18 @@ export const AssignmentContext = React.createContext<AssignmentContextType>({
 
 export default function withAssignmentContext<P>(
 	// tslint:disable-next-line:variable-name
-	Component: React.ComponentType<P & WithAssignmentContextProps>
-): React.SFC<P> {
-	return props => (
+	Component: React.ComponentType<P & WithAssignmentContextProps> & WithNavigationOptions
+) {
+	const sfc: React.SFC<P> & WithNavigationOptions = props => (
 		<AssignmentContext.Consumer>
-			{context =>	<Component {...props} assignmentContext={context} />}
+			{context => <Component {...props} assignmentContext={context} />}
 		</AssignmentContext.Consumer>
 	);
+
+	// Pass on possible React Navigation options
+	const options = Component.navigationOptions;
+	if (typeof options !== 'undefined') {
+		sfc.navigationOptions = options;
+	}
+	return sfc;
 }
