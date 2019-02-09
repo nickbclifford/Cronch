@@ -4,7 +4,7 @@ import { Button as NativeButton, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
-import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
+import { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
 import DisplayAssignments from '../components/DisplayAssignments';
@@ -15,7 +15,6 @@ interface BattlePlanProps extends NavigationScreenProps, WithAssignmentContextPr
 }
 
 interface BattlePlanState {
-	assignments: CanvasEvent[];
 	editMode: boolean;
 }
 
@@ -30,22 +29,11 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 
 	constructor(props: any) {
 		super(props);
-		this.state = { assignments: [], editMode: false };
+		this.state = { editMode: false };
 	}
 
 	componentDidMount() {
 		this.updateHeader();
-		setTimeout(() => {
-			console.log('context', this.props.assignmentContext);
-
-			MyMICDS.canvas.getEvents().subscribe(events => {
-				this.setState({
-					assignments: events.hasURL ? events.events : []
-				});
-			});
-
-			// this.setState({ assignments: this.context.assignments });
-		});
 	}
 
 	@bind
@@ -80,7 +68,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 
 	@bind
 	private onReorder(newAssignments: CanvasEvent[]) {
-		this.setState({ assignments: newAssignments });
+		this.props.assignmentContext.updateAssignments(newAssignments);
 	}
 
 	render() {
@@ -97,7 +85,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 				{this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
-						assignments={this.state.assignments}
+						assignments={this.props.assignmentContext.assignments}
 						headers={false}
 						sort={false}
 						reorder={true}
@@ -111,7 +99,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 				{!this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
-						assignments={this.state.assignments}
+						assignments={this.props.assignmentContext.assignments}
 						headers={false}
 						sort={false}
 						reorder={false}

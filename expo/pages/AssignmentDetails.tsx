@@ -46,10 +46,7 @@ class AssignmentDetails extends React.Component<
 
 	@bind
 	private addToBattlePlan() {
-		// this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
-		// this.context.updateAssignments();
-		console.log('context', this.props.assignmentContext);
-		// this.context.appendAssignment(this.state.assignment);
+		this.props.assignmentContext.appendAssignment(this.state.assignment);
 		this.props.navigation.navigate('BattlePlan');
 	}
 
