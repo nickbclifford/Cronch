@@ -40,3 +40,8 @@ export function humanReadableTimeUntil(date: moment.Moment) {
 		sameElse: 'MM/DD'
 	});
 }
+
+export function oxfordCommaList(arr: string[]): string {
+	const last = arr.pop();
+	return `${arr.join(', ')}, and ${last}`;
+}

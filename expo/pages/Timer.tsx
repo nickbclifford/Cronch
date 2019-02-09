@@ -4,7 +4,8 @@ import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { createTimeslot } from '../common/Timeslot';
+import { createTimeslot, endTimeslot } from '../common/Timeslot';
+import { TaskType } from '../common/TaskType';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 import flipped$ from '../common/PhoneAcrobatics';
@@ -18,6 +19,7 @@ export interface TimerState {
 	modeSelection: number;
 	flipped: boolean;
 	assignment: CanvasEvent;
+	currentTimeslotId: number | null;
 }
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
@@ -53,7 +55,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			paused: true,
 			modeSelection: 0,
 			flipped: false,
-			assignment: this.props.navigation.getParam('assignment')
+			assignment: this.props.navigation.getParam('assignment'),
+			currentTimeslotId: null
 		};
 	}
 
@@ -89,6 +92,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
+		// TODO: Custom events
+		if (this.state.currentTimeslotId) {
+			return endTimeslot(this.state.currentTimeslotId, new Date());
+		}
 	}
 
 	componentDidUpdate() {
@@ -208,7 +215,14 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	private recordTimeSlot() {
-		return createTimeslot(new Date(), this.state.assignment._id);
+		return createTimeslot({
+			start: new Date(),
+			canvasId: this.state.assignment ? this.state.assignment._id : null,
+			taskType: this.state.assignment ? TaskType.CANVAS_ASSIGNMENT : TaskType.CUSTOM,
+			customTitle: null
+		}).then(res => {
+			this.setState({ currentTimeslotId: res.id });
+		});
 	}
 
 	@bind
@@ -221,12 +235,12 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<DisplayAssignments
-				navigation={this.props.navigation}
-				assignments={[this.state.assignment]}
-				headers={true}
-				paddingLeft={8}
-				paddingRight={8}
-				onAssignmentClick={this.navigateToAssignmentDetails}
+					navigation={this.props.navigation}
+					assignments={[this.state.assignment]}
+					headers={true}
+					paddingLeft={8}
+					paddingRight={8}
+					onAssignmentClick={this.navigateToAssignmentDetails}
 				/>
 				<Button
 					title='Create Battle Plan'
@@ -243,7 +257,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					onValueChange={this.setTimerMode}
 				>
 					{this.userCycles.map((cycle, i) =>
-						<Picker.Item key={i} label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`} value={i}/>
+						<Picker.Item
+							key={i}
+							label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`}
+							value={i}
+						/>
 					)}
 					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
 				</Picker>

@@ -1,8 +1,9 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Alert, Button, StyleSheet, View } from 'react-native';
+import { Alert, AsyncStorage, Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import MyMICDS from '../common/MyMICDS';
+import { switchMap } from 'rxjs/operators';
+import MyMICDS, { jwtKey } from '../common/MyMICDS';
 import { changeUserInfo, getUser } from '../common/User';
 import Question from '../components/Question';
 
@@ -34,7 +35,9 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	@bind
 	private logout() {
-		MyMICDS.auth.logout().subscribe(() => {
+		MyMICDS.auth.logout().pipe(
+			switchMap(() => AsyncStorage.removeItem(jwtKey))
+		).subscribe(() => {
 			this.props.navigation.navigate('Auth');
 		});
 	}
