@@ -3,10 +3,11 @@ import * as React from 'react';
 import { Button as NativeButton, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
+
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
-import { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
+import Task from '../common/Task';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 interface BattlePlanProps extends NavigationScreenProps, WithAssignmentContextProps {
@@ -62,12 +63,12 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 	}
 
 	@bind
-	private navigateToTimer(assignment: CanvasEvent) {
+	private navigateToTimer(assignment: Task) {
 		this.props.navigation.navigate('Timer', { assignment });
 	}
 
 	@bind
-	private onReorder(newAssignments: CanvasEvent[]) {
+	private onReorder(newAssignments: Task[]) {
 		this.props.assignmentContext.updateAssignments(newAssignments);
 	}
 

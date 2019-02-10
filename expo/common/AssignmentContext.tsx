@@ -1,5 +1,5 @@
-import { CanvasEvent } from '@mymicds/sdk';
 import * as React from 'react';
+import Task from '../common/Task';
 
 export interface WithAssignmentContextProps {
 	assignmentContext: AssignmentContextType;
@@ -10,9 +10,9 @@ interface WithNavigationOptions {
 }
 
 export interface AssignmentContextType {
-	assignments: CanvasEvent[];
-	updateAssignments(newAssignments: CanvasEvent[]): void;
-	appendAssignment(newAssignment: CanvasEvent): void;
+	assignments: Task[];
+	updateAssignments(newAssignments: Task[]): void;
+	appendAssignment(newAssignment: Task): void;
 }
 
 // tslint:disable-next-line:variable-name

@@ -6,6 +6,7 @@ import { Dimensions, GestureResponderEvent, ScrollView, StatusBar, StyleSheet, T
 import { Button, Divider } from 'react-native-elements';
 import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+
 import withAssignmentContext, {	WithAssignmentContextProps } from '../common/AssignmentContext';
 import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import { humanReadableTimeUntil } from '../common/Utils';

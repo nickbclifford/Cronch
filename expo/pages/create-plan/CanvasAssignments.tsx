@@ -4,12 +4,13 @@ import { StyleSheet, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
-import MyMICDS, { CanvasEvent } from '../../common/MyMICDS';
+import MyMICDS from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
+import Task from '../../common/Task';
 import DisplayAssignments from '../../components/DisplayAssignments';
 
 interface CanvasAssignmentsState {
-	assignments: CanvasEvent[];
+	assignments: Task[];
 }
 
 export default class CanvasAssignments extends React.Component<NavigationScreenProps, CanvasAssignmentsState> {
@@ -42,7 +43,7 @@ export default class CanvasAssignments extends React.Component<NavigationScreenP
 	}
 
 	@bind
-	private navigateToAssignmentDetails(assignment: CanvasEvent) {
+	private navigateToAssignmentDetails(assignment: Task) {
 		this.props.navigation.navigate('AssignmentDetails', { assignment });
 	}
 
