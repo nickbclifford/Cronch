@@ -83,3 +83,24 @@ export const typography = StyleSheet.create({
 		fontSize: 12
 	}
 });
+
+export const components = StyleSheet.create({
+	textInput: {
+		marginBottom: 32,
+		padding: 8,
+		backgroundColor: NEUTRAL[300],
+		color: NEUTRAL[700],
+		borderRadius: 5
+	},
+	buttonStyle: {
+		paddingTop: 12,
+		paddingRight: 24,
+		paddingLeft: 24,
+		paddingBottom: 12,
+		backgroundColor: PRIMARY[700],
+		borderRadius: 32
+	},
+	buttonText: {
+		textTransform: 'uppercase'
+	}
+});

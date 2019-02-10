@@ -7,7 +7,7 @@ import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, {	WithAssignmentContextProps } from '../../common/AssignmentContext';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
-import { NEUTRAL, PRIMARY, typography } from '../../common/StyleGuide';
+import { components, NEUTRAL, typography } from '../../common/StyleGuide';
 import { createCustomTask } from '../../common/Task';
 
 interface CustomAssignmentsForm {
@@ -54,13 +54,13 @@ class CustomAssignments extends React.Component<NavigationScreenProps & WithAssi
 							onChangeText={props.handleChange('taskName')}
 							onBlur={props.handleBlur('taskName')}
 							value={props.values.taskName}
-							style={[typography.body, styles.input]}
+							style={[typography.body, components.textInput]}
 							placeholderTextColor={NEUTRAL[500]}
 						/>
 						<Button
 							title='Add to Plan'
-							buttonStyle={styles.submitButton}
-							titleStyle={styles.submitText}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.textInput}
 							onPress={props.handleSubmit as any}
 						/>
 					</View>
@@ -79,20 +79,5 @@ const styles = StyleSheet.create({
 		paddingLeft: 8,
 		paddingRight: 8,
 		paddingBottom: 32
-	},
-	input: {
-		marginBottom: 32,
-		padding: 8,
-		backgroundColor: NEUTRAL[300],
-		color: NEUTRAL[700],
-		borderRadius: 5
-	},
-	submitButton: {
-		paddingTop: 8,
-		paddingBottom: 8,
-		backgroundColor: PRIMARY[700]
-	},
-	submitText: {
-		textTransform: 'uppercase'
 	}
 });
