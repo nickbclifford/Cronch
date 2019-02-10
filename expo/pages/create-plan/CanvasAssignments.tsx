@@ -1,9 +1,12 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
+
 import MyMICDS, { CanvasEvent } from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
+import { NEUTRAL } from '../../common/StyleGuide';
 import DisplayAssignments from '../../components/DisplayAssignments';
 
 interface CanvasAssignmentsState {
@@ -12,10 +15,19 @@ interface CanvasAssignmentsState {
 
 export default class CanvasAssignments extends React.Component<NavigationScreenProps, CanvasAssignmentsState> {
 
-	static navigationOptions = {
-		title: 'Canvas',
-		header: null
-	};
+	static navigationOptions = createNavigationOptions('Canvas', false, () => {
+		return {
+			tabBarIcon: ({ tintColor }: { tintColor: string }) => {
+				return (
+					<Icon
+						name='graduation-cap'
+						type='font-awesome'
+						color={tintColor}
+					/>
+				);
+			}
+		};
+	});
 
 	constructor(props: any) {
 		super(props);
