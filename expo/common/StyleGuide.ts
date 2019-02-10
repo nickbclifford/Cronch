@@ -86,7 +86,6 @@ export const typography = StyleSheet.create({
 
 export const components = StyleSheet.create({
 	textInput: {
-		marginBottom: 32,
 		padding: 8,
 		backgroundColor: NEUTRAL[300],
 		color: NEUTRAL[700],
@@ -104,3 +103,5 @@ export const components = StyleSheet.create({
 		textTransform: 'uppercase'
 	}
 });
+
+export const textInputPlaceholderColor = NEUTRAL[500];

@@ -7,7 +7,7 @@ import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, {	WithAssignmentContextProps } from '../../common/AssignmentContext';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
-import { components, NEUTRAL, typography } from '../../common/StyleGuide';
+import { components, textInputPlaceholderColor, typography } from '../../common/StyleGuide';
 import { createCustomTask } from '../../common/Task';
 
 interface CustomAssignmentsForm {
@@ -54,8 +54,8 @@ class CustomAssignments extends React.Component<NavigationScreenProps & WithAssi
 							onChangeText={props.handleChange('taskName')}
 							onBlur={props.handleBlur('taskName')}
 							value={props.values.taskName}
-							style={[typography.body, components.textInput]}
-							placeholderTextColor={NEUTRAL[500]}
+							style={[typography.body, components.textInput, styles.input]}
+							placeholderTextColor={textInputPlaceholderColor}
 						/>
 						<Button
 							title='Add to Plan'
@@ -79,5 +79,9 @@ const styles = StyleSheet.create({
 		paddingLeft: 8,
 		paddingRight: 8,
 		paddingBottom: 32
+	},
+	input: {
+		width: '100%',
+		marginBottom: 32
 	}
 });
