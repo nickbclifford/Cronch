@@ -18,13 +18,11 @@ export const PRIMARY: ColorPalette = {
 
 export const NEUTRAL: ColorPalette = {
 	100: '#F7F7F7',
-	300: '#DADADA',
+	300: '#E4E4E4',
 	500: '#81848C',
 	700: '#616366',
 	900: '#202226'
 };
-
-/** @todo  */
 
 export const INFO: ColorPalette = {
 	100: '#E6FFFE',
@@ -74,7 +72,7 @@ export const typography = StyleSheet.create({
 	},
 	h3: {
 		...DEFAULT_TYPOGRAPHY_STYLES,
-		fontSize: 16
+		fontSize: 20
 	},
 	body: {
 		...DEFAULT_TYPOGRAPHY_STYLES,
@@ -85,3 +83,25 @@ export const typography = StyleSheet.create({
 		fontSize: 12
 	}
 });
+
+export const components = StyleSheet.create({
+	textInput: {
+		padding: 8,
+		backgroundColor: NEUTRAL[300],
+		color: NEUTRAL[700],
+		borderRadius: 5
+	},
+	buttonStyle: {
+		paddingTop: 12,
+		paddingRight: 24,
+		paddingLeft: 24,
+		paddingBottom: 12,
+		backgroundColor: PRIMARY[700],
+		borderRadius: 32
+	},
+	buttonText: {
+		textTransform: 'uppercase'
+	}
+});
+
+export const textInputPlaceholderColor = NEUTRAL[500];
