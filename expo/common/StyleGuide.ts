@@ -18,13 +18,11 @@ export const PRIMARY: ColorPalette = {
 
 export const NEUTRAL: ColorPalette = {
 	100: '#F7F7F7',
-	300: '#DADADA',
+	300: '#E4E4E4',
 	500: '#81848C',
 	700: '#616366',
 	900: '#202226'
 };
-
-/** @todo  */
 
 export const INFO: ColorPalette = {
 	100: '#E6FFFE',
@@ -74,7 +72,7 @@ export const typography = StyleSheet.create({
 	},
 	h3: {
 		...DEFAULT_TYPOGRAPHY_STYLES,
-		fontSize: 16
+		fontSize: 20
 	},
 	body: {
 		...DEFAULT_TYPOGRAPHY_STYLES,
