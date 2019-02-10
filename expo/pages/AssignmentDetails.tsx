@@ -7,6 +7,7 @@ import { Button, Divider } from 'react-native-elements';
 import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
+import withAssignmentContext, {	WithAssignmentContextProps } from '../common/AssignmentContext';
 import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import { humanReadableTimeUntil } from '../common/Utils';
 
@@ -18,8 +19,8 @@ interface AssignmentDetailsState {
 	assignment: CanvasEvent;
 }
 
-export default class AssignmentDetails extends React.Component<
-	NavigationScreenProps<NavigationParameters>,
+class AssignmentDetails extends React.Component<
+	NavigationScreenProps<NavigationParameters> & WithAssignmentContextProps,
 	AssignmentDetailsState
 > {
 
@@ -46,7 +47,8 @@ export default class AssignmentDetails extends React.Component<
 
 	@bind
 	private addToBattlePlan() {
-		// this.props.navigation.navigate('Timer', { assignment: this.state.assignment });
+		this.props.assignmentContext.appendAssignment(this.state.assignment);
+		this.props.navigation.navigate('BattlePlan');
 	}
 
 	@bind
@@ -83,6 +85,8 @@ export default class AssignmentDetails extends React.Component<
 	}
 
 }
+
+export default withAssignmentContext(AssignmentDetails);
 
 const styles = StyleSheet.create({
 	container: {
