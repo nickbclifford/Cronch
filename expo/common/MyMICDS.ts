@@ -6,13 +6,13 @@ export const jwtKey = '@MyMICDS:jwt';
 const mymicdsConfig: MyMICDSOptions = {
 	baseURL: 'https://api.mymicds.net/v3',
 	async jwtGetter() {
-		return AsyncStorage.getItem(jwtKey);
+		return await AsyncStorage.getItem(jwtKey);
 	},
 	async jwtSetter(jwt) {
-		return AsyncStorage.setItem(jwtKey, jwt);
+		await AsyncStorage.setItem(jwtKey, jwt);
 	},
 	async jwtClear() {
-		return AsyncStorage.removeItem(jwtKey);
+		await AsyncStorage.removeItem(jwtKey);
 	},
 	updateBackground: false,
 	updateUserInfo: false

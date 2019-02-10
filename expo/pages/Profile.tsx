@@ -1,13 +1,12 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Alert, AsyncStorage, Button, StyleSheet, View } from 'react-native';
+import { Alert, Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { switchMap } from 'rxjs/operators';
-import MyMICDS, { jwtKey } from '../common/MyMICDS';
-import { changeUserInfo, getUser } from '../common/User';
-import Question from '../components/Question';
 
+import MyMICDS from '../common/MyMICDS';
+import { changeUserInfo, getUser } from '../common/User';
 import Hamburger from '../components/Hamburger';
+import Question from '../components/Question';
 
 interface ProfileState {
 	selectedIndex: number | null;
@@ -35,9 +34,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	@bind
 	private logout() {
-		MyMICDS.auth.logout().pipe(
-			switchMap(() => AsyncStorage.removeItem(jwtKey))
-		).subscribe(() => {
+		MyMICDS.auth.logout().subscribe(() => {
 			this.props.navigation.navigate('Auth');
 		});
 	}
