@@ -9,7 +9,7 @@ import { NavigationScreenProps } from 'react-navigation';
 import withAssignmentContext, {	WithAssignmentContextProps } from '../../common/AssignmentContext';
 import { Block, ClassType } from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
-import Task from '../../common/Task';
+import Task, { createCustomTask } from '../../common/Task';
 
 interface CustomAssignmentsForm {
 	taskName: string;
@@ -55,32 +55,7 @@ class CustomAssignments extends React.Component<NavigationScreenProps & WithAssi
 
 	@bind
 	addCustomTaskToPlan({ taskName }: CustomAssignmentsForm) {
-		const task: Task = {
-			_id: taskName,
-			class: {
-				_id: taskName,
-				user: '',
-				name: 'Custom Task',
-				teacher: {
-					_id: null,
-					prefix: '',
-					firstName: '',
-					lastName: ''
-				},
-				type: ClassType.OTHER,
-				block: Block.OTHER,
-				color: '#34444F',
-				textDark: false
-			},
-			title: taskName,
-			start: moment().startOf('day'),
-			end: moment().endOf('day'),
-			checked: false,
-			desc: '',
-			descPlaintext: ''
-		};
-
-		this.props.assignmentContext.appendAssignment(task);
+		this.props.assignmentContext.appendAssignment(createCustomTask(taskName));
 		this.props.navigation.navigate('BattlePlan');
 	}
 
