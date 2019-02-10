@@ -6,7 +6,6 @@ import { NavigationScreenProps } from 'react-navigation';
 
 import MyMICDS, { CanvasEvent } from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
-import { NEUTRAL } from '../../common/StyleGuide';
 import DisplayAssignments from '../../components/DisplayAssignments';
 
 interface CanvasAssignmentsState {
@@ -35,9 +34,9 @@ export default class CanvasAssignments extends React.Component<NavigationScreenP
 	}
 
 	componentDidMount() {
-		MyMICDS.canvas.getEvents().subscribe(events => {
+		MyMICDS.canvas.getEvents().subscribe(({ hasURL, events }) => {
 			this.setState({
-				assignments: events.hasURL ? events.events : []
+				assignments: hasURL ? events : []
 			});
 		});
 	}

@@ -1,15 +1,14 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, Icon, FormLabel, FormInput } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
-import { CanvasEvent } from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
-import { NEUTRAL } from '../../common/StyleGuide';
+// import { NEUTRAL } from '../../common/StyleGuide';
 
 interface CustomAssignmentsState {
-	assignments: CanvasEvent[];
+	taskName: string;
 }
 
 export default class CustomAssignments extends React.Component<NavigationScreenProps, CustomAssignmentsState> {
@@ -30,18 +29,34 @@ export default class CustomAssignments extends React.Component<NavigationScreenP
 
 	constructor(props: any) {
 		super(props);
-		this.state = { assignments: [] };
+		this.state = { taskName: '' };
+	}
+
+	componentDidMount() {
+		// MyMICDS.canvas.getClasses().subscribe(({ hasURL, classes }) => {
+		// 	this.setState({
+		// 		classes: hasURL ? classes : []
+		// 	});
+		// });
 	}
 
 	@bind
-	private navigateToAssignmentDetails(assignment: CanvasEvent) {
-		this.props.navigation.navigate('AssignmentDetails', { assignment });
+	setTaskName(taskName: string) {
+		this.setState({ taskName });
 	}
 
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text>buh</Text>
+				{/*<FormLabel>Task Name</FormLabel>
+				<FormInput
+					placeholder={'Ex. College Apps'}
+				/>
+				<TextInput
+					value={this.state.taskName}
+					onChangeText={this.setTaskName}
+					placeholder={'Username'}
+				/>*/}
 			</View>
 		);
 	}
