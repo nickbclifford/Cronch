@@ -1,15 +1,13 @@
 import bind from 'bind-decorator';
 import { Formik } from 'formik';
-import moment from 'moment';
 import * as React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, {	WithAssignmentContextProps } from '../../common/AssignmentContext';
-import { Block, ClassType } from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
-import Task, { createCustomTask } from '../../common/Task';
+import { createCustomTask } from '../../common/Task';
 
 interface CustomAssignmentsForm {
 	taskName: string;
@@ -34,24 +32,6 @@ class CustomAssignments extends React.Component<NavigationScreenProps & WithAssi
 			}
 		};
 	});
-
-	constructor(props: any) {
-		super(props);
-		this.state = { taskName: '' };
-	}
-
-	componentDidMount() {
-		// MyMICDS.canvas.getClasses().subscribe(({ hasURL, classes }) => {
-		// 	this.setState({
-		// 		classes: hasURL ? classes : []
-		// 	});
-		// });
-	}
-
-	@bind
-	setTaskName(taskName: string) {
-		this.setState({ taskName });
-	}
 
 	@bind
 	addCustomTaskToPlan({ taskName }: CustomAssignmentsForm) {
