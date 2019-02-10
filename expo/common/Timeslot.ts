@@ -1,13 +1,10 @@
-import { TaskType } from './TaskType';
 import { fetchWithJwt, Omit } from './Utils';
 
 export interface Timeslot {
 	id: number;
 	start: Date;
 	end: Date | null;
-	taskType: TaskType;
-	canvasId: string | null;
-	customTitle: string | null;
+	classId: string;
 	user: string;
 }
 

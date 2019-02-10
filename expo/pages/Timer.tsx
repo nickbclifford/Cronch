@@ -4,13 +4,12 @@ import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
-import { TaskType } from '../common/TaskType';
+
+import Task from '../common/Task';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { Omit } from '../common/Utils';
 import DisplayAssignments from '../components/DisplayAssignments';
-
 import flipped$ from '../common/PhoneAcrobatics';
-import Hamburger from '../components/Hamburger';
 
 export interface TimerState {
 	workTimeLeft: number;
@@ -19,7 +18,7 @@ export interface TimerState {
 	paused: boolean;
 	modeSelection: number;
 	flipped: boolean;
-	assignment: CanvasEvent;
+	assignment: Task;
 	currentTimeslotId: number | null;
 }
 
@@ -220,23 +219,12 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		}
 	}
 	private startRecordTimeslot() {
-		const isCanvasAssignment = this.state.assignment;
 		let timeslot: Omit<Timeslot, 'id' | 'end' | 'user'>;
-		if (isCanvasAssignment) {
-			timeslot = {
-				start: new Date(),
-				canvasId: this.state.assignment._id,
-				taskType: TaskType.CANVAS_ASSIGNMENT,
-				customTitle: null
-			};
-		} else {
-			timeslot = {
-				start: new Date(),
-				canvasId: null,
-				taskType: TaskType.CUSTOM,
-				customTitle: 'Custom Study Time'
-			};
-		}
+		timeslot = {
+			start: new Date(),
+			classId: this.state.assignment._id
+		};
+
 		return createTimeslot(timeslot).then(res => {
 			this.setState({ currentTimeslotId: res.id });
 		})
@@ -275,7 +263,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<View style={styles.displayAssignments}>
-					<DisplayAssignments
+					{/* Use the DisplayTask component */}
+					{/* <DisplayAssignments
 						navigation={this.props.navigation}
 						assignments={[this.state.assignment]}
 						headers={false}
@@ -286,12 +275,12 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 						paddingLeft={8}
 						paddingBottom={0}
 						onAssignmentClick={this.navigateToAssignmentDetails}
-					/>
+					/> */}
 				</View>
-				<Button
+				{/* <Button
 					title='Create Battle Plan'
 					onPress={this.navigateToBattlePlan}
-				/>
+				/> */}
 				{ this.state.paused ? (
 					<Button title='Start' onPress={this.togglePause}/>
 				) : (
