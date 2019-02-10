@@ -1,9 +1,9 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text } from 'react-native';
+import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
-import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
 import { TaskType } from '../common/TaskType';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { Omit } from '../common/Utils';
@@ -25,8 +25,13 @@ export interface TimerState {
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
 
-	static navigationOptions = {
-		header: null
+	static navigationOptions: NavigationStackScreenOptions = {
+		header: null,
+		headerStyle: {
+			height: '20%',
+			backgroundColor: '#BADA55'
+		},
+		headerTintColor: '#fff'
 	};
 
 	private interval!: NodeJS.Timer;
@@ -59,6 +64,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			assignment: this.props.navigation.getParam('assignment'),
 			currentTimeslotId: null
 		};
+
+		this.props.navigation.setParams({
+			title: 'buh'
+		});
 	}
 
 	componentDidMount() {
@@ -265,19 +274,20 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Hamburger toggle={this.props.navigation.toggleDrawer} />
-				<DisplayAssignments
-					navigation={this.props.navigation}
-					assignments={[this.state.assignment]}
-					headers={false}
-					sort={false}
-					reorder={false}
-					paddingTop={72}
-					paddingRight={8}
-					paddingLeft={8}
-					paddingBottom={32}
-					onAssignmentClick={this.navigateToAssignmentDetails}
-				/>
+				<View style={styles.displayAssignments}>
+					<DisplayAssignments
+						navigation={this.props.navigation}
+						assignments={[this.state.assignment]}
+						headers={false}
+						sort={false}
+						reorder={false}
+						paddingTop={0}
+						paddingRight={8}
+						paddingLeft={8}
+						paddingBottom={0}
+						onAssignmentClick={this.navigateToAssignmentDetails}
+					/>
+				</View>
 				<Button
 					title='Create Battle Plan'
 					onPress={this.navigateToBattlePlan}
@@ -320,5 +330,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center'
+	},
+	displayAssignments: {
+		height: '20%'
+	},
+	header: {
+		height: '20%'
 	}
 });
