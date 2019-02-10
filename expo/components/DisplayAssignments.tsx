@@ -13,17 +13,18 @@ import {
 	View,
 	ViewStyle
 } from 'react-native';
-import DraggableFlatList, { RenderItemInfo } from 'react-native-draggable-flatlist';
+import DraggableFlatList, { OnMoveEndInfo, RenderItemInfo } from 'react-native-draggable-flatlist';
 import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
-import { CanvasEvent } from '../common/MyMICDS';
+
 import { NEUTRAL, typography } from '../common/StyleGuide';
+import Task from '../common/Task';
 import { humanReadableTimeUntil } from '../common/Utils';
 
-type SectionedAssignments = Array<{ title: number, data: CanvasEvent[] }>;
+type SectionedAssignments = Array<{ title: number, data: Task[] }>;
 
 interface DisplayAssignmentsProps extends NavigationScreenProps {
-	assignments: CanvasEvent[];
+	assignments: Task[];
 	containerStyle?: StyleProp<ViewStyle>;
 	itemStyle?: StyleProp<ViewStyle>;
 	paddingTop?: number;
@@ -31,10 +32,10 @@ interface DisplayAssignmentsProps extends NavigationScreenProps {
 	paddingBottom?: number;
 	paddingLeft?: number;
 	headers: boolean;
-	onAssignmentClick?: (assignment: CanvasEvent) => void;
+	onAssignmentClick?: (assignment: Task) => void;
 	sort?: boolean;
 	reorder?: boolean;
-	onReorder?: (assignments: CanvasEvent[]) => void;
+	onReorder?: (assignments: Task[]) => void;
 }
 
 interface DisplayAssignmentsState {
@@ -42,7 +43,7 @@ interface DisplayAssignmentsState {
 }
 
 interface GroupedAssignments {
-	[timestampDue: number]: CanvasEvent[];
+	[timestampDue: number]: Task[];
 }
 
 export default class DisplayAssignments extends React.Component<DisplayAssignmentsProps, DisplayAssignmentsState> {
@@ -74,27 +75,31 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 	componentDidUpdate(prevProps: any) {
 		if (prevProps.assignments !== this.props.assignments) {
-			const assignments = this.sortAssignments(this.props.assignments);
-
-			// Group assignments by the date they are due
-			const groupedByDue = assignments.reduce<GroupedAssignments>((accumulator, currentValue) => {
-				const due = currentValue.end.clone().startOf('day').valueOf();
-				if (!accumulator[due]) {
-					accumulator[due] = [];
-				}
-				accumulator[due].push(currentValue);
-				return accumulator;
-			}, {});
-
-			const sections = Object.keys(groupedByDue).map(i => parseInt(i, 10)).map(due => {
-				return { title: due, data: groupedByDue[due] };
-			});
-
-			this.setState({ sectionedAssignments: sections });
+			this.updateAssignments(this.props.assignments);
 		}
 	}
 
-	private sortAssignments(assignments: CanvasEvent[]) {
+	private updateAssignments(assignments: Task[]) {
+		const sortedAssignments = this.sortAssignments(assignments);
+
+		// Group assignments by the date they are due
+		const groupedByDue = sortedAssignments.reduce<GroupedAssignments>((accumulator, currentValue) => {
+			const due = currentValue.end.clone().startOf('day').valueOf();
+			if (!accumulator[due]) {
+				accumulator[due] = [];
+			}
+			accumulator[due].push(currentValue);
+			return accumulator;
+		}, {});
+
+		const sections = Object.keys(groupedByDue).map(i => parseInt(i, 10)).map(due => {
+			return { title: due, data: groupedByDue[due] };
+		});
+
+		this.setState({ sectionedAssignments: sections });
+	}
+
+	private sortAssignments(assignments: Task[]) {
 		return assignments
 			.filter(a => a.end.valueOf() > Date.now())
 			.sort((a, b) => a.end.unix() - b.end.unix());
@@ -102,13 +107,12 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 	// Allows React Native to cache each item's position in the list (not used as a sorting key though)
 	@bind
-	private getCacheKey(item: CanvasEvent) {
+	private getCacheKey(item: Task) {
 		return item._id;
 	}
 
 	@bind
 	private renderSectionHeader(info: { section: SectionListData<string> }) {
-		console.log('buh', info);
 		if (!this.props.headers) {
 			return null;
 		}
@@ -132,7 +136,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	@bind
-	private renderAssignment(props: SectionListRenderItemInfo<CanvasEvent> | RenderItemInfo<CanvasEvent>) {
+	private renderAssignment(props: SectionListRenderItemInfo<Task> | RenderItemInfo<Task>) {
 		const assignment = props.item;
 		const itemStyles = StyleSheet.create({
 			container: {
@@ -145,13 +149,19 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 				borderRadius: 5,
 				backgroundColor: assignment.class.color
 			},
-			moveIconContainer: {
+			leftIconContainer: {
 				display: 'flex',
 				justifyContent: 'center',
 				marginRight: 8
 			},
+			rightIconContainer: {
+				display: 'flex',
+				justifyContent: 'center',
+				marginLeft: 8
+			},
 			assignmentContainer: {
-				// flexGrow: 1
+				flexGrow: 1,
+				flexShrink: 1
 			},
 			title: {
 				color: assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]
@@ -167,13 +177,21 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 		// tslint:disable:no-unnecessary-initializer
 		let moveHandler: (() => void) | undefined = undefined;
-		// tslint:disable:no-unnecessary-initializer
 		let moveEndHandler: (() => void) | undefined = undefined;
+		// tslint:enable:no-unnecessary-initializer
 
 		if (this.shouldReorder) {
-			moveHandler = (props as RenderItemInfo<CanvasEvent>).move;
-			moveEndHandler = (props as RenderItemInfo<CanvasEvent>).moveEnd;
+			moveHandler = (props as RenderItemInfo<Task>).move;
+			moveEndHandler = (props as RenderItemInfo<Task>).moveEnd;
 		}
+
+		const trashHandler = () => {
+			const newAssignments = this.props.assignments.filter(event => event._id !== assignment._id);
+			this.updateAssignments(newAssignments);
+			if (this.props.onReorder) {
+				this.props.onReorder(newAssignments);
+			}
+		};
 
 		return (
 			<View style={this.props.itemStyle}>
@@ -185,12 +203,11 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 						{this.shouldReorder && (
 							<TouchableWithoutFeedback
 								hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
-								onPressIn={moveHandler}
-								onPressOut={moveEndHandler}
+								onPress={trashHandler}
 							>
-								<View style={itemStyles.moveIconContainer}>
+								<View style={itemStyles.leftIconContainer}>
 									<Icon
-										name='bars'
+										name='trash'
 										type='font-awesome'
 										size={20}
 										color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
@@ -214,22 +231,22 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 								{assignment.title}
 							</Text>
 						</View>
-						{/*this.shouldReorder && (
+						{this.shouldReorder && (
 							<TouchableWithoutFeedback
 								hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
 								onPressIn={moveHandler}
 								onPressOut={moveEndHandler}
 							>
-								<View style={itemStyles.moveIconContainer}>
+								<View style={itemStyles.rightIconContainer}>
 									<Icon
-										name='trash'
+										name='bars'
 										type='font-awesome'
 										size={20}
 										color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
 									/>
 								</View>
 							</TouchableWithoutFeedback>
-						)*/}
+						)}
 					</View>
 				</TouchableOpacity>
 			</View>
@@ -237,12 +254,23 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 	@bind
-	private handleAssignmentPress(assignment: CanvasEvent) {
+	private handleAssignmentPress(assignment: Task) {
 		return () => {
 			if (this.props.onAssignmentClick) {
 				this.props.onAssignmentClick(assignment);
 			}
 		};
+	}
+
+	@bind
+	private handleReorder({ data }: OnMoveEndInfo<Task>) {
+		if (this.props.onReorder) {
+			let newAssignments: Task[] = [];
+			if (data) {
+				newAssignments = Object.assign([], data);
+			}
+			this.props.onReorder(newAssignments);
+		}
 	}
 
 	render() {
@@ -273,6 +301,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 					renderItem={this.renderAssignment}
 					keyExtractor={this.getCacheKey}
 					style={[this.props.containerStyle, padding]}
+					onMoveEnd={this.handleReorder}
 				/>
 			);
 		}

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Alert } from 'react-native';
 import MyMICDS from './common/MyMICDS';
 
-import AssignmentContext, { AssignmentContextType } from './common/AssignmentContext';
+import { AssignmentContext, AssignmentContextType } from './common/AssignmentContext';
 import AppContainer from './Navigation';
 
 interface GlobalAppState extends AssignmentContextType { }
@@ -15,6 +15,11 @@ export default class App extends React.Component<{}, GlobalAppState> {
 		this.state = {
 			assignments: [],
 			updateAssignments: newAssignments => {
+				this.setState({ assignments: newAssignments });
+			},
+			appendAssignment: newAssignment => {
+				const newAssignments = this.state.assignments;
+				newAssignments.push(newAssignment);
 				this.setState({ assignments: newAssignments });
 			}
 		};

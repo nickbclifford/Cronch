@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Button, StyleSheet } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Button } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
 import { NEUTRAL, PRIMARY } from '../common/StyleGuide';
 
@@ -10,12 +9,6 @@ export default function generateNavigationOptions<Props extends NavigationScreen
 	additionalInfo?: (props: Props) => { [key: string]: any }
 ): (props: Props) => { [key: string]: any } {
 	return props => {
-		const menuStyles = StyleSheet.create({
-			hamburger: {
-				marginLeft: 16
-			}
-		});
-
 		const onPressLeft = () => {
 			props.navigation.toggleDrawer();
 		};
@@ -29,14 +22,6 @@ export default function generateNavigationOptions<Props extends NavigationScreen
 		};
 
 		if (menuButton) {
-			// headerLeft: (
-			// 	<Icon
-			// 		name='bars'
-			// 		type='font-awesome'
-			// 		containerStyle={menuStyles.hamburger}
-			// 		onPress={onPressLeft}
-			// 	/>
-			// )
 			options.headerLeft = <Button title='Menu' color={NEUTRAL[300]} onPress={onPressLeft} />;
 		}
 

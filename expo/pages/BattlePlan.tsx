@@ -3,22 +3,23 @@ import * as React from 'react';
 import { Button as NativeButton, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
-import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
+
+import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
+import Task from '../common/Task';
 import DisplayAssignments from '../components/DisplayAssignments';
 
-interface BattlePlanProps extends NavigationScreenProps {
+interface BattlePlanProps extends NavigationScreenProps, WithAssignmentContextProps {
 	getEditMode: () => boolean;
 	toggleEditMode: () => void;
 }
 
 interface BattlePlanState {
-	assignments: CanvasEvent[];
 	editMode: boolean;
 }
 
-export default class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
+class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 
 	static navigationOptions = createNavigationOptions<BattlePlanProps>(null, true, ({ navigation }) => {
 		return {
@@ -27,30 +28,13 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 		};
 	});
 
-	// static navigationOptions = {
-	// 	headerRight: <Button title='Edit' onPress={() => undefined} />
-	// };
-
-	// static navigationOptions = {
-	// 	// header: null
-	// 	title: 'Battle Plan'
-	// 	headerLeft: ()
-	// 	// headerRight: <Button title='Attack' onPress={BattlePlan.attack} />
-	// };
-
 	constructor(props: any) {
 		super(props);
-		this.state = { assignments: [], editMode: false };
+		this.state = { editMode: false };
 	}
 
 	componentDidMount() {
 		this.updateHeader();
-
-		MyMICDS.canvas.getEvents().subscribe(events => {
-			this.setState({
-				assignments: events.hasURL ? events.events : []
-			});
-		});
 	}
 
 	@bind
@@ -79,8 +63,13 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 	}
 
 	@bind
-	private navigateToTimer(assignment: CanvasEvent) {
+	private navigateToTimer(assignment: Task) {
 		this.props.navigation.navigate('Timer', { assignment });
+	}
+
+	@bind
+	private onReorder(newAssignments: Task[]) {
+		this.props.assignmentContext.updateAssignments(newAssignments);
 	}
 
 	render() {
@@ -97,7 +86,7 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 				{this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
-						assignments={this.state.assignments}
+						assignments={this.props.assignmentContext.assignments}
 						headers={false}
 						sort={false}
 						reorder={true}
@@ -105,12 +94,13 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 						paddingRight={8}
 						paddingLeft={8}
 						paddingBottom={32}
+						onReorder={this.onReorder}
 					/>
 				)}
 				{!this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
-						assignments={this.state.assignments}
+						assignments={this.props.assignmentContext.assignments}
 						headers={false}
 						sort={false}
 						reorder={false}
@@ -126,6 +116,8 @@ export default class BattlePlan extends React.Component<BattlePlanProps, BattleP
 	}
 
 }
+
+export default withAssignmentContext(BattlePlan);
 
 const styles = StyleSheet.create({
 	container: {
