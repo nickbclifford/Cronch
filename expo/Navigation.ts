@@ -11,6 +11,7 @@ import createNavigationOptions from './common/NavigationOptionsFactory';
 import createQuestionnaire from './components/QuestionnaireFactory';
 
 import About from './pages/About';
+import Analytics from './pages/Analytics';
 import AssignmentDetails from './pages/AssignmentDetails';
 import BattlePlan from './pages/BattlePlan';
 import CheckUrls from './pages/CheckUrls';
@@ -37,6 +38,15 @@ const AuthNavigator = createStackNavigator(
 	},
 	{
 		initialRouteName: 'Welcome'
+	}
+);
+
+const AnalyticsNavigator = createStackNavigator(
+	{
+		Analytics
+	},
+	{
+		initialRouteName: 'Analytics'
 	}
 );
 
@@ -100,6 +110,7 @@ const AppNavigator = createDrawerNavigator(
 		Timer: TimerNavigator,
 		Profile: createSingleStackNavigator(Profile),
 		About: createSingleStackNavigator(About),
+		Analytics: AnalyticsNavigator,
 		Questionnaire
 	},
 	{

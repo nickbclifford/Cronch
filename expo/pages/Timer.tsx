@@ -1,13 +1,16 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text } from 'react-native';
+import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
-import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { createTimeslot } from '../common/Timeslot';
+import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
 
 import flipped$ from '../common/PhoneAcrobatics';
-import Hamburger from '../components/Hamburger';
+import { components } from '../common/StyleGuide';
+import Task from '../common/Task';
+import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
+import { Omit } from '../common/Utils';
+import DisplayAssignments from '../components/DisplayAssignments';
 
 export interface TimerState {
 	workTimeLeft: number;
@@ -16,19 +19,19 @@ export interface TimerState {
 	paused: boolean;
 	modeSelection: number;
 	flipped: boolean;
+	assignment: Task;
+	currentTimeslotId: number | null;
 }
-
-let mockAssignment: {
-	canvasEvent: CanvasEvent,
-	// recommendedTime: number,
-	timeSpent: number,
-	done: boolean
-};
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
 
-	static navigationOptions = {
-		header: null
+	static navigationOptions: NavigationStackScreenOptions = {
+		header: null,
+		headerStyle: {
+			height: '20%',
+			backgroundColor: '#BADA55'
+		},
+		headerTintColor: '#fff'
 	};
 
 	private interval!: NodeJS.Timer;
@@ -42,41 +45,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	constructor(props: any) {
 		super(props);
-
-		mockAssignment = {
-			// tslint:disable:max-line-length
-			canvasEvent: JSON.parse(`{
-                "_id": "event-assignment-5872379",
-                "canvas": true,
-                "user": "jcai",
-                "class": {
-                    "_id": null,
-                    "canvas": true,
-                    "user": "jcai",
-                    "name": "MA660",
-                    "teacher": {
-                        "_id": null,
-                        "prefix": "",
-                        "firstName": "",
-                        "lastName": ""
-                    },
-                    "type": "other",
-                    "block": "other",
-                    "color": "#34444F",
-                    "textDark": false
-                },
-                "title": "Notes Arc Length and Curvature",
-                "start": "2019-01-16T06:00:00.000Z",
-                "end": "2019-01-16T06:00:00.000Z",
-                "link": "https://micds.instructure.com/courses/1130489/assignments/5872379",
-                "checked": false,
-                "desc": "hehexd",
-                "descPlaintext": "Our goals today are to find the arc length of a space curve and to find the curvature of a curve at a point on the curve.\\nArc Length (s)=\\nCurvature is the measure of how sharply a curve bends.\\nFormal Definition     We don't want to use the formal definition. :)\\n\\n"
-            }`),
-			// recommendedTime: 0.2 * 60 * 1000,
-			timeSpent: 0,
-			done: false
-		};
 
 		this.userCycles = [{
 			work: 0.1 * 60 * 1000,
@@ -92,8 +60,14 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			onBreak: false,
 			paused: true,
 			modeSelection: 0,
-			flipped: false
+			flipped: false,
+			assignment: this.props.navigation.getParam('assignment'),
+			currentTimeslotId: null
 		};
+
+		this.props.navigation.setParams({
+			title: 'buh'
+		});
 	}
 
 	componentDidMount() {
@@ -114,18 +88,27 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 			// Only pause when user is not on break
 			if (!this.state.onBreak) {
-				console.log('buh');
-				this.setState({ paused: flipped });
+				console.log('buh', flipped);
+				this.setState({ paused: !flipped });
 			}
-
-			this.recordTimeSlot().then(() => {
-				console.log('buh sent');
-			});
 		});
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
+		// TODO: Custom events bb
+		this.endRecordTimeslot();
+	}
+
+	componentWillUpdate(nextProps: any, nextState: any) {
+		console.log(this.state.paused, nextState.paused);
+		if (this.state.paused !== nextState.paused) {
+			if (this.state.paused) {
+				this.startRecordTimeslot();
+			} else {
+				this.endRecordTimeslot();
+			}
+		}
 	}
 
 	componentDidUpdate() {
@@ -191,14 +174,14 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					paused: true
 				});
 				Alert.alert(
-					'Time for a break!',
+					'Time for work!',
 					'Yuhyuhyuh',
 					[
 						{ text: 'Continue', onPress: () => {
 							this.setState({
 								breakTimeLeft: this.userCycles[this.state.modeSelection].break,
 								onBreak: false,
-								paused: false
+								paused: true
 							});
 						} }
 					]
@@ -214,7 +197,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					paused: true
 				});
 				Alert.alert(
-					'Time for work!',
+					'Time for a break!',
 					'Please select an option',
 					[
 						{ text: 'Continue', onPress: () => {
@@ -243,41 +226,94 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			});
 		}
 	}
+	private startRecordTimeslot() {
+		let timeslot: Omit<Timeslot, 'id' | 'end' | 'user'>;
+		timeslot = {
+			start: new Date(),
+			classId: this.state.assignment._id
+		};
 
-	private recordTimeSlot() {
-		// TODO: Custom events
-		return createTimeslot(new Date(), mockAssignment.canvasEvent._id);
+		return createTimeslot(timeslot).then(res => {
+			this.setState({ currentTimeslotId: res.id });
+		})
+		.then(() => {
+			console.log('buh started');
+		}).catch((e: any) => {
+			Alert.alert('Error saving time slot.', e.message);
+		});
+	}
+
+	private endRecordTimeslot() {
+		if (this.state.currentTimeslotId) {
+			return endTimeslot(this.state.currentTimeslotId, new Date())
+			.then(() => {
+				console.log('buh ended');
+				this.setState({ currentTimeslotId: null });
+			})
+			.catch((e: any) => {
+				Alert.alert('Error ending time slot.', e.message);
+			});
+		}
+	}
+
+	// private toggleRecordTimeslot() {
+	// 	if (!this.state.currentTimeslotId) {
+	// 	} else {
+	// 	}
+	// }
+
+	@bind
+	private navigateToAssignmentDetails(assignment: CanvasEvent) {
+		this.props.navigation.navigate('AssignmentDetails', { assignment });
 	}
 
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Hamburger toggle={this.props.navigation.toggleDrawer} />
-				<Button
+				<View style={styles.displayAssignments}>
+					{/* Use the DisplayTask component */}
+					{/* <DisplayAssignments
+						navigation={this.props.navigation}
+						assignments={[this.state.assignment]}
+						headers={false}
+						sort={false}
+						reorder={false}
+						paddingTop={0}
+						paddingRight={8}
+						paddingLeft={8}
+						paddingBottom={0}
+						onAssignmentClick={this.navigateToAssignmentDetails}
+					/> */}
+				</View>
+				{/* <Button
 					title='Create Battle Plan'
 					onPress={this.navigateToBattlePlan}
-				/>
-				{ this.state.paused ? (
-					<Button title='Start' onPress={this.togglePause}/>
-				) : (
-					<Button title='Pause' onPress={this.togglePause}/>
-				)}
+				/> */}
+
 				<Button title='Add Custom' onPress={this.addCustom}/>
 				<Picker
 					selectedValue={this.state.modeSelection}
 					onValueChange={this.setTimerMode}
 				>
 					{this.userCycles.map((cycle, i) =>
-						<Picker.Item key={i} label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`} value={i}/>
+						<Picker.Item
+							key={i}
+							label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`}
+							value={i}
+						/>
 					)}
 					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
 				</Picker>
-				<Text>{mockAssignment.canvasEvent.title}</Text>
+				<Text>{this.state.assignment.title}</Text>
 
 				<Text>Work Timer: {Math.floor(this.state.workTimeLeft / 60000)}:{Math.floor(this.state.workTimeLeft % 60000)}</Text>
 				<Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text>
 				<Text>{this.state.paused.toString()}</Text>
 				<Text>{this.state.flipped.toString()}</Text>
+
+				{ this.state.paused && (
+					<Button title='Flip phone to start your timer!' style={components.buttonStyle}/>
+				) }
 			</SafeAreaView>
 		);
 	}
@@ -291,5 +327,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center'
+	},
+	displayAssignments: {
+		height: '20%'
+	},
+	header: {
+		height: '20%'
 	}
 });

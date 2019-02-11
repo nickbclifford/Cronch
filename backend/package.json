@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node --files src/index.ts",
+    "watch": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint --project tsconfig.json src/**/*.ts"
   },
