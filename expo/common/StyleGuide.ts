@@ -62,6 +62,10 @@ export const DEFAULT_TYPOGRAPHY_STYLES = {
 };
 
 export const typography = StyleSheet.create({
+	h0: {
+		...DEFAULT_TYPOGRAPHY_STYLES,
+		fontSize: 48
+	},
 	h1: {
 		...DEFAULT_TYPOGRAPHY_STYLES,
 		fontSize: 30

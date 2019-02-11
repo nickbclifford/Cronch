@@ -1,16 +1,18 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
+import moment from 'moment';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
-import { Button } from 'react-native-elements';
+import { Alert, Picker, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
 
+import createNavigationOptions from '../common/NavigationOptionsFactory';
 import flipped$ from '../common/PhoneAcrobatics';
-import { components } from '../common/StyleGuide';
+import { ColorPalette, components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { Omit } from '../common/Utils';
-import DisplayAssignments from '../components/DisplayAssignments';
+import DisplayTask from '../components/DisplayTask';
 
 export interface TimerState {
 	workTimeLeft: number;
@@ -25,14 +27,28 @@ export interface TimerState {
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
 
-	static navigationOptions: NavigationStackScreenOptions = {
-		header: null,
-		headerStyle: {
-			height: '20%',
-			backgroundColor: '#BADA55'
-		},
-		headerTintColor: '#fff'
-	};
+	static navigationOptions = ({ navigation }) => {
+		const task: Task = navigation.getParam('assignment');
+
+		const navigateToBattlePlan = () => {
+			navigation.navigate('BattlePlan');
+		};
+
+		return {
+			headerStyle: {
+				backgroundColor: task.class.color,
+				height: 144
+			},
+			headerTintColor: task.class.textDark ? NEUTRAL[900] : NEUTRAL[100],
+			headerTitle: <DisplayTask task={navigation.getParam('assignment')}/>,
+			headerLeft: (
+				<TouchableOpacity onPress={navigateToBattlePlan} style={styles.backButton}>
+					<Icon name='angle-left' type='font-awesome' color={task.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}/>
+				</TouchableOpacity>
+			)
+			// headerLeftContainerStyle: styles.backButtonContainer
+		};
+	}
 
 	private interval!: NodeJS.Timer;
 
@@ -65,12 +81,17 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			currentTimeslotId: null
 		};
 
-		this.props.navigation.setParams({
-			title: 'buh'
-		});
+		// this.props.navigation.state.params.classColor = this.state.assignment.class.color;
+
+		// console.log(this.props.navigation.state.params.classColor);
 	}
 
 	componentDidMount() {
+
+		this.props.navigation.setParams({
+			assignment: this.state.assignment
+		});
+
 		this.interval = setInterval(() => {
 			if (!this.state.paused) {
 				if (this.state.modeSelection === -1) {
@@ -267,6 +288,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		this.props.navigation.navigate('AssignmentDetails', { assignment });
 	}
 
+	@bind
+	private formatTime(time: number) {
+		return moment(this.state.workTimeLeft, 'x').format('mm:ss');
+	}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
@@ -284,6 +310,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 						paddingBottom={0}
 						onAssignmentClick={this.navigateToAssignmentDetails}
 					/> */}
+					{/* <DisplayTask task={this.state.assignment}/> */}
 				</View>
 				{/* <Button
 					title='Create Battle Plan'
@@ -304,16 +331,22 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					)}
 					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
 				</Picker>
-				<Text>{this.state.assignment.title}</Text>
 
-				<Text>Work Timer: {Math.floor(this.state.workTimeLeft / 60000)}:{Math.floor(this.state.workTimeLeft % 60000)}</Text>
-				<Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text>
+				<View style={styles.timerContainer}>
+					<View style={styles.timer}>
+						<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>
+						{/* <Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text> */}
+					</View>
+				</View>
+
 				<Text>{this.state.paused.toString()}</Text>
 				<Text>{this.state.flipped.toString()}</Text>
 
-				{ this.state.paused && (
-					<Button title='Flip phone to start your timer!' style={components.buttonStyle}/>
-				) }
+				<View style={styles.flipNotification}>
+					{ this.state.paused && (
+						<Button title='Flip phone to start your timer!' style={styles.flipNotificationText} buttonStyle={components.buttonStyle} titleStyle={components.buttonText}/>
+					) }
+				</View>
 			</SafeAreaView>
 		);
 	}
@@ -333,5 +366,44 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		height: '20%'
+	},
+	backButton: {
+		paddingLeft: 40,
+		paddingRight: 40,
+		height: '100%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	timer: {
+		height: 200,
+		width: 200,
+		borderRadius: 100,
+		backgroundColor: PRIMARY[700],
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	timerContainer: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	timerText: {
+		color: '#fff',
+		textAlign: 'center'
+	},
+	flipNotification: {
+		position: 'absolute',
+		bottom: '5%',
+		width: '100%',
+		height: '20%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	flipNotificationText: {
+		width: '80%'
 	}
 });
