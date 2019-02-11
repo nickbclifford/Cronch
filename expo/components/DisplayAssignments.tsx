@@ -118,7 +118,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 		}
 		const itemStyles = StyleSheet.create({
 			container: {
-				marginTop: 32,
+				marginTop: 24,
 				marginRight: this.props.paddingRight,
 				marginLeft: this.props.paddingLeft,
 				marginBottom: 16
@@ -130,7 +130,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 		return (
 			<View style={itemStyles.container}>
-				<Text style={typography.h1}>Due {humanDate}</Text>
+				<Text style={typography.h3}>Due {humanDate}</Text>
 			</View>
 		);
 	}
