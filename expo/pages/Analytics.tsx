@@ -44,6 +44,10 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		}
 	}
 
+	compareDate(date1: Date, date2: Date) {
+		return (date1.getDate() === date2.getDate());
+	}
+
 	refreshData() {
 		const out = [];
 
@@ -62,16 +66,18 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		for (let i = 0; i < categories.length; i++) {
 			preOut.push({seriesName: categories[i], data: [], color: 'blue'});
 			this.state.times.forEach(slot => {
-				if (slot.end != null && slot.classId === categories[i]) {
+				const today: Date = new Date();
+				if (slot.end != null && this.compareDate(slot.start, today) && slot.classId === categories[i]) {
 					const differenceHours = slot.start.getHours() - slot.end.getHours();
 					// TODO: get the aggregate amount of time spent and push that
-					preOut[i].data.push({x: this.getDayString(slot.start.getDay()), y: differenceHours});
+					preOut[i].data.push({label: slot.classId, color: 'blue', value: differenceHours});
 				}
 			});
 		}
 
+		/*
 		// now go through each element and add the rest of the week
-		/*for (let e = 0; e < preOut.length; e++) {
+		for (let e = 0; e < preOut.length; e++) {
 			if (preOut[e].data.length < 7) {
 				for (let f = preOut[e].data.length; f < 7; f++) {
 					preOut[e].data.push({x: this.getDayString(f - 1), y: 0});
@@ -100,7 +106,7 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 					<Hamburger toggle={this.props.navigation.toggleDrawer} />
 					<View style={styles.container}>
 					<PureChart
-						type='bar'
+						type='pie'
 						data={this.state.data}
 						width={1200}
 						height={400}
