@@ -1,4 +1,5 @@
 import bind from 'bind-decorator';
+import { WebBrowser } from 'expo';
 import { Formik } from 'formik';
 import * as React from 'react';
 import { Alert, ImageBackground, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -74,6 +75,11 @@ export default class Login extends React.Component<NavigationScreenProps> {
 		);
 	}
 
+	@bind
+	register() {
+		WebBrowser.openBrowserAsync('https://mymicds.net/register');
+	}
+
 	render() {
 		return (
 			<Formik
@@ -115,7 +121,9 @@ export default class Login extends React.Component<NavigationScreenProps> {
 							titleStyle={components.buttonText}
 							onPress={props.handleSubmit as any}
 						/>
-						<Text style={[typography.h3, styles.register]}>Not a member yet? Register</Text>
+						<Text onPress={this.register} style={[typography.h3, styles.register]}>
+							Not a member yet? <Text style={styles.registerUnderline}>Register</Text>
+						</Text>
 					</ImageBackground>
 				)}
 			</Formik>
@@ -132,8 +140,8 @@ const styles = StyleSheet.create({
 	},
 	colorOverlay: {
 		...StyleSheet.absoluteFillObject,
-		// backgroundColor: 'rgba(255, 255, 255, 0.3)'
-		backgroundColor: 'rgba(0, 0, 0, 0.1)'
+		backgroundColor: 'rgba(255, 255, 255, 0.5)'
+		// backgroundColor: 'rgba(0, 0, 0, 0.2)'
 	},
 	logo: {
 		width: 80,
@@ -142,7 +150,8 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		marginBottom: 36,
-		color: NEUTRAL[100]
+		// color: NEUTRAL[100]
+		color: NEUTRAL[900]
 	},
 	usernameGroup: {
 		width: '100%',
@@ -173,12 +182,15 @@ const styles = StyleSheet.create({
 		marginBottom: 24
 	},
 	buttonContainer: {
-		width: '100%'
+		// width: '100%'
 	},
 	register: {
 		marginTop: 32,
 		...StyleSheet.flatten(NUNITO.bold),
-		color: NEUTRAL[100],
+		// color: NEUTRAL[100]
+		color: NEUTRAL[900]
+	},
+	registerUnderline: {
 		textDecorationLine: 'underline'
 	}
 });

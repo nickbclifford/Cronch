@@ -103,8 +103,8 @@ export const components = StyleSheet.create({
 	},
 	buttonStyle: {
 		paddingTop: 12,
-		paddingRight: 24,
-		paddingLeft: 24,
+		paddingRight: 48,
+		paddingLeft: 48,
 		paddingBottom: 12,
 		backgroundColor: PRIMARY[700],
 		borderRadius: 32
