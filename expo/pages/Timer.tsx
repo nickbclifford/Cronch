@@ -1,16 +1,19 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
+import { Audio, PlaybackSource } from 'expo';
+import moment from 'moment';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
-import { Button } from 'react-native-elements';
+import { Alert, Picker, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
 
+import createNavigationOptions from '../common/NavigationOptionsFactory';
 import flipped$ from '../common/PhoneAcrobatics';
-import { components } from '../common/StyleGuide';
+import { ColorPalette, components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { Omit } from '../common/Utils';
-import DisplayAssignments from '../components/DisplayAssignments';
+import DisplayTask from '../components/DisplayTask';
 
 export interface TimerState {
 	workTimeLeft: number;
@@ -18,6 +21,7 @@ export interface TimerState {
 	onBreak: boolean;
 	paused: boolean;
 	modeSelection: number;
+	alarmSelection: number;
 	flipped: boolean;
 	assignment: Task;
 	currentTimeslotId: number | null;
@@ -25,14 +29,30 @@ export interface TimerState {
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
 
-	static navigationOptions: NavigationStackScreenOptions = {
-		header: null,
-		headerStyle: {
-			height: '20%',
-			backgroundColor: '#BADA55'
-		},
-		headerTintColor: '#fff'
-	};
+	static navigationOptions = ({ navigation }) => {
+		const task: Task = navigation.getParam('assignment');
+
+		const navigateToBattlePlan = () => {
+			navigation.navigate('BattlePlan');
+		};
+
+		return {
+			headerStyle: {
+				backgroundColor: task.class.color,
+				height: 144
+			},
+			headerTintColor: task.class.textDark ? NEUTRAL[900] : NEUTRAL[100],
+			headerTitle: <DisplayTask task={navigation.getParam('assignment')}/>,
+			headerLeft: (
+				<TouchableOpacity onPress={navigateToBattlePlan} style={styles.backButton}>
+					<Icon name='angle-left' type='font-awesome' color={task.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}/>
+				</TouchableOpacity>
+			)
+			// headerLeftContainerStyle: styles.backButtonContainer
+		};
+	}
+
+	private alarmSound = new Audio.Sound();
 
 	private interval!: NodeJS.Timer;
 
@@ -43,9 +63,19 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	private shouldAddCycles = false;
 
+	private alarmList: Array<{
+		file: PlaybackSource,
+		displayName: string
+	}>;
+
 	constructor(props: any) {
 		super(props);
-
+		Audio.setAudioModeAsync({
+			playsInSilentModeIOS: true
+			// interruptionModeIOS: 'INTERRUPTION_MODE_IOS_DO_NOT_MIX',
+			// interruptionModeAndroid: 'INTERRUPTION_MODE_ANDROID_DUCK_OTHERS',
+			// playThroughEarpieceAndroid: true
+		}).then(buh => console.log('buh wait', buh));
 		this.userCycles = [{
 			work: 0.1 * 60 * 1000,
 			break: 0.1 * 60 * 1000
@@ -53,24 +83,36 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			work: 0.5 * 60 * 1000,
 			break: 0.5 * 60 * 1000
 		}];
-
+		this.alarmList = [{
+			file: require('../assets/alarm-sounds/2001_A_Space_Odyssey.mp3'),
+			displayName: 'Space Odyssey Theme'
+		}, {
+			file: require('../assets/alarm-sounds/samsung_loop.mp3'),
+			displayName: 'Bright and Cheery :)'
+		}];
 		this.state = {
 			workTimeLeft: this.userCycles[0].work,
 			breakTimeLeft: this.userCycles[0].break,
 			onBreak: false,
 			paused: true,
 			modeSelection: 0,
+			alarmSelection: 0,
 			flipped: false,
 			assignment: this.props.navigation.getParam('assignment'),
 			currentTimeslotId: null
 		};
 
-		this.props.navigation.setParams({
-			title: 'buh'
-		});
+		// this.props.navigation.state.params.classColor = this.state.assignment.class.color;
+
+		// console.log(this.props.navigation.state.params.classColor);
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
+
+		this.props.navigation.setParams({
+			assignment: this.state.assignment
+		});
+
 		this.interval = setInterval(() => {
 			if (!this.state.paused) {
 				if (this.state.modeSelection === -1) {
@@ -92,6 +134,13 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({ paused: !flipped });
 			}
 		});
+		console.log(this.alarmList[0].file);
+		// try {
+		// 	await this.alarmSound.loadAsync(this.alarmList[0].file);
+		// 	await this.alarmSound.setIsLoopingAsync(true);
+		// } catch (error) {
+		// 	Alert.alert('sound buh', error.message());
+		// }
 	}
 
 	componentWillUnmount() {
@@ -162,6 +211,35 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
+	private async setAlarmMode(n: number) {
+			this.setState({
+				alarmSelection: n
+			});
+			// console.log(this.alarmList[n].file, this.alarmList[n].displayName);
+			// const soundObject = new Audio.Sound();
+			// try {
+			// 	await soundObject.loadAsync(this.alarmList[this.alarmSelection].file);
+			// 	console.log('swag', this.alarmList[n].file, this.alarmList[n].displayName);
+			// 	await this.alarmSound.setPositionAsync(0);
+			// 	await this.alarmSound.playAsync();
+			// } catch (error) {
+			// 	Alert.alert('sound buh', error.message());
+			// }
+	}
+
+	@bind
+	private async playAlarm(soundObject: Alarm.Sound) {
+		try {
+			await soundObject.loadAsync(this.alarmList[this.state.alarmSelection].file);
+			await soundObject.setIsLoopingAsync(true);
+			await soundObject.setPositionAsync(0);
+			await soundObject.playAsync();
+		} catch (error) {
+			Alert.alert('sound buh', error.message());
+		}
+	}
+
+	@bind
 	tick() {
 		if (this.state.onBreak) {
 			this.setState({
@@ -173,6 +251,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({
 					paused: true
 				});
+				const soundObject = new Audio.Sound();
+				this.playAlarm(soundObject);
 				Alert.alert(
 					'Time for work!',
 					'Yuhyuhyuh',
@@ -183,6 +263,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 								onBreak: false,
 								paused: true
 							});
+							soundObject.stopAsync();
 						} }
 					]
 				);
@@ -196,6 +277,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({
 					paused: true
 				});
+				const soundObject = new Audio.Sound();
+				this.playAlarm(soundObject);
 				Alert.alert(
 					'Time for a break!',
 					'Please select an option',
@@ -206,6 +289,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 								onBreak: true,
 								paused: false
 							});
+							soundObject.stopAsync();
 						} }
 					]
 				);
@@ -267,6 +351,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		this.props.navigation.navigate('AssignmentDetails', { assignment });
 	}
 
+	@bind
+	private formatTime(time: number) {
+		return moment(this.state.workTimeLeft, 'x').format('mm:ss');
+	}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
@@ -284,6 +373,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 						paddingBottom={0}
 						onAssignmentClick={this.navigateToAssignmentDetails}
 					/> */}
+					{/* <DisplayTask task={this.state.assignment}/> */}
 				</View>
 				{/* <Button
 					title='Create Battle Plan'
@@ -304,16 +394,35 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					)}
 					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
 				</Picker>
+				<Picker
+					selectedValue={this.state.alarmSelection}
+					onValueChange={this.setAlarmMode}
+				>
+					{this.alarmList.map((cycle, i) =>
+						<Picker.Item
+							key={i}
+							label={cycle.displayName}
+							value={i}
+						/>
+					)}
+				</Picker>
 				<Text>{this.state.assignment.title}</Text>
 
-				<Text>Work Timer: {Math.floor(this.state.workTimeLeft / 60000)}:{Math.floor(this.state.workTimeLeft % 60000)}</Text>
-				<Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text>
+				<View style={styles.timerContainer}>
+					<View style={styles.timer}>
+						<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>
+						{/* <Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text> */}
+					</View>
+				</View>
+
 				<Text>{this.state.paused.toString()}</Text>
 				<Text>{this.state.flipped.toString()}</Text>
 
-				{ this.state.paused && (
-					<Button title='Flip phone to start your timer!' style={components.buttonStyle}/>
-				) }
+				<View style={styles.flipNotification}>
+					{ this.state.paused && (
+						<Button title='Flip phone to start your timer!' style={styles.flipNotificationText} buttonStyle={components.buttonStyle} titleStyle={components.buttonText}/>
+					) }
+				</View>
 			</SafeAreaView>
 		);
 	}
@@ -333,5 +442,44 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		height: '20%'
+	},
+	backButton: {
+		paddingLeft: 40,
+		paddingRight: 40,
+		height: '100%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	timer: {
+		height: 200,
+		width: 200,
+		borderRadius: 100,
+		backgroundColor: PRIMARY[700],
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	timerContainer: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	timerText: {
+		color: '#fff',
+		textAlign: 'center'
+	},
+	flipNotification: {
+		position: 'absolute',
+		bottom: '5%',
+		width: '100%',
+		height: '20%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	flipNotificationText: {
+		width: '80%'
 	}
 });
