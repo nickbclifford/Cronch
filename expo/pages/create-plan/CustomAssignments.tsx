@@ -60,7 +60,7 @@ class CustomAssignments extends React.Component<NavigationScreenProps & WithAssi
 						<Button
 							title='Add to Plan'
 							buttonStyle={components.buttonStyle}
-							titleStyle={components.textInput}
+							titleStyle={components.buttonText}
 							onPress={props.handleSubmit as any}
 						/>
 					</View>
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
 		paddingBottom: 32
 	},
 	input: {
-		width: '100%',
 		marginBottom: 32
 	}
 });

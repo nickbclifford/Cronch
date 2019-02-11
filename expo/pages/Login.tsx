@@ -1,14 +1,14 @@
 import bind from 'bind-decorator';
 import { Formik } from 'formik';
 import * as React from 'react';
-import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, ImageBackground, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import { of, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
-import { components, NEUTRAL, textInputPlaceholderColor, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, NUNITO, textInputPlaceholderColor, typography } from '../common/StyleGuide';
 import { getUser, registerUser } from '../common/User';
 import { oxfordCommaList } from '../common/Utils';
 
@@ -81,8 +81,11 @@ export default class Login extends React.Component<NavigationScreenProps> {
 				onSubmit={this.login}
 			>
 				{props => (
-					<View style={styles.container}>
-						<Text style={[typography.h1, styles.title]}>Login to MyMICDS</Text>
+					<ImageBackground source={require('../assets/mymicds-blur.jpg')} style={styles.container}>
+						<StatusBar barStyle='light-content' />
+						<View style={styles.colorOverlay} />
+						{/*<Image source={require('../assets/mymicds-logo.png')} style={styles.logo} />*/}
+						<Text style={[typography.h1, styles.title]}>Login to MyMICDS.net</Text>
 						<View style={styles.usernameGroup}>
 							<TextInput
 								placeholder={'Username'}
@@ -107,11 +110,13 @@ export default class Login extends React.Component<NavigationScreenProps> {
 						/>
 						<Button
 							title='Login'
+							containerStyle={styles.buttonContainer}
 							buttonStyle={components.buttonStyle}
 							titleStyle={components.buttonText}
 							onPress={props.handleSubmit as any}
 						/>
-					</View>
+						<Text style={[typography.h3, styles.register]}>Not a member yet? Register</Text>
+					</ImageBackground>
 				)}
 			</Formik>
 		);
@@ -125,8 +130,19 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center'
 	},
+	colorOverlay: {
+		...StyleSheet.absoluteFillObject,
+		// backgroundColor: 'rgba(255, 255, 255, 0.3)'
+		backgroundColor: 'rgba(0, 0, 0, 0.1)'
+	},
+	logo: {
+		width: 80,
+		height: 80,
+		borderRadius: 40
+	},
 	title: {
-		marginBottom: 36
+		marginBottom: 36,
+		color: NEUTRAL[100]
 	},
 	usernameGroup: {
 		width: '100%',
@@ -144,7 +160,7 @@ const styles = StyleSheet.create({
 		padding: 8,
 		display: 'flex',
 		justifyContent: 'center',
-		backgroundColor: NEUTRAL[500],
+		backgroundColor: NEUTRAL[700],
 		borderTopRightRadius: 5,
 		borderBottomRightRadius: 5
 	},
@@ -155,5 +171,14 @@ const styles = StyleSheet.create({
 	passwordInput: {
 		width: '100%',
 		marginBottom: 24
+	},
+	buttonContainer: {
+		width: '100%'
+	},
+	register: {
+		marginTop: 32,
+		...StyleSheet.flatten(NUNITO.bold),
+		color: NEUTRAL[100],
+		textDecorationLine: 'underline'
 	}
 });

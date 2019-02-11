@@ -23,7 +23,8 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 		const subscription = combineLatest(
 			MyMICDS.auth.$,
 			Font.loadAsync({
-				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf')
+				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf'),
+				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf')
 			})
 		).subscribe(([jwt]) => {
 			if (jwt !== undefined) {
