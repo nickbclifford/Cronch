@@ -9,7 +9,7 @@ import { of, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
-import { components, NEUTRAL, NUNITO, textInputPlaceholderColor, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, NUNITO, typography } from '../common/StyleGuide';
 import { getUser, registerUser } from '../common/User';
 import { oxfordCommaList } from '../common/Utils';
 
@@ -98,8 +98,8 @@ export default class Login extends React.Component<NavigationScreenProps> {
 								onChangeText={props.handleChange('user')}
 								onBlur={props.handleBlur('user')}
 								value={props.values.user}
-								style={[components.textInput, styles.usernameInput]}
-								placeholderTextColor={textInputPlaceholderColor}
+								style={[components.textInput, styles.darkInput, styles.usernameInput]}
+								placeholderTextColor={NEUTRAL[300]}
 							/>
 							<View style={styles.usernameLabelContainer}>
 								<Text style={[typography.body, styles.usernameLabel]}>@micds.org</Text>
@@ -111,8 +111,8 @@ export default class Login extends React.Component<NavigationScreenProps> {
 							onChangeText={props.handleChange('password')}
 							onBlur={props.handleBlur('password')}
 							value={props.values.password}
-							style={[components.textInput, styles.passwordInput]}
-							placeholderTextColor={textInputPlaceholderColor}
+							style={[components.textInput, styles.darkInput, styles.passwordInput]}
+							placeholderTextColor={NEUTRAL[300]}
 						/>
 						<Button
 							title='Login'
@@ -153,6 +153,11 @@ const styles = StyleSheet.create({
 		// color: NEUTRAL[100]
 		color: NEUTRAL[900]
 	},
+	darkInput: {
+		backgroundColor: NEUTRAL[700],
+		// backgroundColor: 'rgba(0, 0, 0, 0.6)',
+		color: NEUTRAL[100]
+	},
 	usernameGroup: {
 		width: '100%',
 		marginBottom: 8,
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
 		padding: 8,
 		display: 'flex',
 		justifyContent: 'center',
-		backgroundColor: NEUTRAL[700],
+		backgroundColor: NEUTRAL[500],
 		borderTopRightRadius: 5,
 		borderBottomRightRadius: 5
 	},
