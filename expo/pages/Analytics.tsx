@@ -1,8 +1,13 @@
+import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import PureChart from 'react-native-pure-chart';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { from } from 'rxjs';
+import * as StyleGuide from '../common/StyleGuide';
 import { getUserTimeslots } from '../common/User';
+
+const timeslot = from(getUserTimeslots());
 
 import Hamburger from '../components/Hamburger';
 
@@ -16,36 +21,72 @@ export default class Template extends React.Component<NavigationScreenProps> {
 		rawData: null,
 		data: [
 			{
-				x: 'monday',
-				y: 5,
-				color: '#ff0000'
+				seriesName: 'chem',
+				data: [
+					{x: 'monday', y: 20},
+					{x: 'tuesday', y: 50},
+					{x: 'wednesday', y: 70}
+				],
+				color: StyleGuide.PRIMARY[100]
 			},
 			{
-				x: 'monday',
-				y: 25,
-				color: '#ff0000'
+				seriesName: 'history',
+				data: [
+					{x: 'monday', y: 60},
+					{x: 'tuesday', y: 50},
+					{x: 'wednesday', y: 70}
+				],
+				color: StyleGuide.PRIMARY[300]
+			},
+			{
+				seriesName: 'thething',
+				data: [
+					{x: 'monday', y: 60},
+					{x: 'tuesday', y: 50},
+					{x: 'wednesday', y: 70}
+				],
+				color: StyleGuide.PRIMARY[500]
 			}
 		]
 	};
 
-	calculateTotalHours() {
-		this.state.data = [];
-	}
-
+	/*
 	componentWillMount() {
-		console.log(getUserTimeslots());
-	}
+		timeslot.subscribe(timeslots => {
+			const out = [];
 
-	componentWillUpdate() {
-		console.log(getUserTimeslots());
-	}
+			timeslots.forEach(slot => {
+				if (slot.end != null) {
+					console.log(slot.classId);
+					const difference: number = (slot.end.getTime() - slot.start.getTime()) / 86400000;
+					out.push({x: slot.classId, y: difference});
+				}
+			});
+
+			this.setState({data: out});
+		});
+	}*/
 
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.container}>
-					<PureChart type='bar' data={this.state.data} />
+				<View style={styles.container}>
+					<Text>hello</Text>
+				</View>
+					<PureChart
+						type='bar'
+						data={this.state.data}
+						width={1200}
+						height={400}
+						showEvenNumberXaxisLabel={false}
+						customValueRendender={(index, point) => {
+							return (
+								<Text style={{textAlign: 'center'}}>{point.y}</Text>
+							)
+						}}
+					/>
 				</View>
 			</SafeAreaView>
 		);
@@ -66,27 +107,30 @@ const styles = StyleSheet.create({
 
 const mockData = [
 	{
-		id: 34,
-		start: '2019-02-10 05:55:14.603000 +00:00',
-		end: '2019-02-10 05:65:14.603000 +00:00',
-		name: 'Science'
+		seriesName: 'chem',
+		data: [
+			{x: 'monday', y: 20},
+			{x: 'tuesday', y: 50},
+			{x: 'wednesday', y: 70}
+		],
+		color: StyleGuide.PRIMARY[100]
 	},
 	{
-		id: 34,
-		start: '2019-02-10 05:55:14.603000 +00:00',
-		end: '2019-02-10 05:65:14.603000 +00:00',
-		name: 'Math'
+		seriesName: 'history',
+		data: [
+			{x: 'monday', y: 60},
+			{x: 'tuesday', y: 50},
+			{x: 'wednesday', y: 70}
+		],
+		color: StyleGuide.PRIMARY[300]
 	},
 	{
-		id: 34,
-		start: '2019-02-10 05:55:14.603000 +00:00',
-		end: '2019-02-10 06:65:14.603000 +00:00',
-		name: 'Science'
-	},
-	{
-		id: 34,
-		start: '2019-02-10 05:55:14.603000 +00:00',
-		end: '2019-02-10 05:65:14.603000 +00:00',
-		name: 'Science'
+		seriesName: 'thething',
+		data: [
+			{x: 'monday', y: 60},
+			{x: 'tuesday', y: 50},
+			{x: 'wednesday', y: 70}
+		],
+		color: StyleGuide.PRIMARY[500]
 	}
 ];
