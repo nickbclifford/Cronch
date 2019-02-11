@@ -4,6 +4,7 @@ import {
 	createDrawerNavigator,
 	createStackNavigator,
 	createSwitchNavigator,
+	NavigationScreenProps,
 	StackNavigatorConfig
 } from 'react-navigation';
 
@@ -22,6 +23,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Timer from './pages/Timer';
 import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
+import TimerModeSelection from './pages/TimerModeSelectionModal';
 import Welcome from './pages/Welcome';
 
 // tslint:disable:variable-name
@@ -60,17 +62,6 @@ const CreatePlan = createBottomTabNavigator(
 	}
 );
 
-const TimerAndModal = createStackNavigator(
-	{
-		Timer,
-		ModeSelection: TimerModeSelectionModal
-	},
-	{
-		mode: 'modal',
-		headerMode: 'none'
-	}
-);
-
 // Use custom trasition in the future
 const TimerNavigator = createStackNavigator(
 	{
@@ -80,10 +71,15 @@ const TimerNavigator = createStackNavigator(
 			navigationOptions: createNavigationOptions('Create Plan', false)
 		},
 		AssignmentDetails,
-		Timer: TimerAndModal
+		Timer: {
+			screen: Timer
+		},
+		ModeSelection: TimerModeSelection
 	},
 	{
-		initialRouteName: 'BattlePlan'
+		initialRouteName: 'BattlePlan',
+		// Timer header would look back if this is other values
+		headerMode: 'screen'
 	}
 );
 
