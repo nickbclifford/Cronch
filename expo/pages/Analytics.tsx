@@ -10,11 +10,12 @@ import { getUserTimeslots } from '../common/User';
 const timeslot = from(getUserTimeslots());
 
 import Hamburger from '../components/Hamburger';
-import { element } from 'prop-types';
 
 interface AnalyticsState {
 	data: any[];
 	times: any[];
+	classes: string[];
+	totalHours: number;
 }
 
 export default class Template extends React.Component<NavigationScreenProps, AnalyticsState> {
@@ -27,7 +28,9 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		super(props);
 		this.state = {
 			times: [],
-			data: []
+			data: [],
+			classes: [],
+			totalHours: 0
 		};
 	}
 
@@ -51,7 +54,7 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 	refreshData() {
 		const out = [];
 
-			// get the categories
+		// get the categories
 		const categories: string[] = [];
 		this.state.times.forEach(slot => {
 			if (categories.indexOf(slot.classId) === -1) {
@@ -61,12 +64,14 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 
 		// start creating data
 		const preOut: any[] = [];
+		const totalsHours = 0;
 
 		// now put the values into the categories
 		for (let i = 0; i < categories.length; i++) {
 			preOut.push({seriesName: categories[i], data: [], color: 'blue'});
 			this.state.times.forEach(slot => {
 				const today: Date = new Date();
+				console.log(slot.start.getDate());
 				if (slot.end != null && this.compareDate(slot.start, today) && slot.classId === categories[i]) {
 					const differenceHours = slot.start.getHours() - slot.end.getHours();
 					// TODO: get the aggregate amount of time spent and push that
@@ -90,34 +95,50 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		this.setState({data: preOut});
 	}
 
-	componentWillMount() {
-		timeslot.subscribe(timeslots => {
-			this.setState({times: timeslots});
-			this.refreshData();
+	@bind
+	basicData() {
+		const out = [];
+
+		// get the categories
+		const categories: string[] = [];
+		this.state.times.forEach(slot => {
+			if (categories.indexOf(slot.classId) === -1) {
+				categories.push(slot.classId);
+			}
+		});
+
+		this.state.times.forEach(slot => {
+			const temp = this.state.totalHours + (slot.end.getMinutes() - slot.start.getHours());
+			this.setState({totalHours: temp});
 		});
 	}
 
+	componentWillMount() {
+		timeslot.subscribe(timeslots => {
+			this.setState({times: timeslots});
+			this.basicData();
+		});
+	}
+
+	/*
+	<PureChart
+		type='pie'
+		data={this.state.data}
+		width={1200}
+		height={400}
+		showEvenNumberXaxisLabel={false}
+	/>
+	 */
+
 	render() {
-		console.log(`RENDER: ${this.state.data}`);
-		if (this.state.data.length !== 0) {
-			console.log(`RENDER: ${this.state.data}`);
-			return (
-				<SafeAreaView style={styles.safeArea}>
-					<Hamburger toggle={this.props.navigation.toggleDrawer} />
-					<View style={styles.container}>
-					<PureChart
-						type='pie'
-						data={this.state.data}
-						width={1200}
-						height={400}
-						showEvenNumberXaxisLabel={false}
-					/>
-					</View>
-				</SafeAreaView>
-			);
-		} else {
-			return null;
-		}
+		return (
+			<SafeAreaView style={styles.safeArea}>
+				<Hamburger toggle={this.props.navigation.toggleDrawer} />
+				<View style={styles.container}>
+				<Text>{this.state.totalHours}</Text>
+				</View>
+			</SafeAreaView>
+		);
 	}
 
 }
