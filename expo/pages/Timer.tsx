@@ -6,6 +6,7 @@ import { Button } from 'react-native-elements';
 import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
 
 import flipped$ from '../common/PhoneAcrobatics';
+import { components } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { Omit } from '../common/Utils';
@@ -288,11 +289,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					title='Create Battle Plan'
 					onPress={this.navigateToBattlePlan}
 				/> */}
-				{ this.state.paused ? (
-					<Button title='Start' onPress={this.togglePause}/>
-				) : (
-					<Button title='Pause' onPress={this.togglePause}/>
-				)}
+
 				<Button title='Add Custom' onPress={this.addCustom}/>
 				<Picker
 					selectedValue={this.state.modeSelection}
@@ -313,6 +310,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				<Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text>
 				<Text>{this.state.paused.toString()}</Text>
 				<Text>{this.state.flipped.toString()}</Text>
+
+				{ this.state.paused && (
+					<Button title='Flip phone to start your timer!' style={components.buttonStyle}/>
+				) }
 			</SafeAreaView>
 		);
 	}
