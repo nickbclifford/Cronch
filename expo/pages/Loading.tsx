@@ -21,14 +21,24 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 
 	private listenToAuth() {
 		const subscription = combineLatest(
-			MyMICDS.auth.$,
+			MyMICDS.user.$,
 			Font.loadAsync({
+				'Nunito-Light': require('../assets/Nunito/Nunito-Light.ttf'),
 				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf'),
-				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf')
+				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf'),
+				'Nunito-ExtraBold': require('../assets/Nunito/Nunito-Bold.ttf')
 			})
-		).subscribe(([jwt]) => {
-			if (jwt !== undefined) {
-				this.props.navigation.navigate(jwt ? 'App' : 'Auth');
+		).subscribe(([user]) => {
+			if (user !== undefined) {
+				if (!user) {
+					this.props.navigation.navigate('Auth');
+				} else {
+					if (user.canvasURL === null) {
+						this.props.navigation.navigate('Auth');
+					} else {
+						this.props.navigation.navigate('CheckUrls');
+					}
+				}
 				subscription.unsubscribe();
 			}
 		});

@@ -43,6 +43,13 @@ export function humanReadableTimeUntil(date: moment.Moment) {
 }
 
 export function oxfordCommaList(arr: string[]): string {
-	const last = arr.pop();
-	return `${arr.join(', ')}, and ${last}`;
+	switch (arr.length) {
+		case 1:
+		return arr[0];
+		case 2:
+		return `${arr[0]} and ${arr[1]}`;
+		default:
+		const last = arr.pop();
+		return `${arr.join(', ')}, and ${last}`;
+	}
 }

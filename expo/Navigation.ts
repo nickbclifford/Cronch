@@ -13,6 +13,7 @@ import createQuestionnaire from './components/QuestionnaireFactory';
 import About from './pages/About';
 import AssignmentDetails from './pages/AssignmentDetails';
 import BattlePlan from './pages/BattlePlan';
+import CheckUrls from './pages/CheckUrls';
 import CanvasAssignments from './pages/create-plan/CanvasAssignments';
 import CustomAssignments from './pages/create-plan/CustomAssignments';
 import Loading from './pages/Loading';
@@ -31,7 +32,8 @@ function createSingleStackNavigator(Component: any, config?: StackNavigatorConfi
 const AuthNavigator = createStackNavigator(
 	{
 		Welcome,
-		Login
+		Login,
+		CheckUrls
 	},
 	{
 		initialRouteName: 'Welcome'

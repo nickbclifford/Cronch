@@ -56,18 +56,24 @@ export const DANGER: ColorPalette = {
 	900: '#571413'
 };
 
-export const NUNITO = StyleSheet.create({
+export const nunito = StyleSheet.create({
+	light: {
+		fontFamily: 'Nunito-Light'
+	},
 	normal: {
 		fontFamily: 'Nunito-Regular'
 	},
 	bold: {
 		fontFamily: 'Nunito-Bold'
+	},
+	extraBold: {
+		fontFamily: 'Nunito-ExtraBold'
 	}
 });
 
 export const DEFAULT_TYPOGRAPHY_STYLES = {
 	color: NEUTRAL[900],
-	...StyleSheet.flatten(NUNITO.normal)
+	...StyleSheet.flatten(nunito.normal)
 };
 
 export const typography = StyleSheet.create({

@@ -5,13 +5,12 @@ import * as React from 'react';
 import { Alert, ImageBackground, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
-import { of, throwError } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
-import { components, NEUTRAL, NUNITO, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, nunito, typography } from '../common/StyleGuide';
 import { getUser, registerUser } from '../common/User';
-import { oxfordCommaList } from '../common/Utils';
 
 export interface LoginForm {
 	user: string;
@@ -52,25 +51,26 @@ export default class Login extends React.Component<NavigationScreenProps> {
 			}),
 			// Make sure that the user has all their URLs intact
 			switchMap(() => MyMICDS.user.getInfo()),
-			switchMap(({ canvasURL, portalURLCalendar, portalURLClasses }) => {
+			map(({ canvasURL, portalURLCalendar, portalURLClasses }) => {
 				const missingURLs: string[] = [];
-				if (canvasURL === null)         { missingURLs.push('Canvas');          }
-				if (portalURLCalendar === null) { missingURLs.push('Portal calendar'); }
-				if (portalURLClasses === null)  { missingURLs.push('Portal classes');  }
 
-				if (missingURLs.length > 0) {
-					return throwError(new Error(
-						`Looks like you haven't saved your ${oxfordCommaList(missingURLs)} ` +
-						`feed${missingURLs.length === 1 ? '' : 's'} on MyMICDS. Please go to your settings on MyMICDS.net ` +
-						`and configure ${missingURLs.length === 1 ? 'it' : 'them'} in order to use Cronch.`
-					));
+				if (canvasURL === null) {
+					missingURLs.push('Canvas');
+				}
+				if (portalURLCalendar === null || portalURLClasses === null) {
+					missingURLs.push('Portal');
 				}
 
-				// It didn't like when I used the EMPTY constant for some reason
-				return of({});
+				return missingURLs;
 			})
 		).subscribe(
-			() => this.props.navigation.navigate('App'),
+			missingURLs => {
+				if (missingURLs.length > 0) {
+					this.props.navigation.navigate('CheckUrls', { missingURLs });
+				} else {
+					this.props.navigation.navigate('App');
+				}
+			},
 			err => Alert.alert('Login Error', err.message)
 		);
 	}
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
 	},
 	register: {
 		marginTop: 32,
-		...StyleSheet.flatten(NUNITO.bold),
+		...StyleSheet.flatten(nunito.bold),
 		// color: NEUTRAL[100]
 		color: NEUTRAL[900]
 	},
