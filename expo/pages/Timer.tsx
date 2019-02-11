@@ -1,5 +1,6 @@
 import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
+import { Audio, PlaybackSound } from 'expo';
 import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
@@ -17,6 +18,7 @@ export interface TimerState {
 	onBreak: boolean;
 	paused: boolean;
 	modeSelection: number;
+	alarmSelection: number;
 	flipped: boolean;
 	assignment: Task;
 	currentTimeslotId: number | null;
@@ -33,6 +35,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		headerTintColor: '#fff'
 	};
 
+	private alarmSound = new Audio.Sound();
+
 	private interval!: NodeJS.Timer;
 
 	private userCycles: Array<{
@@ -42,9 +46,19 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	private shouldAddCycles = false;
 
+	private alarmList: Array<{
+		file: PlaybackSound,
+		displayName: string
+	}>;
+
 	constructor(props: any) {
 		super(props);
-
+		Audio.setAudioModeAsync({
+			playsInSilentModeIOS: true
+			// interruptionModeIOS: 'INTERRUPTION_MODE_IOS_DO_NOT_MIX',
+			// interruptionModeAndroid: 'INTERRUPTION_MODE_ANDROID_DUCK_OTHERS',
+			// playThroughEarpieceAndroid: true
+		}).then(buh => console.log('buh wait', buh));
 		this.userCycles = [{
 			work: 0.1 * 60 * 1000,
 			break: 0.1 * 60 * 1000
@@ -52,13 +66,20 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			work: 0.5 * 60 * 1000,
 			break: 0.5 * 60 * 1000
 		}];
-
+		this.alarmList = [{
+			file: require('../assets/alarm-sounds/2001_A_Space_Odyssey.mp3'),
+			displayName: 'Space Odyssey Theme'
+		}, {
+			file: require('../assets/alarm-sounds/samsung_loop.mp3'),
+			displayName: 'Bright and Cheery :)'
+		}];
 		this.state = {
 			workTimeLeft: this.userCycles[0].work,
 			breakTimeLeft: this.userCycles[0].break,
 			onBreak: false,
 			paused: true,
 			modeSelection: 0,
+			alarmSelection: 0,
 			flipped: false,
 			assignment: this.props.navigation.getParam('assignment'),
 			currentTimeslotId: null
@@ -69,7 +90,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		});
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
 		this.interval = setInterval(() => {
 			if (!this.state.paused) {
 				if (this.state.modeSelection === -1) {
@@ -91,6 +112,13 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({ paused: !flipped });
 			}
 		});
+		console.log(this.alarmList[0].file);
+		// try {
+		// 	await this.alarmSound.loadAsync(this.alarmList[0].file);
+		// 	await this.alarmSound.setIsLoopingAsync(true);
+		// } catch (error) {
+		// 	Alert.alert('sound buh', error.message());
+		// }
 	}
 
 	componentWillUnmount() {
@@ -161,6 +189,35 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
+	private async setAlarmMode(n: number) {
+			this.setState({
+				alarmSelection: n
+			});
+			// console.log(this.alarmList[n].file, this.alarmList[n].displayName);
+			// const soundObject = new Audio.Sound();
+			// try {
+			// 	await soundObject.loadAsync(this.alarmList[this.alarmSelection].file);
+			// 	console.log('swag', this.alarmList[n].file, this.alarmList[n].displayName);
+			// 	await this.alarmSound.setPositionAsync(0);
+			// 	await this.alarmSound.playAsync();
+			// } catch (error) {
+			// 	Alert.alert('sound buh', error.message());
+			// }
+	}
+
+	@bind
+	private async playAlarm(soundObject: Alarm.Sound) {
+		try {
+			await soundObject.loadAsync(this.alarmList[this.state.alarmSelection].file);
+			await soundObject.setIsLoopingAsync(true);
+			await soundObject.setPositionAsync(0);
+			await soundObject.playAsync();
+		} catch (error) {
+			Alert.alert('sound buh', error.message());
+		}
+	}
+
+	@bind
 	tick() {
 		if (this.state.onBreak) {
 			this.setState({
@@ -172,6 +229,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({
 					paused: true
 				});
+				const soundObject = new Audio.Sound();
+				this.playAlarm(soundObject);
 				Alert.alert(
 					'Time for work!',
 					'Yuhyuhyuh',
@@ -182,6 +241,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 								onBreak: false,
 								paused: true
 							});
+							soundObject.stopAsync();
 						} }
 					]
 				);
@@ -195,6 +255,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({
 					paused: true
 				});
+				const soundObject = new Audio.Sound();
+				this.playAlarm(soundObject);
 				Alert.alert(
 					'Time for a break!',
 					'Please select an option',
@@ -205,6 +267,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 								onBreak: true,
 								paused: false
 							});
+							soundObject.stopAsync();
 						} }
 					]
 				);
@@ -306,6 +369,18 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 						/>
 					)}
 					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
+				</Picker>
+				<Picker
+					selectedValue={this.state.alarmSelection}
+					onValueChange={this.setAlarmMode}
+				>
+					{this.alarmList.map((cycle, i) =>
+						<Picker.Item
+							key={i}
+							label={cycle.displayName}
+							value={i}
+						/>
+					)}
 				</Picker>
 				<Text>{this.state.assignment.title}</Text>
 
