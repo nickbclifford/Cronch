@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "Expo Typescript Boilerplate",
-		"description": "This project is really great.",
+		"name": "Cronch",
+		"description": "The all-in-one app to manage your time",
 		"slug": "typescript",
 		"privacy": "public",
 		"sdkVersion": "31.0.0",
@@ -12,7 +12,7 @@
 		"splash": {
 			"image": "./assets/splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#1575BF"
+			"backgroundColor": "#CC76EE"
 		},
 		"updates": {
 			"fallbackToCacheTimeout": 0
