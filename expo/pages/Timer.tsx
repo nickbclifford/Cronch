@@ -3,7 +3,7 @@ import bind from 'bind-decorator';
 import { Audio, PlaybackSource } from 'expo';
 import moment from 'moment';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Picker, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
 
@@ -84,11 +84,23 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			break: 0.5 * 60 * 1000
 		}];
 		this.alarmList = [{
-			file: require('../assets/alarm-sounds/2001_A_Space_Odyssey.mp3'),
+			file: require('../assets/alarm-sounds/2001-A-Space-Odyssey.mp3'),
 			displayName: 'Space Odyssey Theme'
 		}, {
-			file: require('../assets/alarm-sounds/samsung_loop.mp3'),
+			file: require('../assets/alarm-sounds/samsung-loop.mp3'),
 			displayName: 'Bright and Cheery :)'
+		}, {
+			file: require('../assets/alarm-sounds/chime.wav'),
+			displayName: 'Light Chimes'
+		}, {
+			file: require('../assets/alarm-sounds/harp.mp3'),
+			displayName: 'Beautiful Harps'
+		}, {
+			file: require('../assets/alarm-sounds/analog-watch-alarm_daniel-simion.mp3'),
+			displayName: 'Analog Watch'
+		}, {
+			file: require('../assets/alarm-sounds/Temple-Bell.mp3'),
+			displayName: 'Temple Bells'
 		}];
 		this.state = {
 			workTimeLeft: this.userCycles[0].work,
