@@ -3,7 +3,9 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
 import { combineLatest } from 'rxjs';
+
 import MyMICDS from '../common/MyMICDS';
+import { getMissingURLs } from '../common/Utils';
 
 export default class Loading extends React.Component<NavigationScreenProps> {
 
@@ -21,13 +23,26 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 
 	private listenToAuth() {
 		const subscription = combineLatest(
-			MyMICDS.auth.$,
+			MyMICDS.user.$,
 			Font.loadAsync({
-				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf')
+				'Nunito-Light': require('../assets/Nunito/Nunito-Light.ttf'),
+				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf'),
+				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf'),
+				'Nunito-ExtraBold': require('../assets/Nunito/Nunito-ExtraBold.ttf'),
+				'Nunito-Black': require('../assets/Nunito/Nunito-Black.ttf')
 			})
-		).subscribe(([jwt]) => {
-			if (jwt !== undefined) {
-				this.props.navigation.navigate(jwt ? 'App' : 'Auth');
+		).subscribe(([user]) => {
+			if (user !== undefined) {
+				if (user === null) {
+					this.props.navigation.navigate('Auth');
+				} else {
+					const missing = getMissingURLs(user);
+					if (missing.hasRequired) {
+						this.props.navigation.navigate('App');
+					} else {
+						this.props.navigation.navigate('CheckUrls', missing);
+					}
+				}
 				subscription.unsubscribe();
 			}
 		});
