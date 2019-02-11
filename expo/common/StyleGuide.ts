@@ -56,9 +56,27 @@ export const DANGER: ColorPalette = {
 	900: '#571413'
 };
 
+export const nunito = StyleSheet.create({
+	light: {
+		fontFamily: 'Nunito-Light'
+	},
+	normal: {
+		fontFamily: 'Nunito-Regular'
+	},
+	bold: {
+		fontFamily: 'Nunito-Bold'
+	},
+	extraBold: {
+		fontFamily: 'Nunito-ExtraBold'
+	},
+	black: {
+		fontFamily: 'Nunito-Black'
+	}
+});
+
 export const DEFAULT_TYPOGRAPHY_STYLES = {
 	color: NEUTRAL[900],
-	fontFamily: 'Nunito-Regular'
+	...StyleSheet.flatten(nunito.normal)
 };
 
 export const typography = StyleSheet.create({
@@ -86,6 +104,7 @@ export const typography = StyleSheet.create({
 
 export const components = StyleSheet.create({
 	textInput: {
+		...StyleSheet.flatten(typography.body),
 		padding: 8,
 		backgroundColor: NEUTRAL[300],
 		color: NEUTRAL[700],
@@ -93,8 +112,8 @@ export const components = StyleSheet.create({
 	},
 	buttonStyle: {
 		paddingTop: 12,
-		paddingRight: 24,
-		paddingLeft: 24,
+		paddingRight: 48,
+		paddingLeft: 48,
 		paddingBottom: 12,
 		backgroundColor: PRIMARY[700],
 		borderRadius: 32
