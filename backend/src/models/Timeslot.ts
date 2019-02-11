@@ -11,12 +11,6 @@ import {
 } from 'sequelize-typescript';
 import User from './User';
 
-export enum TaskType {
-	CANVAS_ASSIGNMENT,
-	CANVAS_CLASS,
-	CUSTOM
-}
-
 @Table
 export default class Timeslot extends Model<Timeslot> {
 	@PrimaryKey
@@ -30,14 +24,8 @@ export default class Timeslot extends Model<Timeslot> {
 	@Column(DataType.DATE)
 	end!: Date | null;
 
-	@Column(DataType.INTEGER)
-	taskType!: TaskType;
-
 	@Column(DataType.STRING)
-	canvasId!: string | null; // Object ID from MyMICDS
-
-	@Column(DataType.STRING)
-	customTitle!: string | null;
+	classId!: string | null; // Object ID from MyMICDS
 
 	@ForeignKey(() => User)
 	@Column
