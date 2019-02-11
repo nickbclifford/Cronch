@@ -68,6 +68,9 @@ export const nunito = StyleSheet.create({
 	},
 	extraBold: {
 		fontFamily: 'Nunito-ExtraBold'
+	},
+	black: {
+		fontFamily: 'Nunito-Black'
 	}
 });
 

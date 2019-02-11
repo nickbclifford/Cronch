@@ -3,7 +3,9 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
 import { combineLatest } from 'rxjs';
+
 import MyMICDS from '../common/MyMICDS';
+import { getMissingURLs } from '../common/Utils';
 
 export default class Loading extends React.Component<NavigationScreenProps> {
 
@@ -26,17 +28,19 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 				'Nunito-Light': require('../assets/Nunito/Nunito-Light.ttf'),
 				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf'),
 				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf'),
-				'Nunito-ExtraBold': require('../assets/Nunito/Nunito-Bold.ttf')
+				'Nunito-ExtraBold': require('../assets/Nunito/Nunito-ExtraBold.ttf'),
+				'Nunito-Black': require('../assets/Nunito/Nunito-Black.ttf')
 			})
 		).subscribe(([user]) => {
 			if (user !== undefined) {
-				if (!user) {
+				if (user === null) {
 					this.props.navigation.navigate('Auth');
 				} else {
-					if (user.canvasURL === null) {
-						this.props.navigation.navigate('Auth');
+					const missing = getMissingURLs(user);
+					if (missing.hasRequired) {
+						this.props.navigation.navigate('App');
 					} else {
-						this.props.navigation.navigate('CheckUrls');
+						this.props.navigation.navigate('CheckUrls', missing);
 					}
 				}
 				subscription.unsubscribe();

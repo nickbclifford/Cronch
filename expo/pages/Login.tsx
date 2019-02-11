@@ -11,6 +11,7 @@ import { map, switchMap } from 'rxjs/operators';
 import MyMICDS from '../common/MyMICDS';
 import { components, NEUTRAL, nunito, typography } from '../common/StyleGuide';
 import { getUser, registerUser } from '../common/User';
+import { getMissingURLs } from '../common/Utils';
 
 export interface LoginForm {
 	user: string;
@@ -51,22 +52,11 @@ export default class Login extends React.Component<NavigationScreenProps> {
 			}),
 			// Make sure that the user has all their URLs intact
 			switchMap(() => MyMICDS.user.getInfo()),
-			map(({ canvasURL, portalURLCalendar, portalURLClasses }) => {
-				const missingURLs: string[] = [];
-
-				if (canvasURL === null) {
-					missingURLs.push('Canvas');
-				}
-				if (portalURLCalendar === null || portalURLClasses === null) {
-					missingURLs.push('Portal');
-				}
-
-				return missingURLs;
-			})
+			map(getMissingURLs)
 		).subscribe(
-			missingURLs => {
-				if (missingURLs.length > 0) {
-					this.props.navigation.navigate('CheckUrls', { missingURLs });
+			missing => {
+				if (missing.urls.length > 0) {
+					this.props.navigation.navigate('CheckUrls', missing);
 				} else {
 					this.props.navigation.navigate('App');
 				}

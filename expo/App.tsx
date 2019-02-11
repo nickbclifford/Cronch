@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Alert } from 'react-native';
-import MyMICDS from './common/MyMICDS';
 
 import { AssignmentContext, AssignmentContextType } from './common/AssignmentContext';
+import MyMICDS from './common/MyMICDS';
 import AppContainer from './Navigation';
 
 interface GlobalAppState extends AssignmentContextType { }
