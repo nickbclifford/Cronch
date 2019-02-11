@@ -5,11 +5,11 @@ import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
 
+import flipped$ from '../common/PhoneAcrobatics';
 import Task from '../common/Task';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { Omit } from '../common/Utils';
 import DisplayAssignments from '../components/DisplayAssignments';
-import flipped$ from '../common/PhoneAcrobatics';
 
 export interface TimerState {
 	workTimeLeft: number;
@@ -91,14 +91,23 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({ paused: !flipped });
 			}
 		});
-
-		this.startRecordTimeslot();
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
 		// TODO: Custom events bb
 		this.endRecordTimeslot();
+	}
+
+	componentWillUpdate(nextProps: any, nextState: any) {
+		console.log(this.state.paused, nextState.paused);
+		if (this.state.paused !== nextState.paused) {
+			if (this.state.paused) {
+				this.startRecordTimeslot();
+			} else {
+				this.endRecordTimeslot();
+			}
+		}
 	}
 
 	componentDidUpdate() {
@@ -168,7 +177,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					'Yuhyuhyuh',
 					[
 						{ text: 'Continue', onPress: () => {
-							this.startRecordTimeslot();
 							this.setState({
 								breakTimeLeft: this.userCycles[this.state.modeSelection].break,
 								onBreak: false,
@@ -192,7 +200,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					'Please select an option',
 					[
 						{ text: 'Continue', onPress: () => {
-							this.endRecordTimeslot();
 							this.setState({
 								workTimeLeft: this.userCycles[this.state.modeSelection].work,
 								onBreak: true,
