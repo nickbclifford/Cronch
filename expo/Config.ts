@@ -1,3 +1,3 @@
 export default {
-	backendUrl: 'http://172.27.101.13:4500'
+	backendUrl: 'http://192.168.1.134:4500'
 };

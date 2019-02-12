@@ -12,10 +12,12 @@ const timeslot = from(getUserTimeslots());
 import Hamburger from '../components/Hamburger';
 
 interface AnalyticsState {
-	data: any[];
 	times: any[];
 	classes: string[];
-	totalHours: number;
+	weeklyTimes: any[];
+	weeklyTotal: number;
+	dailyTimes: any[];
+	dailyTotal: number;
 }
 
 export default class Template extends React.Component<NavigationScreenProps, AnalyticsState> {
@@ -28,114 +30,110 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		super(props);
 		this.state = {
 			times: [],
-			data: [],
 			classes: [],
-			totalHours: 0
+			weeklyTimes: [],
+			weeklyTotal: 0,
+			dailyTimes: [],
+			dailyTotal: 0
 		};
-	}
-
-	getDayString(day: number): string {
-		switch (day) {
-			case 0: return 'Sunday';
-			case 1: return 'Monday';
-			case 2: return 'Tuesday';
-			case 3: return 'Wednesday';
-			case 4: return 'Thursday';
-			case 5: return 'Friday';
-			case 6: return 'Saturday';
-			default: return 'Day';
-		}
 	}
 
 	compareDate(date1: Date, date2: Date) {
 		return (date1.getDate() === date2.getDate());
 	}
 
-	refreshData() {
-		const out = [];
+	private getWeeklyData() {
+		// gets the weekly reference point
+		const thisWeek: Date = new Date();
+		thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
 
-		// get the categories
-		const categories: string[] = [];
-		this.state.times.forEach(slot => {
-			if (categories.indexOf(slot.classId) === -1) {
-				categories.push(slot.classId);
+		const out: any[] = []; // weekly timeslots
+		this.state.times.forEach(time => {
+			if (time.end != null && time.start > thisWeek) {
+				out.push(time);
 			}
 		});
 
-		// start creating data
-		const preOut: any[] = [];
-		const totalsHours = 0;
+		let ttl = 0;
 
-		// now put the values into the categories
-		for (let i = 0; i < categories.length; i++) {
-			preOut.push({seriesName: categories[i], data: [], color: 'blue'});
-			this.state.times.forEach(slot => {
-				const today: Date = new Date();
-				console.log(slot.start.getDate());
-				if (slot.end != null && this.compareDate(slot.start, today) && slot.classId === categories[i]) {
-					const differenceHours = slot.start.getHours() - slot.end.getHours();
-					// TODO: get the aggregate amount of time spent and push that
-					preOut[i].data.push({label: slot.classId, color: 'blue', value: differenceHours});
-				}
-			});
-		}
+		out.forEach(time => {
+			ttl += ((time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60)));
+		});
 
-		/*
-		// now go through each element and add the rest of the week
-		for (let e = 0; e < preOut.length; e++) {
-			if (preOut[e].data.length < 7) {
-				for (let f = preOut[e].data.length; f < 7; f++) {
-					preOut[e].data.push({x: this.getDayString(f - 1), y: 0});
-				}
-			}
-		}*/
+		ttl /= out.length; // get an average
 
-		console.log(preOut);
-
-		this.setState({data: preOut});
+		this.setState({weeklyTimes: out});
+		this.setState({weeklyTotal: ttl});
 	}
 
-	@bind
-	basicData() {
-		const out = [];
+	private getDailyTimes() {
+			// gets the daily reference point
+			const today: Date = new Date();
 
-		// get the categories
-		const categories: string[] = [];
-		this.state.times.forEach(slot => {
-			if (categories.indexOf(slot.classId) === -1) {
-				categories.push(slot.classId);
-			}
-		});
+			const out: any[] = []; // weekly timeslots
+			this.state.times.forEach(time => {
+				if (time.end != null && time.start.getDay() === today.getDay()) {
+					out.push(time);
+				}
+			});
 
-		this.state.times.forEach(slot => {
-			const temp = this.state.totalHours + (slot.end.getMinutes() - slot.start.getHours());
-			this.setState({totalHours: temp});
-		});
+			let ttl = 0;
+
+			out.forEach(time => {
+				ttl += ((time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60)));
+			});
+
+			this.setState({dailyTotal: ttl});
+			this.setState({dailyTimes: out});
+	}
+
+	private beautifyMinutes(num: number) {
+		return (`${Math.round(num)}h ${(num * 60).toFixed(2)}m`);
 	}
 
 	componentWillMount() {
 		timeslot.subscribe(timeslots => {
 			this.setState({times: timeslots});
-			this.basicData();
+			this.getWeeklyData();
+			this.getDailyTimes();
 		});
 	}
-
-	/*
-	<PureChart
-		type='pie'
-		data={this.state.data}
-		width={1200}
-		height={400}
-		showEvenNumberXaxisLabel={false}
-	/>
-	 */
 
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
-				<View style={styles.container}>
-				<Text>{this.state.totalHours}</Text>
+				<View style={styles.verticalContainer}>
+				<Text style={styles.headerTitle}>This Week</Text>
+				<PureChart
+					type='bar'
+					data={mockData}
+					width={1200}
+					height={400}
+					showEvenNumberXaxisLabel={false}
+				/>
+				<View style={styles.horizontalContainer}>
+					<View style={styles.verticalContainer}>
+						<View style={styles.verticalContainer}>
+							<Text style={styles.title}>Weekly Average</Text>
+							<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
+						</View>
+						<View style={styles.verticalContainer}>
+							<Text style={styles.title}>Today's Total</Text>
+							<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
+						</View>
+					</View>
+					<View style={styles.verticalContainer}>
+						<View style={styles.verticalContainer}>
+							<Text style={styles.title}>Heaviest Night</Text>
+							<Text style={styles.text}>Coming Soon!</Text>
+						</View>
+						<View style={styles.verticalContainer}>
+							<Text style={styles.title}>Lightest Night</Text>
+							<Text style={styles.text}>Coming Soon!</Text>
+						</View>
+					</View>
+				</View>
 				</View>
 			</SafeAreaView>
 		);
@@ -147,10 +145,32 @@ const styles = StyleSheet.create({
 	safeArea: {
 		height: '100%'
 	},
-	container: {
+	headerTitle: {
+		color: StyleGuide.PRIMARY[700],
+		fontSize: 25,
+		fontFamily: 'Nunito-Regular'
+	},
+	title: {
+		color: StyleGuide.PRIMARY[900],
+		fontSize: 20,
+		fontFamily: 'Nunito-Regular'
+	},
+	text: {
+		color: StyleGuide.PRIMARY[700],
+		fontSize: 15,
+		fontFamily: 'Nunito-Regular'
+	},
+	verticalContainer: {
 		flex: 1,
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
+		flexDirection: 'column'
+	},
+	horizontalContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'row'
 	}
 });
 
@@ -160,25 +180,37 @@ const mockData = [
 		data: [
 			{x: 'monday', y: 20},
 			{x: 'tuesday', y: 50},
-			{x: 'wednesday', y: 70}
+			{x: 'wednesday', y: 70},
+			{x: 'thursday', y: 20},
+			{x: 'friday', y: 40},
+			{x: 'saturday', y: 80},
+			{x: 'sunday', y: 90}
 		],
 		color: StyleGuide.PRIMARY[100]
 	},
 	{
 		seriesName: 'history',
 		data: [
-			{x: 'monday', y: 60},
+			{x: 'monday', y: 20},
 			{x: 'tuesday', y: 50},
-			{x: 'wednesday', y: 0}
+			{x: 'wednesday', y: 70},
+			{x: 'thursday', y: 10},
+			{x: 'friday', y: 80},
+			{x: 'saturday', y: 20},
+			{x: 'sunday', y: 90}
 		],
 		color: StyleGuide.PRIMARY[300]
 	},
 	{
 		seriesName: 'thething',
 		data: [
-			{x: 'monday', y: 60},
-			{x: 'tuesday', y: 50},
-			{x: 'wednesday', y: 70}
+			{x: 'monday', y: 10},
+			{x: 'tuesday', y: 34},
+			{x: 'wednesday', y: 91},
+			{x: 'thursday', y: 23},
+			{x: 'friday', y: 56},
+			{x: 'saturday', y: 12},
+			{x: 'sunday', y: 67}
 		],
 		color: StyleGuide.PRIMARY[500]
 	}
