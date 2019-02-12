@@ -382,7 +382,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	@bind
 	private cancelVibrate() {
-		Vibration.vibrate([this.state.vibrateDuration, this.state.vibrateDuration], true);
+		Vibration.cancel();
 	}
 	render() {
 		return (
