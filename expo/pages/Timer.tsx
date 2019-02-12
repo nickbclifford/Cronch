@@ -52,8 +52,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		};
 	}
 
-	private alarmSound = new Audio.Sound();
-
 	private interval!: NodeJS.Timer;
 
 	private userCycles: Array<{
@@ -71,10 +69,11 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	constructor(props: any) {
 		super(props);
 		Audio.setAudioModeAsync({
-			playsInSilentModeIOS: true
-			// interruptionModeIOS: 'INTERRUPTION_MODE_IOS_DO_NOT_MIX',
-			// interruptionModeAndroid: 'INTERRUPTION_MODE_ANDROID_DUCK_OTHERS',
-			// playThroughEarpieceAndroid: true
+			playsInSilentModeIOS: true,
+			allowsRecordingIOS: false,
+			interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+			shouldDuckAndroid: true,
+			interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
 		}).then(buh => console.log('buh wait', buh));
 		this.userCycles = [{
 			work: 0.1 * 60 * 1000,
@@ -240,7 +239,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private async playAlarm(soundObject: Alarm.Sound) {
+	private async playAlarm(soundObject: Audio.Sound) {
 		try {
 			await soundObject.loadAsync(this.alarmList[this.state.alarmSelection].file);
 			await soundObject.setIsLoopingAsync(true);
