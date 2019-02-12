@@ -25,6 +25,7 @@ export interface TimerState {
 	flipped: boolean;
 	assignment: Task;
 	currentTimeslotId: number | null;
+	vibrateDuration: number;
 }
 
 export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
@@ -68,13 +69,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	constructor(props: any) {
 		super(props);
-		Audio.setAudioModeAsync({
-			playsInSilentModeIOS: true,
-			allowsRecordingIOS: false,
-			interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-			shouldDuckAndroid: true,
-			interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
-		}).then(buh => console.log('buh wait', buh));
 		this.userCycles = [{
 			work: 0.1 * 60 * 1000,
 			break: 0.1 * 60 * 1000
@@ -110,7 +104,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			alarmSelection: 0,
 			flipped: false,
 			assignment: this.props.navigation.getParam('assignment'),
-			currentTimeslotId: null
+			currentTimeslotId: null,
+			vibrateDuration: 500
 		};
 
 		// this.props.navigation.state.params.classColor = this.state.assignment.class.color;
@@ -145,13 +140,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({ paused: !flipped });
 			}
 		});
-		console.log(this.alarmList[0].file);
-		// try {
-		// 	await this.alarmSound.loadAsync(this.alarmList[0].file);
-		// 	await this.alarmSound.setIsLoopingAsync(true);
-		// } catch (error) {
-		// 	Alert.alert('sound buh', error.message());
-		// }
+		this.prepareSound();
 	}
 
 	componentWillUnmount() {
@@ -264,6 +253,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				});
 				const soundObject = new Audio.Sound();
 				this.playAlarm(soundObject);
+				this.vibratePhone();
 				Alert.alert(
 					'Time for work!',
 					'Yuhyuhyuh',
@@ -275,6 +265,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 								paused: true
 							});
 							soundObject.stopAsync();
+							this.cancelVibrate();
 						} }
 					]
 				);
@@ -290,6 +281,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				});
 				const soundObject = new Audio.Sound();
 				this.playAlarm(soundObject);
+				this.vibratePhone();
 				Alert.alert(
 					'Time for a break!',
 					'Please select an option',
@@ -301,6 +293,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 								paused: false
 							});
 							soundObject.stopAsync();
+							this.cancelVibrate();
 						} }
 					]
 				);
@@ -356,6 +349,21 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	// 	} else {
 	// 	}
 	// }
+	private async prepareSound() {
+		try {
+			await Audio.setAudioModeAsync({
+				playsInSilentModeIOS: true,
+				allowsRecordingIOS: false,
+				interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+				shouldDuckAndroid: true,
+				interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
+			}).then(err => {
+				console.log('this is setting audio error ', err);
+			});
+		} catch (error) {
+			Alert.alert('sound buh', error.message());
+		}
+	}
 
 	@bind
 	private navigateToAssignmentDetails(assignment: CanvasEvent) {
@@ -367,6 +375,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		return moment(this.state.workTimeLeft, 'x').format('mm:ss');
 	}
 
+	@bind
+	private vibratePhone() {
+		Vibration.vibrate([this.state.vibrateDuration, this.state.vibrateDuration], true);
+	}
+
+	@bind
+	private cancelVibrate() {
+		Vibration.vibrate([this.state.vibrateDuration, this.state.vibrateDuration], true);
+	}
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
