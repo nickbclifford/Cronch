@@ -1,14 +1,11 @@
 import bind from 'bind-decorator';
-import { Button } from 'react-native-elements';
-import { Dimensions } from 'react-native';
-import Hamburger from '../components/Hamburger';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
-import Swiper from 'react-native-swiper';
 import PureChart from 'react-native-pure-chart';
+import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { components, PRIMARY } from '../common/StyleGuide';
+import { PRIMARY } from '../common/StyleGuide';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
 import Hamburger from '../components/Hamburger';
@@ -264,7 +261,7 @@ const styles = StyleSheet.create({
 		paddingRight: 24,
 		paddingLeft: 24,
 		paddingBottom: 12,
-		backgroundColor: StyleGuide.PRIMARY[700]
+		backgroundColor: PRIMARY[700]
 	}
 });
 
