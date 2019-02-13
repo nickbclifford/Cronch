@@ -5,11 +5,14 @@ import PureChart from 'react-native-pure-chart';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { from } from 'rxjs';
 import * as StyleGuide from '../common/StyleGuide';
+import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
 
 const timeslot = from(getUserTimeslots());
 
 import Hamburger from '../components/Hamburger';
+import { updateLocale } from 'moment';
+import { Button } from 'react-native-elements';
 
 interface AnalyticsState {
 	times: any[];
@@ -18,6 +21,7 @@ interface AnalyticsState {
 	weeklyTotal: number;
 	dailyTimes: any[];
 	dailyTotal: number;
+	chartData: any[];
 }
 
 export default class Template extends React.Component<NavigationScreenProps, AnalyticsState> {
@@ -31,6 +35,18 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		this.state = {
 			times: [],
 			classes: [],
+			chartData: [
+				{
+					value: 50,
+					label: 'stuff',
+					color: 'red'
+				},
+				{
+					value: 29,
+					label: 'otherstuff',
+					color: 'blue'
+				}
+			],
 			weeklyTimes: [],
 			weeklyTotal: 0,
 			dailyTimes: [],
@@ -42,7 +58,15 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		return (date1.getDate() === date2.getDate());
 	}
 
-	private getWeeklyData() {
+	private calculateHourDiff(start: Date, end: Date): number {
+		return ((end.getTime() - start.getTime()) * (1 / (1000 * 60 * 60)));
+	}
+
+	private pickRandomColor() {
+		return colors[Math.floor(Math.random() * colors.length)];
+	}
+
+	private makeWeeklyData() {
 		// gets the weekly reference point
 		const thisWeek: Date = new Date();
 		thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
@@ -66,11 +90,11 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 		this.setState({weeklyTotal: ttl});
 	}
 
-	private getDailyTimes() {
+	private makeDailyData() {
 			// gets the daily reference point
 			const today: Date = new Date();
 
-			const out: any[] = []; // weekly timeslots
+			const out: any[] = []; // daily timeslots
 			this.state.times.forEach(time => {
 				if (time.end != null && time.start.getDay() === today.getDay()) {
 					out.push(time);
@@ -85,6 +109,36 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 
 			this.setState({dailyTotal: ttl});
 			this.setState({dailyTimes: out});
+
+			// now find the classes
+			const cs: string[] = [];
+			out.forEach(slot => {
+				if (slot.classId !== null && cs.indexOf(slot.classId) === -1) {
+					// new class found, push it
+					cs.push(slot.classId);
+				}
+			});
+
+			console.log(cs);
+
+			this.setState({classes: cs});
+
+			const preOut: any[] = [];
+			// create the chartData for the day
+			cs.forEach(cl => {
+				console.log(cl);
+				let totalHours = 0;
+				out.forEach(slot => {
+					if (slot.end != null && slot.classId === cl) {
+						totalHours += this.calculateHourDiff(slot.start, slot.end);
+					}
+				});
+
+				preOut.push({label: cl, value: +(totalHours * 60).toFixed(2), color: this.pickRandomColor()});
+			});
+
+			console.log(preOut);
+			this.setState({chartData: preOut});
 	}
 
 	private beautifyMinutes(num: number) {
@@ -94,9 +148,16 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 	componentWillMount() {
 		timeslot.subscribe(timeslots => {
 			this.setState({times: timeslots});
-			this.getWeeklyData();
-			this.getDailyTimes();
+			this.makeWeeklyData();
+			this.makeDailyData();
 		});
+	}
+
+	@bind
+	private updateData() {
+		// showEvenNumberXaxisLabel={false}
+		this.makeWeeklyData();
+		this.makeDailyData();
 	}
 
 	render() {
@@ -106,11 +167,10 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 				<View style={styles.verticalContainer}>
 				<Text style={styles.headerTitle}>This Week</Text>
 				<PureChart
-					type='bar'
-					data={mockData}
+					type='pie'
+					data={this.state.chartData}
 					width={1200}
 					height={400}
-					showEvenNumberXaxisLabel={false}
 				/>
 				<View style={styles.horizontalContainer}>
 					<View style={styles.verticalContainer}>
@@ -134,6 +194,7 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 						</View>
 					</View>
 				</View>
+				<Button title='Update' onPress={this.updateData} style={StyleGuide.components.buttonStyle} />
 				</View>
 			</SafeAreaView>
 		);
@@ -214,4 +275,25 @@ const mockData = [
 		],
 		color: StyleGuide.PRIMARY[500]
 	}
+];
+
+const pieMock = [
+	{
+		value: 0.5,
+		label: 'stuff',
+		color: 'red'
+	},
+	{
+		value: 0.2,
+		label: 'otherstuff',
+		color: 'blue'
+	}
+];
+
+const colors = [
+	'#F9EBFF',
+	'#E6AFFB',
+	'#CC76EE',
+	'#7C16A5',
+	'#540174'
 ];
