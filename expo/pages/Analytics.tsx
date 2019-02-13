@@ -1,7 +1,11 @@
 import bind from 'bind-decorator';
+import { Button } from 'react-native-elements';
+import { Dimensions } from 'react-native';
+import Hamburger from '../components/Hamburger';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
+import Swiper from 'react-native-swiper';
 import PureChart from 'react-native-pure-chart';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { components, PRIMARY } from '../common/StyleGuide';
@@ -173,13 +177,27 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.verticalContainer}>
-				<Text style={styles.headerTitle}>This Week</Text>
-				<PureChart
-					type='pie'
-					data={this.state.chartData}
-					width={1200}
-					height={400}
-				/>
+				<Swiper horizontal={true}>
+				<View style={styles.verticalContainer}>
+					<Text style={styles.headerTitle}>Today (in minutes)</Text>
+					<PureChart
+						type='pie'
+						data={this.state.chartData}
+						width={'100%'}
+						height={400}
+					/>
+				</View>
+				<View style={styles.verticalContainer}>
+					<Text style={styles.headerTitle}>This week (in minutes)</Text>
+					<PureChart
+						type='bar'
+						data={mockData}
+						width={'100%'}
+						height={200}
+						showEvenNumberXaxisLabel={false}
+					/>
+				</View>
+				</Swiper>
 				<View style={styles.horizontalContainer}>
 					<View style={styles.verticalContainer}>
 						<View style={styles.verticalContainer}>
@@ -202,7 +220,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 						</View>
 					</View>
 				</View>
-				<Button title='Update' onPress={this.updateData} style={components.buttonStyle} />
+				<Button title='Update' onPress={this.updateData} style={styles.buttonStyle} />
 				</View>
 			</SafeAreaView>
 		);
@@ -240,6 +258,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		flexDirection: 'row'
+	},
+	buttonStyle: {
+		paddingTop: 12,
+		paddingRight: 24,
+		paddingLeft: 24,
+		paddingBottom: 12,
+		backgroundColor: StyleGuide.PRIMARY[700]
 	}
 });
 
