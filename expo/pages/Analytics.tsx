@@ -1,30 +1,31 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { from } from 'rxjs';
-import * as StyleGuide from '../common/StyleGuide';
+import { components, PRIMARY } from '../common/StyleGuide';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
-
-const timeslot = from(getUserTimeslots());
-
 import Hamburger from '../components/Hamburger';
-import { updateLocale } from 'moment';
-import { Button } from 'react-native-elements';
 
-interface AnalyticsState {
-	times: any[];
-	classes: string[];
-	weeklyTimes: any[];
-	weeklyTotal: number;
-	dailyTimes: any[];
-	dailyTotal: number;
-	chartData: any[];
+interface ChartDataPoint {
+	label: string;
+	value: number;
+	color: string;
 }
 
-export default class Template extends React.Component<NavigationScreenProps, AnalyticsState> {
+interface AnalyticsState {
+	times: Timeslot[];
+	classes: string[];
+	weeklyTimes: Timeslot[];
+	weeklyTotal: number;
+	dailyTimes: Timeslot[];
+	dailyTotal: number;
+	chartData: ChartDataPoint[];
+}
+
+export default class Analytics extends React.Component<NavigationScreenProps, AnalyticsState> {
 
 	static navigationOptions = {
 		header: null
@@ -55,99 +56,106 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 	}
 
 	compareDate(date1: Date, date2: Date) {
-		return (date1.getDate() === date2.getDate());
+		return date1.getDate() === date2.getDate();
 	}
 
 	private calculateHourDiff(start: Date, end: Date): number {
-		return ((end.getTime() - start.getTime()) * (1 / (1000 * 60 * 60)));
+		return (end.getTime() - start.getTime()) * (1 / (1000 * 60 * 60));
 	}
 
 	private pickRandomColor() {
+		const colors: string[] = Object.values(PRIMARY);
 		return colors[Math.floor(Math.random() * colors.length)];
 	}
 
 	private makeWeeklyData() {
 		// gets the weekly reference point
-		const thisWeek: Date = new Date();
+		const thisWeek = new Date();
 		thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
 
-		const out: any[] = []; // weekly timeslots
-		this.state.times.forEach(time => {
+		const weeklyTimes: Timeslot[] = []; // weekly timeslots
+		for (const time of this.state.times) {
 			if (time.end != null && time.start > thisWeek) {
-				out.push(time);
+				weeklyTimes.push(time);
 			}
-		});
+		}
 
-		let ttl = 0;
+		let total = 0;
 
-		out.forEach(time => {
-			ttl += ((time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60)));
-		});
+		for (const time of weeklyTimes) {
+			if (time.end != null) {
+				total += (time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60));
+			}
+		}
 
-		ttl /= out.length; // get an average
+		total /= weeklyTimes.length; // get an average
 
-		this.setState({weeklyTimes: out});
-		this.setState({weeklyTotal: ttl});
+		this.setState({ weeklyTimes, weeklyTotal: total });
 	}
 
 	private makeDailyData() {
-			// gets the daily reference point
-			const today: Date = new Date();
+		// gets the daily reference point
+		const today = new Date();
 
-			const out: any[] = []; // daily timeslots
-			this.state.times.forEach(time => {
-				if (time.end != null && time.start.getDay() === today.getDay()) {
-					out.push(time);
+		const dailyTimes: Timeslot[] = []; // daily timeslots
+		for (const time of this.state.times) {
+			if (time.end != null && time.start.getDay() === today.getDay()) {
+				dailyTimes.push(time);
+			}
+		}
+
+		let total = 0;
+
+		for (const time of dailyTimes) {
+			if (time.end != null) {
+				total += (time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60));
+			}
+		}
+
+		this.setState({ dailyTotal: total, dailyTimes });
+
+		// now find the classes
+		const classes: string[] = [];
+		for (const slot of dailyTimes) {
+			if (!classes.includes(slot.classId)) {
+				// new class found, push it
+				classes.push(slot.classId);
+			}
+		}
+
+		console.log(classes);
+
+		this.setState({ classes });
+
+		const chartData: ChartDataPoint[] = [];
+		// create the chartData for the day
+		for (const cl of classes) {
+			console.log(cl);
+			let totalHours = 0;
+			for (const slot of dailyTimes) {
+				if (slot.end != null && slot.classId === cl) {
+					totalHours += this.calculateHourDiff(slot.start, slot.end);
 				}
+			}
+
+			chartData.push({
+				label: cl,
+				value: +(totalHours * 60).toFixed(2),
+				color: this.pickRandomColor()
 			});
+		}
 
-			let ttl = 0;
-
-			out.forEach(time => {
-				ttl += ((time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60)));
-			});
-
-			this.setState({dailyTotal: ttl});
-			this.setState({dailyTimes: out});
-
-			// now find the classes
-			const cs: string[] = [];
-			out.forEach(slot => {
-				if (slot.classId !== null && cs.indexOf(slot.classId) === -1) {
-					// new class found, push it
-					cs.push(slot.classId);
-				}
-			});
-
-			console.log(cs);
-
-			this.setState({classes: cs});
-
-			const preOut: any[] = [];
-			// create the chartData for the day
-			cs.forEach(cl => {
-				console.log(cl);
-				let totalHours = 0;
-				out.forEach(slot => {
-					if (slot.end != null && slot.classId === cl) {
-						totalHours += this.calculateHourDiff(slot.start, slot.end);
-					}
-				});
-
-				preOut.push({label: cl, value: +(totalHours * 60).toFixed(2), color: this.pickRandomColor()});
-			});
-
-			console.log(preOut);
-			this.setState({chartData: preOut});
+		console.log(chartData);
+		this.setState({ chartData });
 	}
 
 	private beautifyMinutes(num: number) {
-		return (`${Math.round(num)}h ${(num * 60).toFixed(2)}m`);
+		return `${Math.round(num)}h ${(num * 60).toFixed(2)}m`;
 	}
 
 	componentWillMount() {
-		timeslot.subscribe(timeslots => {
-			this.setState({times: timeslots});
+		getUserTimeslots().then(timeslots => {
+			this.setState({ times: timeslots });
 			this.makeWeeklyData();
 			this.makeDailyData();
 		});
@@ -194,7 +202,7 @@ export default class Template extends React.Component<NavigationScreenProps, Ana
 						</View>
 					</View>
 				</View>
-				<Button title='Update' onPress={this.updateData} style={StyleGuide.components.buttonStyle} />
+				<Button title='Update' onPress={this.updateData} style={components.buttonStyle} />
 				</View>
 			</SafeAreaView>
 		);
@@ -207,17 +215,17 @@ const styles = StyleSheet.create({
 		height: '100%'
 	},
 	headerTitle: {
-		color: StyleGuide.PRIMARY[700],
+		color: PRIMARY[700],
 		fontSize: 25,
 		fontFamily: 'Nunito-Regular'
 	},
 	title: {
-		color: StyleGuide.PRIMARY[900],
+		color: PRIMARY[900],
 		fontSize: 20,
 		fontFamily: 'Nunito-Regular'
 	},
 	text: {
-		color: StyleGuide.PRIMARY[700],
+		color: PRIMARY[700],
 		fontSize: 15,
 		fontFamily: 'Nunito-Regular'
 	},
@@ -247,7 +255,7 @@ const mockData = [
 			{x: 'saturday', y: 80},
 			{x: 'sunday', y: 90}
 		],
-		color: StyleGuide.PRIMARY[100]
+		color: PRIMARY[100]
 	},
 	{
 		seriesName: 'history',
@@ -260,7 +268,7 @@ const mockData = [
 			{x: 'saturday', y: 20},
 			{x: 'sunday', y: 90}
 		],
-		color: StyleGuide.PRIMARY[300]
+		color: PRIMARY[300]
 	},
 	{
 		seriesName: 'thething',
@@ -273,7 +281,7 @@ const mockData = [
 			{x: 'saturday', y: 12},
 			{x: 'sunday', y: 67}
 		],
-		color: StyleGuide.PRIMARY[500]
+		color: PRIMARY[500]
 	}
 ];
 
@@ -288,12 +296,4 @@ const pieMock = [
 		label: 'otherstuff',
 		color: 'blue'
 	}
-];
-
-const colors = [
-	'#F9EBFF',
-	'#E6AFFB',
-	'#CC76EE',
-	'#7C16A5',
-	'#540174'
 ];
