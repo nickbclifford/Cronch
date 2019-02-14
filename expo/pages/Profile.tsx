@@ -1,22 +1,22 @@
 import bind from 'bind-decorator';
+import { Formik, FormikProps } from 'formik';
 import * as React from 'react';
-import { Alert, Button, StyleSheet, View, Picker, Text } from 'react-native';
+import { Alert, Button, Picker, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { Formik } from 'formik';
 
+import { number } from 'prop-types';
 import MyMICDS from '../common/MyMICDS';
+import { typography } from '../common/StyleGuide';
 import { changeUserInfo, getUser, User } from '../common/User';
 import Hamburger from '../components/Hamburger';
 import Question from '../components/Question';
-import { number } from 'prop-types';
-import { typography } from '../common/StyleGuide';
 
 interface ProfileState {
 }
 
 interface SettingsFormValues {
 	dataSharingSelection: number | null;
-	alarmSelection: number | null;
+	alarmSelection: number| null;
 }
 
 interface CronchAlarm {
@@ -27,7 +27,7 @@ interface CronchAlarm {
 const settingsFormInitialValues: SettingsFormValues = {
 	dataSharingSelection: null,
 	alarmSelection: null
-}
+};
 
 const alarmList: CronchAlarm[] = [{
 	fileName: require('../assets/alarm-sounds/2001-A-Space-Odyssey.mp3'),
@@ -47,7 +47,7 @@ const alarmList: CronchAlarm[] = [{
 }, {
 	fileName: require('../assets/alarm-sounds/Temple-Bell.mp3'),
 	displayName: 'Temple Bells'
-}]
+}];
 
 export default class Profile extends React.Component<NavigationScreenProps, ProfileState> {
 
@@ -126,6 +126,12 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	// 		// }
 	// }
 
+	handleFieldChangeFactory(props: FormikProps<SettingsFormValues>, field: keyof SettingsFormValues) {
+		return (value: any) => {
+			props.setFieldValue(field, value);
+		};
+	}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
@@ -140,17 +146,14 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 							<Question
 								question='How should we handle your timer data?'
 								responses={this.questionNames}
-								onSelectResponse={(index) => {
-									props.handleChange('dataSharingSelection')(`${index}`)
-								}}
-								selectedIndex={parseInt(props.values.dataSharingSelection as any)}
+								onSelectResponse={this.handleFieldChangeFactory(props, 'dataSharingSelection')}
+								selectedIndex={props.values.dataSharingSelection}
 							/>
-							
 							<View style={styles.alarmPicker}>
 								<Text style={[typography.h3, styles.alarmPickerLabel]}>Alarm Preferences</Text>
 								<Picker
 									selectedValue={props.values.alarmSelection}
-									onValueChange={props.handleChange('alarmSelection')}
+									onValueChange={this.handleFieldChangeFactory(props, 'alarmSelection')}
 								>
 									{alarmList.map((alarm, i) =>
 										<Picker.Item
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		display: 'flex',
-		justifyContent: 'center',
+		justifyContent: 'center'
 		// for some reason this messes with the Picker component
 		// alignItems: 'center'
 	},
