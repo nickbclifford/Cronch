@@ -5,7 +5,7 @@ import moment from 'moment';
 import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
-import { NavigationScreenProps, NavigationStackScreenOptions, SafeAreaView } from 'react-navigation';
+import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import flipped$ from '../common/PhoneAcrobatics';
@@ -21,7 +21,6 @@ export interface TimerState {
 	onBreak: boolean;
 	paused: boolean;
 	modeSelection: number;
-	alarmSelection: number;
 	flipped: boolean;
 	assignment: Task;
 	currentTimeslotId: number | null;
@@ -62,11 +61,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	private shouldAddCycles = false;
 
-	private alarmList: Array<{
-		file: PlaybackSource,
-		displayName: string
-	}>;
-
 	constructor(props: any) {
 		super(props);
 		this.userCycles = [{
@@ -76,32 +70,13 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			work: 0.5 * 60 * 1000,
 			break: 0.5 * 60 * 1000
 		}];
-		this.alarmList = [{
-			file: require('../assets/alarm-sounds/2001-A-Space-Odyssey.mp3'),
-			displayName: 'Space Odyssey Theme'
-		}, {
-			file: require('../assets/alarm-sounds/samsung-loop.mp3'),
-			displayName: 'Bright and Cheery :)'
-		}, {
-			file: require('../assets/alarm-sounds/chime.wav'),
-			displayName: 'Light Chimes'
-		}, {
-			file: require('../assets/alarm-sounds/harp.mp3'),
-			displayName: 'Beautiful Harps'
-		}, {
-			file: require('../assets/alarm-sounds/analog-watch-alarm_daniel-simion.mp3'),
-			displayName: 'Analog Watch'
-		}, {
-			file: require('../assets/alarm-sounds/Temple-Bell.mp3'),
-			displayName: 'Temple Bells'
-		}];
+
 		this.state = {
 			workTimeLeft: this.userCycles[0].work,
 			breakTimeLeft: this.userCycles[0].break,
 			onBreak: false,
 			paused: true,
 			modeSelection: 0,
-			alarmSelection: 0,
 			flipped: false,
 			assignment: this.props.navigation.getParam('assignment'),
 			currentTimeslotId: null,
@@ -211,31 +186,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private async setAlarmMode(n: number) {
-			this.setState({
-				alarmSelection: n
-			});
-			// console.log(this.alarmList[n].file, this.alarmList[n].displayName);
-			// const soundObject = new Audio.Sound();
-			// try {
-			// 	await soundObject.loadAsync(this.alarmList[this.alarmSelection].file);
-			// 	console.log('swag', this.alarmList[n].file, this.alarmList[n].displayName);
-			// 	await this.alarmSound.setPositionAsync(0);
-			// 	await this.alarmSound.playAsync();
-			// } catch (error) {
-			// 	Alert.alert('sound buh', error.message());
-			// }
-	}
-
-	@bind
 	private async playAlarm(soundObject: Audio.Sound) {
+		// get alarm preference from backend
 		try {
 			await soundObject.loadAsync(this.alarmList[this.state.alarmSelection].file);
 			await soundObject.setIsLoopingAsync(true);
 			await soundObject.setPositionAsync(0);
 			await soundObject.playAsync();
 		} catch (error) {
-			Alert.alert('sound buh', error.message());
+			Alert.alert('sound buh', error.message);
 		}
 	}
 
@@ -422,18 +381,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					)}
 					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
 				</Picker>
-				<Picker
-					selectedValue={this.state.alarmSelection}
-					onValueChange={this.setAlarmMode}
-				>
-					{this.alarmList.map((cycle, i) =>
-						<Picker.Item
-							key={i}
-							label={cycle.displayName}
-							value={i}
-						/>
-					)}
-				</Picker>
+
 				<Text>{this.state.assignment.title}</Text>
 
 				<View style={styles.timerContainer}>
