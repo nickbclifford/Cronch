@@ -1,12 +1,13 @@
 import bind from 'bind-decorator';
 import { Formik, FormikProps } from 'formik';
 import * as React from 'react';
-import { Alert, Button, Picker, StyleSheet, Text, View } from 'react-native';
+import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
+import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import { number } from 'prop-types';
 import MyMICDS from '../common/MyMICDS';
-import { typography } from '../common/StyleGuide';
+import { components, typography } from '../common/StyleGuide';
 import { changeUserInfo, getUser, User } from '../common/User';
 import Hamburger from '../components/Hamburger';
 import Question from '../components/Question';
@@ -136,6 +137,21 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
+
+				{this.user && (
+					<View style={styles.userInfo}>
+						<Text style={typography.h3}>Logged in as: {this.user.username}</Text>
+						<Button
+							title='Logout'
+							onPress={this.logout}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+					</View>
+				)}
+
+				<Text style={typography.h1}>Profile Settings</Text>
+
 				<Formik
 					initialValues={settingsFormInitialValues}
 					onSubmit={this.saveSettings}
@@ -165,8 +181,12 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 								</Picker>
 							</View>
 
-							<Button title='Save' onPress={props.handleSubmit as any} />
-							<Button title='Logout' onPress={this.logout} />
+							<Button
+								title='Save'
+								onPress={props.handleSubmit as any}
+								buttonStyle={components.buttonStyle}
+								titleStyle={components.buttonText}
+							/>
 						</View>
 					)}
 				</Formik>
@@ -185,6 +205,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'center'
 		// for some reason this messes with the Picker component
 		// alignItems: 'center'
+	},
+	userInfo: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between'
 	},
 	question: {
 		flex: 1
