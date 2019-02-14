@@ -77,10 +77,10 @@ export default class Login extends React.Component<NavigationScreenProps> {
 				onSubmit={this.login}
 			>
 				{props => (
-					<ImageBackground source={require('../assets/mymicds-blur.jpg')} style={styles.container}>
+					<ImageBackground source={require('../assets/mymicds/blur.jpg')} style={styles.container}>
 						<StatusBar barStyle='light-content' />
 						<View style={styles.colorOverlay} />
-						{/*<Image source={require('../assets/mymicds-logo.png')} style={styles.logo} />*/}
+						{/*<Image source={require('../assets/mymicds/logo.png')} style={styles.logo} />*/}
 						<Text style={[typography.h1, styles.title]}>Login to MyMICDS.net</Text>
 						<View style={styles.usernameGroup}>
 							<TextInput
