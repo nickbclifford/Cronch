@@ -14,7 +14,7 @@ export default class Avatar extends React.Component<NavigationScreenProps> {
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<View style={styles.container}>
-					<Cronchy skin={Skin.GREEN_PLAIN} />
+					<Cronchy skin={Skin.GREEN_PLAIN} style={styles.avatar} />
 				</View>
 			</SafeAreaView>
 		);
@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
 		height: '100%'
 	},
 	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
+	},
+	avatar: {
+		width: '100%'
 	}
 });

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { Image } from 'react-native-elements';
 
 export enum Skin {
@@ -63,6 +63,7 @@ const accessoryImages = {
 };
 
 export interface CronchyProps {
+	style: StyleProp<ViewStyle>;
 	skin: Skin;
 	expression?: Expression;
 	headwear?: Headwear[];
@@ -75,7 +76,7 @@ export default class Cronchy extends React.Component<CronchyProps> {
 			return null;
 		}
 		return (
-			<View>
+			<View style={this.props.style}>
 				<Image source={skinImages[this.props.skin]} />
 			</View>
 		);
