@@ -81,7 +81,7 @@ export default class CheckUrls extends React.Component<NavigationScreenProps, Ch
 						and follow the directions under <Text style={[nunito.bold, styles.link]}>'URL Settings'</Text>
 					</Text>
 					<ImageBackground
-						source={require('../assets/urls.png')}
+						source={require('../assets/mymicds/urls.png')}
 						style={styles.imageContainer}
 						imageStyle={styles.image as ImageStyle}
 					/>
