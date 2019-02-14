@@ -1,5 +1,6 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
+import moment from 'moment';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
@@ -40,13 +41,8 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			chartData: [
 				{
 					value: 50,
-					label: 'stuff',
+					label: 'No Work!',
 					color: 'red'
-				},
-				{
-					value: 29,
-					label: 'otherstuff',
-					color: 'blue'
 				}
 			],
 			weeklyTimes: [],
@@ -61,7 +57,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 	}
 
 	private calculateHourDiff(start: Date, end: Date): number {
-		return (end.getTime() - start.getTime()) * (1 / (1000 * 60 * 60));
+		return moment.duration(moment(end).diff(start)).as('hours');
 	}
 
 	private pickRandomColor() {
@@ -85,7 +81,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 
 		for (const time of weeklyTimes) {
 			if (time.end != null) {
-				total += (time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60));
+				total += this.calculateHourDiff(time.start, time.end);
 			}
 		}
 
@@ -109,7 +105,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 
 		for (const time of dailyTimes) {
 			if (time.end != null) {
-				total += (time.end.getTime() - time.start.getTime()) * (1 / (1000 * 60 * 60));
+				total += this.calculateHourDiff(time.start, time.end);
 			}
 		}
 
@@ -141,17 +137,55 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 
 			chartData.push({
 				label: cl,
-				value: +(totalHours * 60).toFixed(2),
+				value: +(totalHours).toFixed(2),
 				color: this.pickRandomColor()
 			});
 		}
 
 		console.log(chartData);
-		this.setState({ chartData });
+
+		if (chartData.length > 0) {
+			this.setState({ chartData });
+		}
+	}
+
+	private findMostPracticedSubject(): string {
+		if (this.state.dailyTimes.length > 0) {
+			let biggestClass = 0;
+
+			for (let i = 0; i < this.state.dailyTimes.length; i++) {
+				if (this.calculateHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) > this.calculateHourDiff(this.state.dailyTimes[biggestClass].start, this.state.dailyTimes[biggestClass].end)) {
+					// new class found, update index
+					biggestClass = i;
+				}
+			}
+
+			return this.state.dailyTimes[biggestClass].classId;
+		} else {
+			return 'Not Available';
+		}
+	}
+
+	private findLeastPracticedSubject(): string {
+		if (this.state.dailyTimes.length > 0) {
+			let smallestClass = 0;
+
+			for (let i = 0; i < this.state.dailyTimes.length; i++) {
+				if (this.calculateHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) < this.calculateHourDiff(this.state.dailyTimes[smallestClass].start, this.state.dailyTimes[smallestClass].end)) {
+					// new class found, update index
+					smallestClass = i;
+				}
+			}
+
+			return this.state.dailyTimes[smallestClass].classId;
+		} else {
+			return 'Not Available';
+		}
 	}
 
 	private beautifyMinutes(num: number) {
-		return `${Math.round(num)}h ${(num * 60).toFixed(2)}m`;
+		// TODO: get the beautify minutes working
+		return `${Math.round(num)}h`;
 	}
 
 	componentWillMount() {
@@ -174,15 +208,33 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			<SafeAreaView style={styles.safeArea}>
 				<Hamburger toggle={this.props.navigation.toggleDrawer} />
 				<View style={styles.verticalContainer}>
-				<Swiper horizontal={true}>
+				<Swiper horizontal={false}>
 				<View style={styles.verticalContainer}>
-					<Text style={styles.headerTitle}>Today (in minutes)</Text>
+					<Text style={styles.headerTitle}>Today (in hours)</Text>
 					<PureChart
 						type='pie'
 						data={this.state.chartData}
 						width={'100%'}
 						height={400}
 					/>
+					<View style={styles.horizontalContainer}>
+						<View style={styles.verticalContainer}>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Today's Total</Text>
+								<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
+							</View>
+						</View>
+						<View style={styles.verticalContainer}>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>{'Most Active'}</Text>
+								<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>{'Least Active'}</Text>
+								<Text style={styles.text}>{this.findLeastPracticedSubject()}</Text>
+							</View>
+						</View>
+					</View>
 				</View>
 				<View style={styles.verticalContainer}>
 					<Text style={styles.headerTitle}>This week (in minutes)</Text>
@@ -193,9 +245,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 						height={200}
 						showEvenNumberXaxisLabel={false}
 					/>
-				</View>
-				</Swiper>
-				<View style={styles.horizontalContainer}>
+					<View style={styles.horizontalContainer}>
 					<View style={styles.verticalContainer}>
 						<View style={styles.verticalContainer}>
 							<Text style={styles.title}>Weekly Average</Text>
@@ -217,6 +267,8 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 						</View>
 					</View>
 				</View>
+				</View>
+				</Swiper>
 				<Button title='Update' onPress={this.updateData} style={styles.buttonStyle} />
 				</View>
 			</SafeAreaView>
