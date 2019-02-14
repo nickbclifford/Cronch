@@ -4,7 +4,6 @@ import {
 	createDrawerNavigator,
 	createStackNavigator,
 	createSwitchNavigator,
-	NavigationScreenProps,
 	StackNavigatorConfig
 } from 'react-navigation';
 
@@ -18,6 +17,7 @@ import BattlePlan from './pages/BattlePlan';
 import CheckUrls from './pages/CheckUrls';
 import CanvasAssignments from './pages/create-plan/CanvasAssignments';
 import CustomAssignments from './pages/create-plan/CustomAssignments';
+import Avatar from './pages/Avatar';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -104,6 +104,7 @@ const Questionnaire = createQuestionnaire(
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer: TimerNavigator,
+		Avatar: createSingleStackNavigator(Avatar),
 		Profile: createSingleStackNavigator(Profile),
 		About: createSingleStackNavigator(About),
 		Analytics: AnalyticsNavigator,
