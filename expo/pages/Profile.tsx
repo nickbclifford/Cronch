@@ -140,8 +140,10 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 							<Question
 								question='How should we handle your timer data?'
 								responses={this.questionNames}
-								onSelectResponse={props.handleChange('dataSharingSelection')}
-								selectedIndex={props.values.dataSharingSelection}
+								onSelectResponse={(index) => {
+									props.handleChange('dataSharingSelection')(`${index}`)
+								}}
+								selectedIndex={parseInt(props.values.dataSharingSelection as any)}
 							/>
 							
 							<View style={styles.alarmPicker}>
