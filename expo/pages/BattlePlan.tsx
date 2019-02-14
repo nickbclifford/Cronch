@@ -8,6 +8,7 @@ import withAssignmentContext, { WithAssignmentContextProps } from '../common/Ass
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
 import Task from '../common/Task';
+import Crunchy, { Skin } from '../components/Crunchy';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 interface BattlePlanProps extends NavigationScreenProps, WithAssignmentContextProps {
@@ -111,6 +112,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						onAssignmentClick={this.navigateToTimer}
 					/>
 				)}
+				<Crunchy skin={Skin.GREEN_PLAIN} />
 			</View>
 		);
 	}

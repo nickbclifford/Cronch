@@ -11,7 +11,7 @@ export default class About extends React.Component<NavigationScreenProps> {
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<View style={styles.container}>
-					<Text>This was created by cool people. Want to give feedback? Email support@mymicds.gov</Text>
+					<Text>This was created by Michel Gira, and Elsa Sjogren helped a litle bit. I love her so much because shes the best. Want to give Christian LeNoir money? Paypal pikachululz@gmail.com</Text>
 				</View>
 			</SafeAreaView>
 		);
