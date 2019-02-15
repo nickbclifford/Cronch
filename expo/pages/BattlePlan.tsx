@@ -1,14 +1,14 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button as NativeButton, StyleSheet, View } from 'react-native';
+import { Button as NativeButton, Dimensions, ImageStyle, StyleProp, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
+import Image from 'react-native-scalable-image';
 import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
+import { NEUTRAL, SUCCESS, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
-import Cronchy, { Skin } from '../components/Cronchy';
 import DisplayAssignments from '../components/DisplayAssignments';
 
 interface BattlePlanProps extends NavigationScreenProps, WithAssignmentContextProps {
@@ -83,6 +83,16 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						buttonStyle={styles.addAssignmentsButton}
 						onPress={this.navigateToCreatePlan}
 					/>
+					{this.props.assignmentContext.assignments.length === 0 && (
+						<View style={styles.guideContainer}>
+							<Image
+								source={require('../assets/apples/preset/hewwo-uweseres.png')}
+								width={Dimensions.get('window').width * 0.8}
+								style={styles.guideImage as StyleProp<ImageStyle>}
+							/>
+							<Text style={[typography.h3, styles.guideText]}>Add an Assignment{'\n'}to get started!</Text>
+						</View>
+					)}
 				</View>
 				{this.state.editMode && (
 					<DisplayAssignments
@@ -112,7 +122,6 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						onAssignmentClick={this.navigateToTimer}
 					/>
 				)}
-				<Cronchy skin={Skin.GREEN_PLAIN} />
 			</View>
 		);
 	}
@@ -123,7 +132,9 @@ export default withAssignmentContext(BattlePlan);
 
 const styles = StyleSheet.create({
 	container: {
-		height: '100%'
+		height: '100%',
+		display: 'flex',
+		alignItems: 'center'
 	},
 	addAssignmentsContainer: {
 		width: '100%',
@@ -131,10 +142,22 @@ const styles = StyleSheet.create({
 		zIndex: 1000,
 		top: 16,
 		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'center'
+		alignItems: 'center'
 	},
 	addAssignmentsButton: {
 		backgroundColor: SUCCESS[500]
+	},
+	guideContainer: {
+		display: 'flex',
+		alignItems: 'center'
+	},
+	guideImage: {
+		marginTop: 128,
+		marginBottom: 16,
+		opacity: 0.65
+	},
+	guideText: {
+		textAlign: 'center',
+		color: NEUTRAL[500]
 	}
 });
