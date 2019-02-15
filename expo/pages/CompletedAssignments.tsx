@@ -1,19 +1,18 @@
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import Hamburger from '../components/Hamburger';
+import createNavigationOptions from '../common/NavigationOptionsFactory';
+import { PRIMARY } from '../common/StyleGuide';
 
 export default class Template extends React.Component<NavigationScreenProps> {
 
-	static navigationOptions = {
-		header: null
-	};
+	static navigationOptions = createNavigationOptions('Completed Assignments');
 
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Hamburger toggle={this.props.navigation.toggleDrawer} />
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.container}>
 					<Text>Component Works!</Text>
 				</View>

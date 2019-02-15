@@ -2,13 +2,13 @@ import bind from 'bind-decorator';
 import { Formik, FormikProps } from 'formik';
 import { number } from 'prop-types';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
+import { Alert, Picker, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import MyMICDS from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { components, typography } from '../common/StyleGuide';
+import { components, PRIMARY, typography } from '../common/StyleGuide';
 import { changeUserInfo, getUser, User } from '../common/User';
 import Question from '../components/Question';
 
@@ -139,6 +139,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.userInfo}>
 					<Text style={typography.h3}>Logged in as: {MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}</Text>
 					<Button

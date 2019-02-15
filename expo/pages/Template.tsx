@@ -12,7 +12,7 @@ export default class Template extends React.Component<NavigationScreenProps> {
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-			<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.container}>
 					<Text>Component Works!</Text>
 				</View>
