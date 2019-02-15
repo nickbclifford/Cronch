@@ -14,9 +14,6 @@ export default class Timer extends Model<Timer> {
 	@Column
 	break!: number;
 
-	@Column
-	selected!: boolean;
-
 	@ForeignKey(() => User)
 	@Column
 	user!: string;

@@ -20,7 +20,9 @@ router.post('/', requireLoggedIn, (req, res) => {
 
 router.get('/', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!)
-		.then(user => successResponse(res, { user: user ? user.toJSON() : null }))
+		.then(user => {
+			return successResponse(res, { user: user ? user.toJSON() : null });
+		})
 		.catch(err => errorResponse(res, err));
 });
 
@@ -29,6 +31,7 @@ router.patch('/', requireLoggedIn, (req, res) => {
 		.then(user => {
 			const dataSharing = req.body.dataSharing;
 			const alarmSelection = req.body.alarmSelection;
+			const timerSelection = req.body.timerSelection;
 
 			if (typeof dataSharing !== 'undefined') {
 				if (typeof dataSharing !== 'number' && (dataSharing < DataSharing.NO_SEND || dataSharing > DataSharing.FULL_SEND)) {
@@ -44,6 +47,14 @@ router.patch('/', requireLoggedIn, (req, res) => {
 				}
 
 				user!.alarmSelection = alarmSelection;
+			}
+
+			if (typeof timerSelection !== 'undefined') {
+				if (typeof timerSelection !== 'number') {
+					return Promise.reject(new APIError('Invalid timer selection value', 400));
+				}
+
+				user!.timerSelection = timerSelection;
 			}
 
 			// TODO: Other attributes
