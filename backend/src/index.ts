@@ -9,6 +9,7 @@ const sequelize = new Sequelize({
 	modelPaths: [__dirname + '/models']
 });
 
+import battlePlanRouter from './routes/battlePlanTask';
 import questionnaireRouter from './routes/questionnaireResponse';
 import timeslotRouter from './routes/timeslot';
 import userRouter from './routes/user';
@@ -16,13 +17,18 @@ import userRouter from './routes/user';
 import { json } from 'body-parser';
 import { jwtMiddleware } from './utils';
 
-sequelize.sync({ force: config.forceModelSync }).then(() => {
+(async () => {
+	if (typeof config.forceModelSync === 'string') {
+		await sequelize.model(config.forceModelSync).sync({ force: true });
+	}
+
 	// Initialize Express
 	const app = express();
 
 	app.use(json());
 	app.use(jwtMiddleware);
 
+	app.use('/battle-plan-tasks', battlePlanRouter);
 	app.use('/questionnaire-response', questionnaireRouter);
 	app.use('/timeslot', timeslotRouter);
 	app.use('/user', userRouter);
@@ -30,4 +36,4 @@ sequelize.sync({ force: config.forceModelSync }).then(() => {
 	app.listen(config.port, () => {
 		console.log(`Server listening on *:${config.port}`);
 	});
-});
+})();

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Timer from '../models/Timer';
+import BattlePlanTask from '../models/BattlePlanTask';
 import Timeslot from '../models/Timeslot';
 import User, { DataSharing } from '../models/User';
 import { APIError, errorResponse, requireLoggedIn, successResponse } from '../utils';
@@ -19,7 +20,7 @@ router.post('/', requireLoggedIn, (req, res) => {
 
 router.get('/', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!)
-		.then(user => successResponse(res, user!.toJSON()))
+		.then(user => successResponse(res, { user: user ? user.toJSON() : null }))
 		.catch(err => errorResponse(res, err));
 });
 
@@ -78,6 +79,11 @@ router.post('/timers', requireLoggedIn, (req, res) => {
 router.get('/timers', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!, { include: [Timer, Timeslot] })
 		.then(user => successResponse(res, user!.timers.map(t => t.toJSON())))
+});
+
+router.get('/battle-plan-tasks', requireLoggedIn, (req, res) => {
+	User.findByPk(req.authorizedUser!, { include: [BattlePlanTask] })
+		.then(user => successResponse(res, user!.battlePlanTasks.map(t => t.toJSON())))
 		.catch(err => errorResponse(res, err));
 });
 

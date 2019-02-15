@@ -1,4 +1,5 @@
 import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import BattlePlanTask from './BattlePlanTask';
 import Response from './QuestionnaireResponse';
 import Timer from './Timer';
 import Timeslot from './Timeslot';
@@ -29,4 +30,7 @@ export default class User extends Model<User> {
 
 	@HasMany(() => Timer)
 	timers!: Timer[];
+
+	@HasMany(() => BattlePlanTask)
+	battlePlanTasks!: BattlePlanTask[];
 }

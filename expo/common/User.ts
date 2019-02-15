@@ -1,6 +1,11 @@
 import { DataSharing } from '../../backend/src/models/User';
+import { BattlePlanTask } from './BattlePlanTask';
 import { convertJSONDates, Timeslot } from './Timeslot';
 import { fetchWithJwt, Omit } from './Utils';
+
+export interface GetUserResponse {
+	user: User | null;
+}
 
 export interface User {
 	username: string;
@@ -18,7 +23,7 @@ export function registerUser() {
 }
 
 export function getUser() {
-	return fetchWithJwt<User>('/user', {
+	return fetchWithJwt<GetUserResponse>('/user', {
 		method: 'GET'
 	});
 }
@@ -45,6 +50,12 @@ export function updateTimers(timers: TimerData[]) {
 
 export function getTimers() {
 	return fetchWithJwt<TimerData[]>('/user/timers', {
+		method: 'GET'
+	});
+}
+
+export function getUserBattlePlanTasks() {
+	return fetchWithJwt<BattlePlanTask[]>('/user/battle-plan-tasks', {
 		method: 'GET'
 	});
 }
