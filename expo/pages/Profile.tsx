@@ -6,12 +6,13 @@ import { Alert, Picker, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import CronchyUser from '../components/CronchyUser';
+import { alarmList } from '../common/Alarms';
 import MyMICDS from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, PRIMARY, typography } from '../common/StyleGuide';
 import { changeUserInfo, getUser, User } from '../common/User';
 import { handleFieldChangeFactory } from '../common/Utils';
+import CronchyUser from '../components/CronchyUser';
 import Question from '../components/Question';
 
 interface ProfileState {
@@ -22,35 +23,10 @@ interface SettingsFormValues {
 	alarmSelection: number| null;
 }
 
-interface CronchAlarm {
-	fileName: string;
-	displayName: string;
-}
-
 const settingsFormInitialValues: SettingsFormValues = {
 	dataSharingSelection: null,
 	alarmSelection: null
 };
-
-const alarmList: CronchAlarm[] = [{
-	fileName: require('../assets/alarm-sounds/2001-A-Space-Odyssey.mp3'),
-	displayName: 'Space Odyssey Theme'
-}, {
-	fileName: require('../assets/alarm-sounds/samsung-loop.mp3'),
-	displayName: 'Bright and Cheery :)'
-}, {
-	fileName: require('../assets/alarm-sounds/chime.wav'),
-	displayName: 'Light Chimes'
-}, {
-	fileName: require('../assets/alarm-sounds/harp.mp3'),
-	displayName: 'Beautiful Harps'
-}, {
-	fileName: require('../assets/alarm-sounds/analog-watch-alarm_daniel-simion.mp3'),
-	displayName: 'Analog Watch'
-}, {
-	fileName: require('../assets/alarm-sounds/Temple-Bell.mp3'),
-	displayName: 'Temple Bells'
-}];
 
 export default class Profile extends React.Component<NavigationScreenProps, ProfileState> {
 
@@ -72,7 +48,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 		this.user = user;
 
-		settingsFormInitialValues.alarmSelection = this.user.alarm || null;
+		settingsFormInitialValues.alarmSelection = this.user.alarmSelection || null;
 		settingsFormInitialValues.dataSharingSelection = this.user.dataSharing || null;
 
 		this.setState({});
@@ -94,7 +70,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	private saveSettings(values: SettingsFormValues) {
 		changeUserInfo({
 			dataSharing: values.dataSharingSelection || 0,
-			alarm: values.alarmSelection || 0
+			alarmSelection: values.alarmSelection || 0
 		}).then(() => {
 			Alert.alert(
 				'Info',

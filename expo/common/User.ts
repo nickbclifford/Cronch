@@ -11,8 +11,9 @@ export interface GetUserResponse {
 export interface User {
 	username: string;
 	dataSharing: DataSharing;
-	alarm: number;
-	timers: Timer[];
+	alarmSelection: number;
+	timers?: Timer[];
+	timerSelection: number;
 }
 
 export function registerUser() {
