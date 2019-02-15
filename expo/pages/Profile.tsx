@@ -10,6 +10,8 @@ import MyMICDS from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, PRIMARY, typography } from '../common/StyleGuide';
 import { changeUserInfo, getUser, User } from '../common/User';
+import { handleFieldChangeFactory } from '../common/Utils';
+import Hamburger from '../components/Hamburger';
 import Question from '../components/Question';
 
 interface ProfileState {
@@ -65,9 +67,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 		const { user } = await getUser();
 
 		if (user === null) {
-			// return this.logout();
-			console.log('user is null!', user);
-			return;
+			return this.logout();
 		}
 
 		this.user = user;
@@ -130,12 +130,6 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	// 		// }
 	// }
 
-	handleFieldChangeFactory(props: FormikProps<SettingsFormValues>, field: keyof SettingsFormValues) {
-		return (value: any) => {
-			props.setFieldValue(field, value);
-		};
-	}
-
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
@@ -162,14 +156,14 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 							<Question
 								question='How should we handle your timer data?'
 								responses={this.questionNames}
-								onSelectResponse={this.handleFieldChangeFactory(props, 'dataSharingSelection')}
+								onSelectResponse={handleFieldChangeFactory<SettingsFormValues>(props, 'dataSharingSelection')}
 								selectedIndex={props.values.dataSharingSelection}
 							/>
 							<View style={styles.alarmPicker}>
 								<Text style={[typography.h3, styles.alarmPickerLabel]}>Alarm Preferences</Text>
 								<Picker
 									selectedValue={props.values.alarmSelection}
-									onValueChange={this.handleFieldChangeFactory(props, 'alarmSelection')}
+									onValueChange={handleFieldChangeFactory<SettingsFormValues>(props, 'alarmSelection')}
 								>
 									{alarmList.map((alarm, i) =>
 										<Picker.Item
@@ -190,6 +184,13 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 						</View>
 					)}
 				</Formik>
+				{/* Logout button for debug */}
+				<Button
+					title='Logout'
+					onPress={this.logout}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
 			</SafeAreaView>
 		);
 	}

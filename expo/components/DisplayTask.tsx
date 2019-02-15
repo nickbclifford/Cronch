@@ -37,14 +37,14 @@ export default class Template extends React.Component<DisplayTasksProps> {
 			<View style={styles.container}>
 				<View style={styles.taskContainer}>
 					<Text
-						style={[typography.h0, styles.classText]}
+						style={[typography.h1, styles.classText]}
 						numberOfLines={1}
 						ellipsizeMode='tail'
 					>
 						{this.props.task.class.name}
 					</Text>
 					<Text
-						style={[typography.h1, styles.classText]}
+						style={[typography.h3, styles.classText]}
 						numberOfLines={1}
 						ellipsizeMode='tail'
 					>

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import BattlePlanTask from '../models/BattlePlanTask';
+import Timer from '../models/Timer';
 import Timeslot from '../models/Timeslot';
 import User, { DataSharing } from '../models/User';
 import { APIError, errorResponse, requireLoggedIn, successResponse } from '../utils';
@@ -28,6 +29,7 @@ router.patch('/', requireLoggedIn, (req, res) => {
 		.then(user => {
 			const dataSharing = req.body.dataSharing;
 			const alarmSelection = req.body.alarmSelection;
+
 			if (typeof dataSharing !== 'undefined') {
 				if (typeof dataSharing !== 'number' && (dataSharing < DataSharing.NO_SEND || dataSharing > DataSharing.FULL_SEND)) {
 					return Promise.reject(new APIError('Invalid data sharing value', 400));
@@ -55,6 +57,12 @@ router.patch('/', requireLoggedIn, (req, res) => {
 router.get('/timeslots', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!, { include: [Timeslot] })
 		.then(user => successResponse(res, user!.timeslots.map(t => t.toJSON())))
+		.catch(err => errorResponse(res, err));
+});
+
+router.get('/timers', requireLoggedIn, (req, res) => {
+	User.findByPk(req.authorizedUser!, { include: [Timer] })
+		.then(user => successResponse(res, user!.timers.map(t => t.toJSON())))
 		.catch(err => errorResponse(res, err));
 });
 

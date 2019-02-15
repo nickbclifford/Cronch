@@ -5,7 +5,7 @@ import { APIError, errorResponse, requireLoggedIn, successResponse } from '../ut
 const router = Router();
 
 router.post('/', requireLoggedIn, (req, res) => {
-	const taskIds = req.body;
+	const taskIds: string[] = req.body;
 	if (!(taskIds instanceof Array && taskIds.every(t => typeof t === 'string'))) {
 		errorResponse(res, new APIError('Invalid list of task IDs', 400));
 		return;
@@ -19,7 +19,7 @@ router.post('/', requireLoggedIn, (req, res) => {
 
 	// Get rid of all of a user's battle plan tasks before inserting them
 	BattlePlanTask.destroy({ where: { user: req.authorizedUser! } })
-		.then(() => Promise.all(tasks.map(t => t.save())))
+		.then(() => BattlePlanTask.bulkCreate(tasks))
 		.then(() => successResponse(res))
 		.catch(err => errorResponse(res, err));
 });
