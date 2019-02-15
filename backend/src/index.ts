@@ -37,6 +37,9 @@ import { jwtMiddleware } from './utils';
 	app.use('/timeslot', timeslotRouter);
 	app.use('/user', userRouter);
 
+	// 404 handler
+	app.use((req, res) => res.status(404).send('route not found'));
+
 	app.listen(config.port, () => {
 		console.log(`Server listening on *:${config.port}`);
 	});
