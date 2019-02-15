@@ -11,13 +11,14 @@ import createNavigationOptions from './common/NavigationOptionsFactory';
 import createQuestionnaire from './components/QuestionnaireFactory';
 
 import About from './pages/About';
+import AllowNotifications from './pages/AllowNotifications';
 import Analytics from './pages/Analytics';
 import AssignmentDetails from './pages/AssignmentDetails';
+import Avatar from './pages/Avatar';
 import BattlePlan from './pages/BattlePlan';
 import CheckUrls from './pages/CheckUrls';
 import CanvasAssignments from './pages/create-plan/CanvasAssignments';
 import CustomAssignments from './pages/create-plan/CustomAssignments';
-import Avatar from './pages/Avatar';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -62,18 +63,28 @@ const CreatePlan = createBottomTabNavigator(
 	}
 );
 
-// Use custom trasition in the future
-const TimerNavigator = createStackNavigator(
+const BattlePlanAndAllowNotifications = createStackNavigator(
 	{
 		BattlePlan,
+		AllowNotifications
+	},
+	{
+		mode: 'modal',
+		navigationOptions: {
+			header: null
+		}
+	}
+);
+
+const TimerNavigator = createStackNavigator(
+	{
+		BattlePlan: BattlePlanAndAllowNotifications,
 		CreatePlan: {
 			screen: CreatePlan,
 			navigationOptions: createNavigationOptions('Create Plan', false)
 		},
 		AssignmentDetails,
-		Timer: {
-			screen: Timer
-		},
+		Timer,
 		ModeSelection: TimerModeSelection
 	},
 	{

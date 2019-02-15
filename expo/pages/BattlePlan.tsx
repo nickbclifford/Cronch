@@ -1,6 +1,8 @@
 import bind from 'bind-decorator';
+import { Notifications, Permissions } from 'expo';
 import * as React from 'react';
 import {
+	AsyncStorage,
 	Button as NativeButton,
 	Dimensions,
 	ImageStyle,
@@ -43,7 +45,20 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		this.state = { editMode: false };
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
+		console.log('component did mount');
+		const asked = this.props.navigation.getParam('askedNotifications');
+
+		console.log('asekd?', asked);
+
+		if (asked === undefined) {
+			const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+			if (status !== 'granted') {
+				this.props.navigation.setParams({
+					askedNotifications: false
+				});
+			}
+		}
 		this.updateHeader();
 	}
 
@@ -73,8 +88,14 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 	}
 
 	@bind
-	private navigateToTimer(assignment: Task) {
-		this.props.navigation.navigate('Timer', { assignment });
+	private async navigateToTimer(assignment: Task) {
+		const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+		const deniedNotifications = await AsyncStorage.getItem('deniedNotifications') === 'true';
+		if (status === 'granted' || deniedNotifications) {
+			this.props.navigation.navigate('Timer', { assignment });
+		} else {
+			this.props.navigation.navigate('AllowNotifications', { redirectTo: 'BattlePlan' });
+		}
 	}
 
 	@bind
