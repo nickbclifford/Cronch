@@ -1,10 +1,12 @@
 import { Font } from 'expo';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps } from 'react-navigation';
 import { combineLatest } from 'rxjs';
+import { filter, first } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
+import { getUser } from '../common/User';
 import { getMissingURLs } from '../common/Utils';
 
 export default class Loading extends React.Component<NavigationScreenProps> {
@@ -22,8 +24,11 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 	 */
 
 	private listenToAuth() {
-		const subscription = combineLatest(
-			MyMICDS.user.$,
+		combineLatest(
+			MyMICDS.auth.$.pipe(
+				filter(auth => auth !== undefined),
+				first()
+			),
 			Font.loadAsync({
 				'Nunito-Light': require('../assets/Nunito/Nunito-Light.ttf'),
 				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf'),
@@ -31,19 +36,34 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 				'Nunito-ExtraBold': require('../assets/Nunito/Nunito-ExtraBold.ttf'),
 				'Nunito-Black': require('../assets/Nunito/Nunito-Black.ttf')
 			})
-		).subscribe(([user]) => {
-			if (user !== undefined) {
-				if (user === null) {
-					this.props.navigation.navigate('Auth');
-				} else {
-					const missing = getMissingURLs(user);
-					if (missing.hasRequired) {
-						this.props.navigation.navigate('App');
-					} else {
-						this.props.navigation.navigate('CheckUrls', missing);
+		).subscribe(async ([mymicdsAuth]) => {
+			if (mymicdsAuth === null) {
+				this.props.navigation.navigate('Auth');
+			} else {
+				combineLatest(
+					MyMICDS.user.$.pipe(
+						filter(user => user !== undefined && user !== null),
+						first()
+					),
+					getUser()
+				).subscribe(
+					([mymicdsUser, { user: cronchUser }]) => {
+						console.log('my con', mymicdsUser, cronchUser);
+						if (cronchUser === null) {
+							MyMICDS.auth.logout().subscribe({
+								error: err => Alert.alert('Logout Error', err.message),
+								complete: () => this.props.navigation.navigate('Auth')
+							});
+						} else {
+							const missing = getMissingURLs(mymicdsUser!);
+							if (missing.hasRequired) {
+								this.props.navigation.navigate('App');
+							} else {
+								this.props.navigation.navigate('CheckUrls', missing);
+							}
+						}
 					}
-				}
-				subscription.unsubscribe();
+				);
 			}
 		});
 	}

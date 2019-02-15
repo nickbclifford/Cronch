@@ -1,4 +1,13 @@
-import { AutoIncrement, BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+	AutoIncrement,
+	BelongsTo,
+	Column,
+	CreatedAt,
+	ForeignKey,
+	Model,
+	PrimaryKey,
+	Table
+} from 'sequelize-typescript';
 import User from './User';
 
 @Table
@@ -20,4 +29,7 @@ export default class QuestionnaireResponse extends Model<QuestionnaireResponse> 
 
 	@BelongsTo(() => User)
 	userObject!: User;
+
+	@CreatedAt
+	answeredAt!: Date;
 }

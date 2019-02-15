@@ -43,10 +43,8 @@ export default class Login extends React.Component<NavigationScreenProps> {
 				}
 
 				// If you can successfully getUser, then we already know the user and they don't have to "register"
-				try {
-					await getUser();
-				} catch {
-					// Otherwise, if it fails, register them with us
+				const { user: cronchUser } = await getUser();
+				if (cronchUser === null) {
 					return registerUser();
 				}
 			}),

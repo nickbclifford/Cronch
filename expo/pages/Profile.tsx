@@ -1,15 +1,15 @@
 import bind from 'bind-decorator';
 import { Formik, FormikProps } from 'formik';
+import { number } from 'prop-types';
 import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import { number } from 'prop-types';
 import MyMICDS from '../common/MyMICDS';
+import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, typography } from '../common/StyleGuide';
 import { changeUserInfo, getUser, User } from '../common/User';
-import Hamburger from '../components/Hamburger';
 import Question from '../components/Question';
 
 interface ProfileState {
@@ -54,20 +54,23 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	private user!: User;
 
-	static navigationOptions = {
-		header: null,
-		title: 'Profile'
-	};
+	static navigationOptions = createNavigationOptions('Profile');
 
 	constructor(props: any) {
 		super(props);
-
-		this.state = {
-		};
+		this.state = { };
 	}
 
 	async componentDidMount() {
-		this.user = await getUser();
+		const { user } = await getUser();
+
+		if (user === null) {
+			// return this.logout();
+			console.log('user is null!', user);
+			return;
+		}
+
+		this.user = user;
 
 		settingsFormInitialValues.alarmSelection = this.user.alarm || null;
 		settingsFormInitialValues.dataSharingSelection = this.user.dataSharing || null;
@@ -136,19 +139,15 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Hamburger toggle={this.props.navigation.toggleDrawer} />
-
-				{this.user && (
-					<View style={styles.userInfo}>
-						<Text style={typography.h3}>Logged in as: {this.user.username}</Text>
-						<Button
-							title='Logout'
-							onPress={this.logout}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-					</View>
-				)}
+				<View style={styles.userInfo}>
+					<Text style={typography.h3}>Logged in as: {MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}</Text>
+					<Button
+						title='Logout'
+						onPress={this.logout}
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
+					/>
+				</View>
 
 				<Text style={typography.h1}>Profile Settings</Text>
 

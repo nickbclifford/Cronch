@@ -1,4 +1,5 @@
 import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import BattlePlanTask from './BattlePlanTask';
 import Response from './QuestionnaireResponse';
 import Timeslot from './Timeslot';
 
@@ -25,4 +26,7 @@ export default class User extends Model<User> {
 
 	@Column(DataType.INTEGER)
 	alarmSelection!: number;
+
+	@HasMany(() => BattlePlanTask)
+	battlePlanTasks!: BattlePlanTask[];
 }
