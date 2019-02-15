@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import { Accessory, Expression, Headwear, Skin } from '../common/AvatarTypes';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
+import { PRIMARY } from '../common/StyleGuide';
 import Cronchy from '../components/Cronchy';
-// import { typography } from '../common/StyleGuide';
 
 export default class Avatar extends React.Component<NavigationScreenProps> {
 
@@ -14,6 +14,7 @@ export default class Avatar extends React.Component<NavigationScreenProps> {
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.container}>
 					<Cronchy
 						style={styles.avatar}

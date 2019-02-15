@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+
 import createNavigationOptions from '../common/NavigationOptionsFactory';
+import { PRIMARY } from '../common/StyleGuide';
 
 export default class About extends React.Component<NavigationScreenProps> {
 
@@ -10,6 +12,7 @@ export default class About extends React.Component<NavigationScreenProps> {
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.container}>
 					<Text>This was created by Michel Gira, and Elsa Sjogren helped a litle bit. I love her so much because shes the best. Want to give Christian LeNoir money? Paypal pikachululz@gmail.com</Text>
 				</View>

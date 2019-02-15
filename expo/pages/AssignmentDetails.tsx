@@ -65,6 +65,7 @@ class AssignmentDetails extends React.Component<
 				<StatusBar
 					barStyle={this.state.assignment.class.textDark ? 'dark-content' : 'light-content'}
 					backgroundColor={this.state.assignment.class.color}
+					animated={true}
 				/>
 				<SafeAreaView style={styles.safeArea}>
 					<ScrollView style={styles.detailsContainer}>

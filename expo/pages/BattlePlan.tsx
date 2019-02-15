@@ -1,13 +1,22 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button as NativeButton, Dimensions, ImageStyle, StyleProp, StyleSheet, Text, View } from 'react-native';
+import {
+	Button as NativeButton,
+	Dimensions,
+	ImageStyle,
+	StatusBar,
+	StyleProp,
+	StyleSheet,
+	Text,
+	View
+} from 'react-native';
 import { Button } from 'react-native-elements';
 import Image from 'react-native-scalable-image';
 import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { NEUTRAL, SUCCESS, typography } from '../common/StyleGuide';
+import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import DisplayAssignments from '../components/DisplayAssignments';
 
@@ -76,6 +85,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 	render() {
 		return (
 			<View style={styles.container}>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.addAssignmentsContainer}>
 					<Button
 						title='Add Assignments'
@@ -87,7 +97,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						<View style={styles.guideContainer}>
 							<Image
 								source={require('../assets/apples/preset/hewwo-uweseres.png')}
-								width={Dimensions.get('window').width * 0.8}
+								width={Dimensions.get('window').width * 0.65}
 								style={styles.guideImage as StyleProp<ImageStyle>}
 							/>
 							<Text style={[typography.h3, styles.guideText]}>Add an Assignment{'\n'}to get started!</Text>
@@ -132,9 +142,7 @@ export default withAssignmentContext(BattlePlan);
 
 const styles = StyleSheet.create({
 	container: {
-		height: '100%',
-		display: 'flex',
-		alignItems: 'center'
+		height: '100%'
 	},
 	addAssignmentsContainer: {
 		width: '100%',
