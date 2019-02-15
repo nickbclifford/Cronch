@@ -5,6 +5,7 @@ import { fetchWithJwt, Omit } from './Utils';
 export interface User {
 	username: string;
 	dataSharing: DataSharing;
+	alarm: number;
 }
 
 export function registerUser() {

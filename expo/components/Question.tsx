@@ -3,6 +3,8 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 
+import { typography } from '../common/StyleGuide';
+
 export interface QuestionInfo {
 	question: string;
 	responses: string[];
@@ -40,7 +42,7 @@ export default class Question extends React.Component<QuestionProps> {
 		));
 		return (
 			<View style={styles.container}>
-				<Text style={styles.text}>{this.props.question}</Text>
+				<Text style={[typography.h3, styles.text]}>{this.props.question}</Text>
 				{responseRadios}
 			</View>
 		);
@@ -50,7 +52,7 @@ export default class Question extends React.Component<QuestionProps> {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1
+		minHeight: 200
 	},
 	text: {
 		alignSelf: 'center'

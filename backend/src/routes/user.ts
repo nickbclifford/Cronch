@@ -26,12 +26,22 @@ router.patch('/', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!)
 		.then(user => {
 			const dataSharing = req.body.dataSharing;
+			const alarmSelection = req.body.alarmSelection;
 			if (typeof dataSharing !== 'undefined') {
 				if (typeof dataSharing !== 'number' && (dataSharing < DataSharing.NO_SEND || dataSharing > DataSharing.FULL_SEND)) {
 					return Promise.reject(new APIError('Invalid data sharing value', 400));
 				}
 
 				user!.dataSharing = dataSharing;
+			}
+
+			if (typeof alarmSelection !== 'undefined') {
+				if (typeof alarmSelection !== 'number') {
+					return Promise.reject(new APIError('Invalid alarm selection value', 400));
+				}
+
+				user!.dataSharing = dataSharing;
+				user!.alarmSelection = alarmSelection;
 			}
 
 			// TODO: Other attributes
