@@ -1,6 +1,7 @@
+import { FormikProps } from 'formik';
 import moment from 'moment';
-
 import { AsyncStorage } from 'react-native';
+
 import Config from '../Config';
 import { GetUserInfoResponse, jwtKey } from './MyMICDS';
 
@@ -71,5 +72,11 @@ export function getMissingURLs(user: GetUserInfoResponse) {
 	return {
 		urls,
 		hasRequired
+	};
+}
+
+export function handleFieldChangeFactory<T>(props: FormikProps<T>, field: keyof T) {
+	return (value: any) => {
+		props.setFieldValue(field as string, value);
 	};
 }

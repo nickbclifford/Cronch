@@ -16,6 +16,8 @@ import { Omit } from '../common/Utils';
 import DisplayTask from '../components/DisplayTask';
 
 export interface TimerState {
+	maxWorkTime: number;
+	maxBreakTime: number;
 	workTimeLeft: number;
 	breakTimeLeft: number;
 	onBreak: boolean;
@@ -54,26 +56,16 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	private interval!: NodeJS.Timer;
 
-	private userCycles: Array<{
-		work: number,
-		break: number
-	}>;
-
 	private shouldAddCycles = false;
 
 	constructor(props: any) {
 		super(props);
-		this.userCycles = [{
-			work: 0.1 * 60 * 1000,
-			break: 0.1 * 60 * 1000
-		}, {
-			work: 0.5 * 60 * 1000,
-			break: 0.5 * 60 * 1000
-		}];
 
 		this.state = {
-			workTimeLeft: this.userCycles[0].work,
-			breakTimeLeft: this.userCycles[0].break,
+			maxBreakTime: 600000,
+			maxWorkTime: 600000,
+			workTimeLeft: 600000,
+			breakTimeLeft: 600000,
 			onBreak: false,
 			paused: true,
 			modeSelection: 0,
@@ -135,18 +127,6 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		}
 	}
 
-	componentDidUpdate() {
-		if (this.props.navigation.getParam('shouldAddCycle')) {
-			this.props.navigation.setParams({ shouldAddCycle: false });
-			this.shouldAddCycles = true;
-		} else {
-			if (this.shouldAddCycles) {
-				this.userCycles.push(this.props.navigation.getParam('addCycle'));
-			}
-			this.shouldAddCycles = false;
-		}
-	}
-
 	@bind
 	private navigateToBattlePlan() {
 		this.props.navigation.navigate('BattlePlan');
@@ -154,7 +134,9 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	@bind
 	private addCustom() {
-		this.props.navigation.navigate('ModeSelection');
+		this.props.navigation.navigate('ModeSelection', {
+			setTimerMode: this.setTimerMode
+		});
 	}
 
 	@bind
@@ -165,24 +147,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private setTimerMode(n: number) {
-		if (n === -1) {
-			this.setState({
-				workTimeLeft: 0,
-				breakTimeLeft: 0,
-				onBreak: false,
-				paused: false,
-				modeSelection: n
-			});
-		} else {
-			this.setState({
-				workTimeLeft: this.userCycles[n].work,
-				breakTimeLeft: this.userCycles[n].break,
-				onBreak: false,
-				paused: false,
-				modeSelection: n
-			});
-		}
+	private setTimerMode(mode: { maxWorkTime: number, maxBreakTime: number }) {
+		this.setState({
+			maxWorkTime: mode.maxWorkTime,
+			maxBreakTime: mode.maxBreakTime,
+			workTimeLeft: mode.maxWorkTime,
+			breakTimeLeft: mode.maxBreakTime,
+			onBreak: false,
+			paused: !this.state.flipped
+		});
 	}
 
 	@bind
@@ -219,7 +192,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					[
 						{ text: 'Continue', onPress: () => {
 							this.setState({
-								breakTimeLeft: this.userCycles[this.state.modeSelection].break,
+								breakTimeLeft: this.state.maxBreakTime,
 								onBreak: false,
 								paused: true
 							});
@@ -247,7 +220,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					[
 						{ text: 'Continue', onPress: () => {
 							this.setState({
-								workTimeLeft: this.userCycles[this.state.modeSelection].work,
+								workTimeLeft: this.state.maxWorkTime,
 								onBreak: true,
 								paused: false
 							});
@@ -367,36 +340,33 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 					onPress={this.navigateToBattlePlan}
 				/> */}
 
-				<Button title='Add Custom' onPress={this.addCustom}/>
-				<Picker
-					selectedValue={this.state.modeSelection}
-					onValueChange={this.setTimerMode}
-				>
-					{this.userCycles.map((cycle, i) =>
-						<Picker.Item
-							key={i}
-							label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`}
-							value={i}
-						/>
-					)}
-					<Picker.Item key={-1} label='Manual Timer' value={-1}/>
-				</Picker>
-
-				<Text>{this.state.assignment.title}</Text>
-
 				<View style={styles.timerContainer}>
 					<View style={styles.timer}>
-						<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>
-						{/* <Text>Break Timer: {Math.floor(this.state.breakTimeLeft / 60000)}:{Math.floor(this.state.breakTimeLeft % 60000)}</Text> */}
+					{!this.state.onBreak ?
+						(<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>) :
+						(<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.breakTimeLeft)}</Text>)
+					}
 					</View>
 				</View>
+
+				<Button
+					title='Add Custom'
+					onPress={this.addCustom}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
 
 				<Text>{this.state.paused.toString()}</Text>
 				<Text>{this.state.flipped.toString()}</Text>
 
 				<View style={styles.flipNotification}>
 					{ this.state.paused && (
-						<Button title='Flip phone to start your timer!' style={styles.flipNotificationText} buttonStyle={components.buttonStyle} titleStyle={components.buttonText}/>
+						<Button
+							title='Flip phone to start your timer!'
+							style={styles.flipNotificationText}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
 					) }
 				</View>
 			</SafeAreaView>

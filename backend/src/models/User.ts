@@ -1,5 +1,6 @@
 import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import Response from './QuestionnaireResponse';
+import Timer from './Timer';
 import Timeslot from './Timeslot';
 
 export enum DataSharing {
@@ -25,4 +26,7 @@ export default class User extends Model<User> {
 
 	@Column(DataType.INTEGER)
 	alarmSelection!: number;
+
+	@HasMany(() => Timer)
+	timers!: Timer[];
 }
