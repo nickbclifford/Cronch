@@ -243,9 +243,19 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		}
 	}
 
+	private findDayDeviation() {
+		let tempTotal = 0;
+		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
+		for (const val of this.state.dailyTimes) {
+			if (val.end !== null)
+				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
+		}
+		return (Math.sqrt(tempTotal / (this.state.dailyTimes.length - 1))).toFixed(2);
+	}
+
 	private beautifyMinutes(num: number) {
 		// TODO: get the beautify minutes working
-		return `${Math.round(num)}h`;
+		return `${Math.round(num)}H`;
 	}
 
 	componentWillMount() {
@@ -289,14 +299,18 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 								<Text style={styles.title}>Today's Total</Text>
 								<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
 							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Today's Deviation</Text>
+								<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
+							</View>
 						</View>
 						<View style={styles.verticalContainer}>
 							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>{'Most Active'}</Text>
+								<Text style={styles.title}>Most Active</Text>
 								<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
 							</View>
 							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>{'Least Active'}</Text>
+								<Text style={styles.title}>Least Active</Text>
 								<Text style={styles.text}>{this.findLeastPracticedSubject()}</Text>
 							</View>
 						</View>
