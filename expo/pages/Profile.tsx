@@ -65,9 +65,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 		const { user } = await getUser();
 
 		if (user === null) {
-			// return this.logout();
-			console.log('user is null!', user);
-			return;
+			return this.logout();
 		}
 
 		this.user = user;
