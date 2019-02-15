@@ -61,6 +61,7 @@ router.get('/timeslots', requireLoggedIn, (req, res) => {
 
 router.post('/timers', requireLoggedIn, (req, res) => {
 	const timers = req.body.timers;
+	console.log(timers);
 	if (typeof timers !== 'undefined') {
 		if (!timers.length) {
 			return Promise.reject(new APIError('Invalid timer value', 400));
@@ -73,7 +74,7 @@ router.post('/timers', requireLoggedIn, (req, res) => {
 });
 
 router.get('/timers', requireLoggedIn, (req, res) => {
-	return 	User.findByPk(req.authorizedUser!, { include: [Timer] })
+	User.findByPk(req.authorizedUser!, { include: [Timer] })
 	.then(user => {console.log(user); return successResponse(res, user!.timers.map(t => t.toJSON())); })
 	.catch(err => errorResponse(res, err));
 });

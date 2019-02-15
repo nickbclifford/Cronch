@@ -57,8 +57,9 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 		}];
 
 		getTimers().then(timers => {
-			this.userCycles = timers;
-			console.log(timers);
+			if (timers.length > 0) {
+				this.userCycles = timers;
+			}
 		})
 		.catch((e: Error) => {
 			Alert.alert('Error getting timers', e.message);
@@ -102,8 +103,9 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 					onSubmit={this.addTimerMode}
 				>
 					{props => (
-					<View>
+					<View style={styles.newTimerContainer}>
 						<Picker
+							style={styles.newTimerPicker}
 							selectedValue={props.values.work}
 							onValueChange={handleFieldChangeFactory<NewTimerValues>(props, 'work')}
 						>
@@ -113,6 +115,7 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 						</Picker>
 
 						<Picker
+							style={styles.newTimerPicker}
 							selectedValue={props.values.break}
 							onValueChange={handleFieldChangeFactory<NewTimerValues>(props, 'break')}
 						>
@@ -172,5 +175,12 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center'
+	},
+	newTimerContainer: {
+		display: 'flex',
+		flexDirection: 'row'
+	},
+	newTimerPicker: {
+		flexGrow: 1
 	}
 });
