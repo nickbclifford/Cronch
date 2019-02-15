@@ -3,6 +3,10 @@ import { BattlePlanTask } from './BattlePlanTask';
 import { convertJSONDates, Timeslot } from './Timeslot';
 import { fetchWithJwt, Omit } from './Utils';
 
+export interface GetUserResponse {
+	user: User | null;
+}
+
 export interface User {
 	username: string;
 	dataSharing: DataSharing;
@@ -16,7 +20,7 @@ export function registerUser() {
 }
 
 export function getUser() {
-	return fetchWithJwt<User>('/user', {
+	return fetchWithJwt<GetUserResponse>('/user', {
 		method: 'GET'
 	});
 }

@@ -15,8 +15,8 @@ export default class BattlePlanTask extends Model<BattlePlanTask> {
 	@Column
 	planOrder!: number;
 
-	@Column
 	@Unique
+	@Column
 	taskId!: string; // Object ID or task title
 
 	@BelongsTo(() => User)

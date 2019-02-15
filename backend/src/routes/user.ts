@@ -19,7 +19,7 @@ router.post('/', requireLoggedIn, (req, res) => {
 
 router.get('/', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!)
-		.then(user => successResponse(res, user!.toJSON()))
+		.then(user => successResponse(res, { user: user ? user.toJSON() : null }))
 		.catch(err => errorResponse(res, err));
 });
 
