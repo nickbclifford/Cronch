@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import BattlePlanTask from '../models/BattlePlanTask';
 import Timeslot from '../models/Timeslot';
 import User, { DataSharing } from '../models/User';
 import { APIError, errorResponse, requireLoggedIn, successResponse } from '../utils';
@@ -40,7 +41,6 @@ router.patch('/', requireLoggedIn, (req, res) => {
 					return Promise.reject(new APIError('Invalid alarm selection value', 400));
 				}
 
-				user!.dataSharing = dataSharing;
 				user!.alarmSelection = alarmSelection;
 			}
 
@@ -55,6 +55,12 @@ router.patch('/', requireLoggedIn, (req, res) => {
 router.get('/timeslots', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!, { include: [Timeslot] })
 		.then(user => successResponse(res, user!.timeslots.map(t => t.toJSON())))
+		.catch(err => errorResponse(res, err));
+});
+
+router.get('/battle-plan-tasks', requireLoggedIn, (req, res) => {
+	User.findByPk(req.authorizedUser!, { include: [BattlePlanTask] })
+		.then(user => successResponse(res, user!.battlePlanTasks.map(t => t.toJSON())))
 		.catch(err => errorResponse(res, err));
 });
 

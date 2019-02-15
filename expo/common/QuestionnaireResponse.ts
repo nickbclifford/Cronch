@@ -5,6 +5,7 @@ export interface QuestionnaireResponse {
 	question: string;
 	answer: string;
 	user: string;
+	answeredAt: Date;
 }
 
 export function submitResponse(question: string, answer: string) {
@@ -17,5 +18,8 @@ export function submitResponse(question: string, answer: string) {
 export function getResponse(id: number) {
 	return fetchWithJwt<QuestionnaireResponse>(`/questionnaire-response/${id}`, {
 		method: 'GET'
+	}).then(q => {
+		q.answeredAt = new Date(q.answeredAt);
+		return q;
 	});
 }

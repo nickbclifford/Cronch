@@ -1,4 +1,5 @@
 import { DataSharing } from '../../backend/src/models/User';
+import { BattlePlanTask } from './BattlePlanTask';
 import { convertJSONDates, Timeslot } from './Timeslot';
 import { fetchWithJwt, Omit } from './Utils';
 
@@ -31,4 +32,10 @@ export function getUserTimeslots() {
 	return fetchWithJwt<Timeslot[]>('/user/timeslots', {
 		method: 'GET'
 	}).then(ts => ts.map(convertJSONDates));
+}
+
+export function getUserBattlePlanTasks() {
+	return fetchWithJwt<BattlePlanTask[]>('/user/battle-plan-tasks', {
+		method: 'GET'
+	});
 }
