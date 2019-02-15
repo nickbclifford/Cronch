@@ -22,4 +22,7 @@ export default class User extends Model<User> {
 
 	@HasMany(() => Response)
 	responses!: Response[];
+
+	@Column(DataType.INTEGER)
+	alarmSelection!: number;
 }

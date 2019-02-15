@@ -8,18 +8,13 @@ router.post('/', requireLoggedIn, (req, res) => {
 	const start = new Date(req.body.start);
 	if (isNaN(start.getTime())) { errorResponse(res, new APIError('Invalid start time', 400)); return; }
 
-	const classId = req.body.classId as string || null;
-	if (classId === null) {
-		errorResponse(res, new APIError('Missing required Canvas assignment/class object ID', 400));
-		return;
-	}
-	// Object IDs have to be 24 chars long
+	const classId = req.body.classId;
 	if (typeof classId !== 'string') {
-		errorResponse(res, new APIError('Invalid Canvas assignment/class object ID', 400));
+		errorResponse(res, new APIError('Invalid Canvas assignment object ID/task title', 400));
 		return;
 	}
 
-	const timeslot = new Timeslot({ start, user: req.authorizedUser! });
+	const timeslot = new Timeslot({ start, user: req.authorizedUser!, classId });
 	timeslot.save()
 		.then(newTimeslot => successResponse(res, { id: newTimeslot.id }))
 		.catch(err => errorResponse(res, err));
