@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import Timer from '../models/Timer';
 import BattlePlanTask from '../models/BattlePlanTask';
 import Timeslot from '../models/Timeslot';
 import User, { DataSharing } from '../models/User';
@@ -28,6 +29,7 @@ router.patch('/', requireLoggedIn, (req, res) => {
 		.then(user => {
 			const dataSharing = req.body.dataSharing;
 			const alarmSelection = req.body.alarmSelection;
+
 			if (typeof dataSharing !== 'undefined') {
 				if (typeof dataSharing !== 'number' && (dataSharing < DataSharing.NO_SEND || dataSharing > DataSharing.FULL_SEND)) {
 					return Promise.reject(new APIError('Invalid data sharing value', 400));
@@ -56,6 +58,27 @@ router.get('/timeslots', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!, { include: [Timeslot] })
 		.then(user => successResponse(res, user!.timeslots.map(t => t.toJSON())))
 		.catch(err => errorResponse(res, err));
+});
+
+router.post('/timers', requireLoggedIn, (req, res) => {
+	const timers = req.body.timers;
+	console.log(timers);
+	if (typeof timers !== 'undefined') {
+		if (!timers.length) {
+			return successResponse(res);
+		}
+	}
+
+	const buh: Timer[] = timers.map((timer: any) => Object.assign(timer, { user: req.authorizedUser! }));
+	console.log(buh)
+	return Timer.bulkCreate(buh)
+		.then(() => successResponse(res))
+		.catch(err => errorResponse(res, err));
+});
+
+router.get('/timers', requireLoggedIn, (req, res) => {
+	User.findByPk(req.authorizedUser!, { include: [Timer, Timeslot] })
+		.then(user => successResponse(res, user!.timers.map(t => t.toJSON())))
 });
 
 router.get('/battle-plan-tasks', requireLoggedIn, (req, res) => {

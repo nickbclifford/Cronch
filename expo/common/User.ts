@@ -11,7 +11,10 @@ export interface User {
 	username: string;
 	dataSharing: DataSharing;
 	alarm: number;
+	timers: TimerData[];
 }
+
+export interface TimerData { id?: number, work: number; break: number; selected?: boolean; }
 
 export function registerUser() {
 	return fetchWithJwt('/user', {
@@ -36,6 +39,19 @@ export function getUserTimeslots() {
 	return fetchWithJwt<Timeslot[]>('/user/timeslots', {
 		method: 'GET'
 	}).then(ts => ts.map(convertJSONDates));
+}
+
+export function updateTimers(timers: TimerData[]) {
+	return fetchWithJwt<TimerData[]>('/user/timers', {
+		method: 'POST',
+		body: JSON.stringify({timers})
+	});
+}
+
+export function getTimers() {
+	return fetchWithJwt<TimerData[]>('/user/timers', {
+		method: 'GET'
+	});
 }
 
 export function getUserBattlePlanTasks() {
