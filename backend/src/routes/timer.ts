@@ -12,7 +12,7 @@ router.post('/', requireLoggedIn, (req, res) => {
 		return;
 	}
 
-	const timerObjs = timers.map(t => new Timer({ ...t, user: req.authorizedUser! }));
+	const timerObjs = timers.map(t => ({ ...t, user: req.authorizedUser! }));
 	return Timer.bulkCreate(timerObjs)
 		.then(() => successResponse(res))
 		.catch(err => errorResponse(res, err));

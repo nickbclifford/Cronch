@@ -18,10 +18,10 @@ import BattlePlan from './pages/BattlePlan';
 import CheckUrls from './pages/CheckUrls';
 import CanvasAssignments from './pages/create-plan/CanvasAssignments';
 import CustomAssignments from './pages/create-plan/CustomAssignments';
+import HomeworkTimer from './pages/HomeworkTimer';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
-import Timer from './pages/Timer';
 import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
 import TimerModeSelection from './pages/TimerModeSelectionModal';
 import Welcome from './pages/Welcome';
@@ -72,7 +72,7 @@ const TimerNavigator = createStackNavigator(
 		},
 		AssignmentDetails,
 		Timer: {
-			screen: Timer
+			screen: HomeworkTimer
 		},
 		ModeSelection: TimerModeSelection
 	},

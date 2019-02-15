@@ -7,7 +7,7 @@ import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import { components } from '../common/StyleGuide';
 import { Timer, updateTimers } from '../common/Timer';
-import { getUserTimers } from '../common/User';
+import { changeUserInfo, getUser, getUserTimers } from '../common/User';
 import { handleFieldChangeFactory, Omit } from '../common/Utils';
 
 interface NewTimerValues {
@@ -32,7 +32,7 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 
 	static navigationOptions = { };
 
-	private userCycles: Array<Omit<Timer, 'selected'>> = [];
+	private userCycles: Timer[] = [];
 
 	componentDidMount() {
 		this.userCycles = [{
@@ -51,6 +51,9 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 		.catch((e: Error) => {
 			Alert.alert('Error getting timers', e.message);
 		});
+
+		getUser()
+			.then(res => timerSelectionInitialValues.timerSelection = res.user!.timerSelection);
 	}
 
 	@bind
@@ -76,10 +79,12 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 
 		updateTimers(
 			this.userCycles
-			// timers with id are the ones already in DB
-				.filter(c => !c.id)
-				.map<Timer>((c, i) => Object.assign(c, { selected: values.timerSelection === i }))
-		).then(() => {
+			// timers with id are the ones already in DB, but also resave the new selection
+				.filter((timer, i) => !timer.id)
+		).then(() => changeUserInfo({
+			timerSelection: values.timerSelection
+		}))
+		.then(() => {
 			this.props.navigation.state.params!.setTimerMode(timerMode);
 			this.props.navigation.navigate('Timer');
 		}).catch((e: Error) => {

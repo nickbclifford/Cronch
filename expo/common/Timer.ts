@@ -4,7 +4,6 @@ export interface Timer {
 	id?: number;
 	work: number;
 	break: number;
-	selected?: boolean;
 }
 
 export function updateTimers(timers: Timer[]) {

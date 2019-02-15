@@ -1,0 +1,5 @@
+{
+	"tslint.jsEnable": true,
+	"tslint.configFile": "./expo/tslint.json",
+	"tslint.autoFixOnSave": true
+}

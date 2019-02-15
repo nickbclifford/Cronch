@@ -7,11 +7,14 @@ import { Alert, Picker, StyleSheet, Text, TouchableOpacity, Vibration, View } fr
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
+import { alarmList } from '../common/Alarms';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import flipped$ from '../common/PhoneAcrobatics';
 import { ColorPalette, components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
+import { Timer } from '../common/Timer';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
+import { getUser, getUserTimers, User } from '../common/User';
 import { Omit } from '../common/Utils';
 import DisplayTask from '../components/DisplayTask';
 
@@ -23,13 +26,14 @@ export interface TimerState {
 	onBreak: boolean;
 	paused: boolean;
 	modeSelection: number;
+	alarmSelection: number;
 	flipped: boolean;
 	assignment: Task;
 	currentTimeslotId: number | null;
 	vibrateDuration: number;
 }
 
-export default class Timer extends React.Component<NavigationScreenProps, TimerState> {
+export default class HomeorkTimer extends React.Component<NavigationScreenProps, TimerState> {
 
 	static navigationOptions = ({ navigation }) => {
 		const task: Task = navigation.getParam('assignment');
@@ -56,23 +60,24 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	private interval!: NodeJS.Timer;
 
-	private shouldAddCycles = false;
+	private user!: User;
 
 	constructor(props: any) {
 		super(props);
 
 		this.state = {
-			maxBreakTime: 600000,
-			maxWorkTime: 600000,
-			workTimeLeft: 600000,
-			breakTimeLeft: 600000,
+			maxBreakTime: 15 * 60 * 1000,
+			maxWorkTime: 45 * 60 * 1000,
+			workTimeLeft: 0,
+			breakTimeLeft: 0,
 			onBreak: false,
 			paused: true,
 			modeSelection: 0,
 			flipped: false,
 			assignment: this.props.navigation.getParam('assignment'),
 			currentTimeslotId: null,
-			vibrateDuration: 500
+			vibrateDuration: 500,
+			alarmSelection: 0
 		};
 
 		// this.props.navigation.state.params.classColor = this.state.assignment.class.color;
@@ -106,7 +111,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				console.log('buh', flipped);
 				this.setState({ paused: !flipped });
 			}
-			
+
 			// If user is using manual, switch to break when phone faces upward
 			if (this.state.modeSelection === -1) {
 				if (flipped) {
@@ -115,7 +120,37 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				this.setState({ onBreak: !flipped });
 			}
 		});
+
 		this.prepareSound();
+
+		getUser()
+			.then(res => {
+				if (!res.user) { return new Error('User does not exist'); }
+
+				console.log(res.user);
+				this.user = res.user;
+
+				this.setState({
+					alarmSelection: res.user.alarmSelection,
+					modeSelection: res.user.timerSelection
+				});
+			})
+			.then(() => getUserTimers())
+			.then(timers => {
+				console.log(timers);
+				const selectedTimer = timers[this.user.timerSelection];
+
+				if (selectedTimer) {
+					this.setTimerMode({
+						maxBreakTime: selectedTimer.break,
+						maxWorkTime: selectedTimer.work,
+						modeSelection: this.user.timerSelection
+					});
+				}
+			})
+			.catch(e => {
+				Alert.alert('Error getting user', e.message);
+			});
 	}
 
 	componentWillUnmount() {
@@ -171,7 +206,8 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	private async playAlarm(soundObject: Audio.Sound) {
 		// get alarm preference from backend
 		try {
-			await soundObject.loadAsync(this.alarmList[this.state.alarmSelection].file);
+			const soundFile = alarmList[this.state.alarmSelection].file;
+			await soundObject.loadAsync(soundFile);
 			await soundObject.setIsLoopingAsync(true);
 			await soundObject.setPositionAsync(0);
 			await soundObject.playAsync();
@@ -298,9 +334,10 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 				interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
 				shouldDuckAndroid: true,
 				interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
-			}).then(err => {
-				console.log('this is setting audio error ', err);
 			});
+			// .then(err => {
+			// 	console.log('this is setting audio error ', err);
+			// });
 		} catch (error) {
 			Alert.alert('sound buh', error.message());
 		}
