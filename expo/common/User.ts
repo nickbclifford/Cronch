@@ -1,5 +1,6 @@
 import { DataSharing } from '../../backend/src/models/User';
 import { BattlePlanTask } from './BattlePlanTask';
+import { Timer } from './Timer';
 import { convertJSONDates, Timeslot } from './Timeslot';
 import { fetchWithJwt, Omit } from './Utils';
 
@@ -11,10 +12,8 @@ export interface User {
 	username: string;
 	dataSharing: DataSharing;
 	alarm: number;
-	timers: TimerData[];
+	timers: Timer[];
 }
-
-export interface TimerData { id?: number, work: number; break: number; selected?: boolean; }
 
 export function registerUser() {
 	return fetchWithJwt('/user', {
@@ -41,15 +40,8 @@ export function getUserTimeslots() {
 	}).then(ts => ts.map(convertJSONDates));
 }
 
-export function updateTimers(timers: TimerData[]) {
-	return fetchWithJwt<TimerData[]>('/user/timers', {
-		method: 'POST',
-		body: JSON.stringify({timers})
-	});
-}
-
-export function getTimers() {
-	return fetchWithJwt<TimerData[]>('/user/timers', {
+export function getUserTimers() {
+	return fetchWithJwt<Timer[]>('/user/timers', {
 		method: 'GET'
 	});
 }

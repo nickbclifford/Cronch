@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import Timer from '../models/Timer';
 import BattlePlanTask from '../models/BattlePlanTask';
+import Timer from '../models/Timer';
 import Timeslot from '../models/Timeslot';
 import User, { DataSharing } from '../models/User';
 import { APIError, errorResponse, requireLoggedIn, successResponse } from '../utils';
@@ -60,25 +60,10 @@ router.get('/timeslots', requireLoggedIn, (req, res) => {
 		.catch(err => errorResponse(res, err));
 });
 
-router.post('/timers', requireLoggedIn, (req, res) => {
-	const timers = req.body.timers;
-	console.log(timers);
-	if (typeof timers !== 'undefined') {
-		if (!timers.length) {
-			return successResponse(res);
-		}
-	}
-
-	const buh: Timer[] = timers.map((timer: any) => Object.assign(timer, { user: req.authorizedUser! }));
-	console.log(buh)
-	return Timer.bulkCreate(buh)
-		.then(() => successResponse(res))
-		.catch(err => errorResponse(res, err));
-});
-
 router.get('/timers', requireLoggedIn, (req, res) => {
-	User.findByPk(req.authorizedUser!, { include: [Timer, Timeslot] })
+	User.findByPk(req.authorizedUser!, { include: [Timer] })
 		.then(user => successResponse(res, user!.timers.map(t => t.toJSON())))
+		.catch(err => errorResponse(res, err));
 });
 
 router.get('/battle-plan-tasks', requireLoggedIn, (req, res) => {

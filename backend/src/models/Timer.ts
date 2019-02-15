@@ -1,6 +1,4 @@
-import {
-	AutoIncrement,
-	BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement,	BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import User from './User';
 
 @Table
@@ -10,13 +8,13 @@ export default class Timer extends Model<Timer> {
 	@Column
 	id!: number;
 
-	@Column(DataType.INTEGER)
+	@Column
 	work!: number;
 
-	@Column(DataType.INTEGER)
+	@Column
 	break!: number;
 
-	@Column(DataType.BOOLEAN)
+	@Column
 	selected!: boolean;
 
 	@ForeignKey(() => User)

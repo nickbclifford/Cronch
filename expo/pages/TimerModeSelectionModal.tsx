@@ -1,18 +1,14 @@
 import bind from 'bind-decorator';
 import { Formik } from 'formik';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text, View } from 'react-native';
+import { Alert, Picker, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { bindCallback, range } from 'rxjs';
 
 import { components } from '../common/StyleGuide';
-import { getTimers, updateTimers } from '../common/User';
-import { TimerData, User } from '../common/User';
+import { Timer, updateTimers } from '../common/Timer';
+import { getUserTimers } from '../common/User';
 import { handleFieldChangeFactory, Omit } from '../common/Utils';
-
-interface TimerModeSelectionState {
-}
 
 interface NewTimerValues {
 	work: number;
@@ -32,20 +28,11 @@ const newTimerInitialValues: NewTimerValues = {
 	break: 15 * 60 * 1000
 };
 
-export default class TimerModeSelection extends React.Component<NavigationScreenProps, TimerModeSelectionState> {
+export default class TimerModeSelection extends React.Component<NavigationScreenProps> {
 
-	static navigationOptions = {
+	static navigationOptions = { };
 
-	};
-
-	private userCycles: Array<Omit<TimerData, 'selected'>> = [];
-
-	constructor(props: any) {
-		super(props);
-
-		this.state = {
-		};
-	}
+	private userCycles: Array<Omit<Timer, 'selected'>> = [];
 
 	componentDidMount() {
 		this.userCycles = [{
@@ -56,7 +43,7 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 			break: 0.5 * 60 * 1000
 		}];
 
-		getTimers().then(timers => {
+		getUserTimers().then(timers => {
 			if (timers.length > 0) {
 				this.userCycles = timers;
 			}
@@ -67,7 +54,7 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 	}
 
 	@bind
-	addTimerMode(values: NewTimerValues) {
+	private addTimerMode(values: NewTimerValues) {
 		this.userCycles.push(values);
 	}
 
@@ -90,8 +77,8 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 		updateTimers(
 			this.userCycles
 			// timers with id are the ones already in DB
-				.filter((c) => !c.id)
-				.map((c, i) => Object.assign(c, { selected: values.timerSelection === i }))
+				.filter(c => !c.id)
+				.map<Timer>((c, i) => Object.assign(c, { selected: values.timerSelection === i }))
 		).then(() => {
 			this.props.navigation.state.params!.setTimerMode(timerMode);
 			this.props.navigation.navigate('Timer');

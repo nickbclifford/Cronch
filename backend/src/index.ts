@@ -11,6 +11,7 @@ const sequelize = new Sequelize({
 
 import battlePlanRouter from './routes/battlePlanTask';
 import questionnaireRouter from './routes/questionnaireResponse';
+import timerRouter from './routes/timer';
 import timeslotRouter from './routes/timeslot';
 import userRouter from './routes/user';
 
@@ -30,6 +31,7 @@ import { jwtMiddleware } from './utils';
 
 	app.use('/battle-plan-tasks', battlePlanRouter);
 	app.use('/questionnaire-response', questionnaireRouter);
+	app.use('/timers', timerRouter);
 	app.use('/timeslot', timeslotRouter);
 	app.use('/user', userRouter);
 

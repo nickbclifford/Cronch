@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import PureChart from 'react-native-pure-chart';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { getUserTimeslots } from '../common/User';
@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
 	}
 });
 
+// noinspection JSUnusedLocalSymbols
 const mockData = [
 	{
 		id: 34,
