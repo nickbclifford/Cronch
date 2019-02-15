@@ -6,12 +6,12 @@ import { Alert, Picker, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
+import CronchyUser from '../components/CronchyUser';
 import MyMICDS from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, PRIMARY, typography } from '../common/StyleGuide';
 import { changeUserInfo, getUser, User } from '../common/User';
 import { handleFieldChangeFactory } from '../common/Utils';
-import Hamburger from '../components/Hamburger';
 import Question from '../components/Question';
 
 interface ProfileState {
@@ -194,6 +194,15 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 			</SafeAreaView>
 		);
 	}
+
+	// render() {
+	// 	return (
+	// 		<SafeAreaView style={styles.safeArea}>
+	// 			<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
+	// 			<CronchyUser user={MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : null} />
+	// 		</SafeAreaView>
+	// 	);
+	// }
 
 }
 

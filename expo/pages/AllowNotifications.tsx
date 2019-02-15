@@ -6,6 +6,7 @@ import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import { Expression, Skin } from '../common/AvatarTypes';
+import { getNotificationPermissions, submitNotificationToken } from '../common/NotificationToken';
 import { components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
 import Cronchy from '../components/Cronchy';
 
@@ -27,16 +28,14 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 	@bind
 	async askForPermission() {
 		this.setState({ asking: true });
-		const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+		const status = await getNotificationPermissions();
 		console.log('status after ask', status);
 		if (status !== 'granted') {
 			await AsyncStorage.setItem('deniedNotifications', 'true');
 			return this.continue();
 		}
 		const token = await Notifications.getExpoPushTokenAsync();
-
-		/** @todo Save Expo push token in backend  */
-
+		await submitNotificationToken(token);
 		this.continue();
 	}
 
