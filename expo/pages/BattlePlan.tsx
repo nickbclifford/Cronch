@@ -46,19 +46,18 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 	}
 
 	async componentDidMount() {
-		console.log('component did mount');
-		const asked = this.props.navigation.getParam('askedNotifications');
+		// const asked = this.props.navigation.getParam('askedNotifications');
 
-		console.log('asekd?', asked);
-
-		if (asked === undefined) {
-			const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-			if (status !== 'granted') {
-				this.props.navigation.setParams({
-					askedNotifications: false
-				});
-			}
-		}
+		// console.log('asekd?', asked);
+		//
+		// if (asked === undefined) {
+		// 	const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+		// 	if (status !== 'granted') {
+		// 		this.props.navigation.setParams({
+		// 			askedNotifications: false
+		// 		});
+		// 	}
+		// }
 		this.updateHeader();
 	}
 
@@ -90,8 +89,9 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 	@bind
 	private async navigateToTimer(assignment: Task) {
 		const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-		const deniedNotifications = await AsyncStorage.getItem('deniedNotifications') === 'true';
-		if (status === 'granted' || deniedNotifications) {
+		console.log('battle plan notif status', status);
+		// const deniedNotifications = await AsyncStorage.getItem('deniedNotifications') === 'true';
+		if (true || status === 'granted') {
 			this.props.navigation.navigate('Timer', { assignment });
 		} else {
 			this.props.navigation.navigate('AllowNotifications', { redirectTo: 'BattlePlan' });

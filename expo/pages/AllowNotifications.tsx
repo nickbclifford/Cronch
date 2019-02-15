@@ -5,9 +5,9 @@ import { AsyncStorage, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
+import { Expression, Skin } from '../common/AvatarTypes';
 import { components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
 import Cronchy from '../components/Cronchy';
-import { Expression, Skin } from '../common/AvatarTypes';
 
 interface AllowNotificationsState {
 	asking: boolean;
@@ -28,6 +28,7 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 	async askForPermission() {
 		this.setState({ asking: true });
 		const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+		console.log('status after ask', status);
 		if (status !== 'granted') {
 			await AsyncStorage.setItem('deniedNotifications', 'true');
 			return this.continue();
