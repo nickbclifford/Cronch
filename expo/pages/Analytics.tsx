@@ -11,9 +11,15 @@ import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
 import Hamburger from '../components/Hamburger';
 
-interface ChartDataPoint {
+interface PieChartDataPoint {
 	label: string;
 	value: number;
+	color: string;
+}
+
+interface LineChartDataPoint {
+	seriesName: string;
+	data: any[];
 	color: string;
 }
 
@@ -24,7 +30,8 @@ interface AnalyticsState {
 	weeklyTotal: number;
 	dailyTimes: Timeslot[];
 	dailyTotal: number;
-	chartData: ChartDataPoint[];
+	pieChartData: PieChartDataPoint[];
+	lineChartData: LineChartDataPoint[];
 }
 
 export default class Analytics extends React.Component<NavigationScreenProps, AnalyticsState> {
@@ -38,7 +45,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		this.state = {
 			times: [],
 			classes: [],
-			chartData: [
+			pieChartData: [
 				{
 					value: 50,
 					label: 'No Work!',
@@ -48,7 +55,8 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			weeklyTimes: [],
 			weeklyTotal: 0,
 			dailyTimes: [],
-			dailyTotal: 0
+			dailyTotal: 0,
+			lineChartData: []
 		};
 	}
 
@@ -56,13 +64,30 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		return date1.getDate() === date2.getDate();
 	}
 
-	private calculateHourDiff(start: Date, end: Date): number {
+	private calcHourDiff(start: Date, end: Date): number {
 		return moment.duration(moment(end).diff(start)).as('hours');
+	}
+
+	private calcMinuteDiff(start: Date, end: Date): number {
+		return moment.duration(moment(end).diff(start)).as('minutes');
 	}
 
 	private pickRandomColor() {
 		const colors: string[] = Object.values(PRIMARY);
 		return colors[Math.floor(Math.random() * colors.length)];
+	}
+
+	private convertDay(day: number) {
+		switch (day) {
+			case 0: return 'Sunday';
+			case 1: return 'Monday';
+			case 2: return 'Tuesday';
+			case 3: return 'Wednesday';
+			case 4 :return 'Thursday';
+			case 5: return 'Friday';
+			case 6: return 'Saturday';
+			default: return 'Day'
+		}
 	}
 
 	private makeWeeklyData() {
@@ -77,17 +102,50 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			}
 		}
 
+		// need to get available days of the week
+		/*let availableDates: number[] = [];
+		weeklyTimes.forEach(time => {
+			if (availableDates.indexOf(time.start.getDay()) === -1) {
+				// new day found, push it
+				availableDates.push(time.start.getDay());
+			}
+		})*/
+
+		// now that we have the available days of the week, we need to create the chartData
+		// we need one series that has each day
+		let chartData: LineChartDataPoint[] = [];
+
+		let thisWeekData: LineChartDataPoint = {
+			seriesName: 'Series',
+			data: [],
+			color: this.pickRandomColor()
+		}
+
+		for (let i = 0; i < 7; i++) {
+			// i is day of the week
+			let dayTotal = 0;
+
+			weeklyTimes.forEach(time => {
+				if (time.end !== null && time.start.getDay() === i) {
+					dayTotal += this.calcHourDiff(time.start, time.end);
+				}
+			})
+			thisWeekData.data.push({x: this.convertDay(i), y: (dayTotal > 0)? parseFloat(dayTotal.toFixed(2)): dayTotal});
+		}
+
+		chartData.push(thisWeekData);
+
 		let total = 0;
 
 		for (const time of weeklyTimes) {
 			if (time.end != null) {
-				total += this.calculateHourDiff(time.start, time.end);
+				total += this.calcHourDiff(time.start, time.end);
 			}
 		}
 
 		total /= weeklyTimes.length; // get an average
 
-		this.setState({ weeklyTimes, weeklyTotal: total });
+		this.setState({ weeklyTimes, weeklyTotal: total, lineChartData: chartData });
 	}
 
 	private makeDailyData() {
@@ -105,7 +163,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 
 		for (const time of dailyTimes) {
 			if (time.end != null) {
-				total += this.calculateHourDiff(time.start, time.end);
+				total += this.calcHourDiff(time.start, time.end);
 			}
 		}
 
@@ -114,7 +172,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		// now find the classes
 		const classes: string[] = [];
 		for (const slot of dailyTimes) {
-			if (!classes.includes(slot.classId)) {
+			if (slot.end !== null && !classes.includes(slot.classId)) {
 				// new class found, push it
 				classes.push(slot.classId);
 			}
@@ -124,14 +182,16 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 
 		this.setState({ classes });
 
-		const chartData: ChartDataPoint[] = [];
+		const chartData: PieChartDataPoint[] = [];
 		// create the chartData for the day
 		for (const cl of classes) {
 			console.log(cl);
 			let totalHours = 0;
 			for (const slot of dailyTimes) {
 				if (slot.end != null && slot.classId === cl) {
-					totalHours += this.calculateHourDiff(slot.start, slot.end);
+					const diff = Math.round(this.calcHourDiff(slot.start, slot.end));
+					console.log(`hour diff: ${diff}`);
+					totalHours += (diff === 0)? this.calcMinuteDiff(slot.start, slot.end): diff;
 				}
 			}
 
@@ -145,7 +205,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		console.log(chartData);
 
 		if (chartData.length > 0) {
-			this.setState({ chartData });
+			this.setState({ pieChartData: chartData });
 		}
 	}
 
@@ -154,7 +214,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			let biggestClass = 0;
 
 			for (let i = 0; i < this.state.dailyTimes.length; i++) {
-				if (this.calculateHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) > this.calculateHourDiff(this.state.dailyTimes[biggestClass].start, this.state.dailyTimes[biggestClass].end)) {
+				if (this.state.dailyTimes[i].end !== null && this.calcHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) > this.calcHourDiff(this.state.dailyTimes[biggestClass].start, this.state.dailyTimes[biggestClass].end)) {
 					// new class found, update index
 					biggestClass = i;
 				}
@@ -171,7 +231,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			let smallestClass = 0;
 
 			for (let i = 0; i < this.state.dailyTimes.length; i++) {
-				if (this.calculateHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) < this.calculateHourDiff(this.state.dailyTimes[smallestClass].start, this.state.dailyTimes[smallestClass].end)) {
+				if (this.state.dailyTimes[i].end !== null && this.calcHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) < this.calcHourDiff(this.state.dailyTimes[smallestClass].start, this.state.dailyTimes[smallestClass].end)) {
 					// new class found, update index
 					smallestClass = i;
 				}
@@ -191,16 +251,22 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 	componentWillMount() {
 		getUserTimeslots().then(timeslots => {
 			this.setState({ times: timeslots });
+			console.log(timeslots);
 			this.makeWeeklyData();
 			this.makeDailyData();
 		});
+		//this.updateData();
 	}
 
 	@bind
 	private updateData() {
 		// showEvenNumberXaxisLabel={false}
-		this.makeWeeklyData();
-		this.makeDailyData();
+		getUserTimeslots().then(timeslots => {
+			this.setState({ times: timeslots });
+			console.log(timeslots);
+			this.makeWeeklyData();
+			this.makeDailyData();
+		});
 	}
 
 	render() {
@@ -213,7 +279,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 					<Text style={styles.headerTitle}>Today (in hours)</Text>
 					<PureChart
 						type='pie'
-						data={this.state.chartData}
+						data={this.state.pieChartData}
 						width={'100%'}
 						height={400}
 					/>
@@ -237,10 +303,10 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 					</View>
 				</View>
 				<View style={styles.verticalContainer}>
-					<Text style={styles.headerTitle}>This week (in minutes)</Text>
+					<Text style={styles.headerTitle}>This week (in hours)</Text>
 					<PureChart
 						type='bar'
-						data={mockData}
+						data={this.state.lineChartData}
 						width={'100%'}
 						height={200}
 						showEvenNumberXaxisLabel={false}
