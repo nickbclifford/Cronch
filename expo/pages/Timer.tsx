@@ -102,9 +102,17 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 			});
 
 			// Only pause when user is not on break
-			if (!this.state.onBreak) {
+			if (!this.state.onBreak && this.state.modeSelection !== -1) {
 				console.log('buh', flipped);
 				this.setState({ paused: !flipped });
+			}
+			
+			// If user is using manual, switch to break when phone faces upward
+			if (this.state.modeSelection === -1) {
+				if (flipped) {
+					this.setState({ paused: false });
+				}
+				this.setState({ onBreak: !flipped });
 			}
 		});
 		this.prepareSound();
@@ -147,14 +155,15 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 	}
 
 	@bind
-	private setTimerMode(mode: { maxWorkTime: number, maxBreakTime: number }) {
+	private setTimerMode(mode: { maxWorkTime: number, maxBreakTime: number, modeSelection: number }) {
 		this.setState({
 			maxWorkTime: mode.maxWorkTime,
 			maxBreakTime: mode.maxBreakTime,
 			workTimeLeft: mode.maxWorkTime,
 			breakTimeLeft: mode.maxBreakTime,
 			onBreak: false,
-			paused: !this.state.flipped
+			paused: !this.state.flipped,
+			modeSelection: mode.modeSelection
 		});
 	}
 
@@ -304,7 +313,7 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 
 	@bind
 	private formatTime(time: number) {
-		return moment(this.state.workTimeLeft, 'x').format('mm:ss');
+		return moment(time, 'x').format('mm:ss');
 	}
 
 	@bind
@@ -320,32 +329,18 @@ export default class Timer extends React.Component<NavigationScreenProps, TimerS
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<View style={styles.displayAssignments}>
-					{/* Use the DisplayTask component */}
-					{/* <DisplayAssignments
-						navigation={this.props.navigation}
-						assignments={[this.state.assignment]}
-						headers={false}
-						sort={false}
-						reorder={false}
-						paddingTop={0}
-						paddingRight={8}
-						paddingLeft={8}
-						paddingBottom={0}
-						onAssignmentClick={this.navigateToAssignmentDetails}
-					/> */}
-					{/* <DisplayTask task={this.state.assignment}/> */}
+					{this.state.onBreak ?
+						<Text>Break</Text> :
+						<Text>Work</Text>
+					}
 				</View>
-				{/* <Button
-					title='Create Battle Plan'
-					onPress={this.navigateToBattlePlan}
-				/> */}
 
 				<View style={styles.timerContainer}>
 					<View style={styles.timer}>
-					{!this.state.onBreak ?
-						(<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>) :
-						(<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.breakTimeLeft)}</Text>)
-					}
+					{/* {!this.state.onBreak ? */}
+						<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>
+						<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.breakTimeLeft)}</Text>
+					{/* } */}
 					</View>
 				</View>
 

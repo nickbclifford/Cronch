@@ -75,18 +75,23 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 	private setTimerMode(values: TimerSelectionValues) {
 		let timerMode = {
 			maxWorkTime: 0,
-			maxBreakTime: 0
+			maxBreakTime: 0,
+			modeSelection: -1
 		};
 
 		if (values.timerSelection !== -1) {
 			timerMode = {
 				maxWorkTime: this.userCycles[values.timerSelection].work,
-				maxBreakTime: this.userCycles[values.timerSelection].break
+				maxBreakTime: this.userCycles[values.timerSelection].break,
+				modeSelection: values.timerSelection
 			};
 		}
 
 		updateTimers(
-			this.userCycles.map((c, i) => Object.assign(c, { selected: values.timerSelection === i }))
+			this.userCycles
+			// timers with id are the ones already in DB
+				.filter((c) => !c.id)
+				.map((c, i) => Object.assign(c, { selected: values.timerSelection === i }))
 		).then(() => {
 			this.props.navigation.state.params!.setTimerMode(timerMode);
 			this.props.navigation.navigate('Timer');

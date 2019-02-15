@@ -9,7 +9,7 @@ export interface User {
 	timers: TimerData[];
 }
 
-export interface TimerData { work: number; break: number; selected: boolean; }
+export interface TimerData { id?: number, work: number; break: number; selected?: boolean; }
 
 export function registerUser() {
 	return fetchWithJwt('/user', {
@@ -44,7 +44,7 @@ export function updateTimers(timers: TimerData[]) {
 }
 
 export function getTimers() {
-	return fetchWithJwt<TimerData[]>('/user/timeslots', {
+	return fetchWithJwt<TimerData[]>('/user/timers', {
 		method: 'GET'
 	});
 }

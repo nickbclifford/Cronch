@@ -64,19 +64,21 @@ router.post('/timers', requireLoggedIn, (req, res) => {
 	console.log(timers);
 	if (typeof timers !== 'undefined') {
 		if (!timers.length) {
-			return Promise.reject(new APIError('Invalid timer value', 400));
+			return successResponse(res);
 		}
 	}
 
-	return Timer.bulkCreate(timers.map((timer: any) => Object.assign(timer, { user: req.authorizedUser! })))
+	const buh: Timer[] = timers.map((timer: any) => Object.assign(timer, { user: req.authorizedUser! }));
+	console.log(buh)
+	return Timer.bulkCreate(buh)
 		.then(() => successResponse(res))
 		.catch(err => errorResponse(res, err));
 });
 
 router.get('/timers', requireLoggedIn, (req, res) => {
-	User.findByPk(req.authorizedUser!, { include: [Timer] })
-	.then(user => {console.log(user); return successResponse(res, user!.timers.map(t => t.toJSON())); })
-	.catch(err => errorResponse(res, err));
+	User.findByPk(req.authorizedUser!, { include: [Timer, Timeslot] })
+		.then(user => successResponse(res, user!.timers.map(t => t.toJSON())))
+		.catch(err => errorResponse(res, err));
 });
 
 export default router;
