@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import './App.css';
 import logo from './logo.svg';
+import { Link } from 'react-router-dom';
 
-class App extends Component {
+class App extends React.Component {
 	render() {
 		return (
 			<div className='App'>
@@ -19,6 +20,7 @@ class App extends Component {
 					>
 						Learn React
 					</a>
+					<Link to='/other-page'>buh</Link>
 				</header>
 			</div>
 		);
