@@ -1,8 +1,7 @@
 import bind from 'bind-decorator';
-import { Notifications, Permissions } from 'expo';
+import { Permissions } from 'expo';
 import * as React from 'react';
 import {
-	AsyncStorage,
 	Button as NativeButton,
 	Dimensions,
 	ImageStyle,
