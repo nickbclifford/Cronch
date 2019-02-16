@@ -17,7 +17,7 @@ export default class BattlePlanTask extends Model<BattlePlanTask> {
 
 	@Unique
 	@Column
-	taskId!: string; // Object ID or task title
+	taskId!: string; // Canvas ID or task title
 
 	@BelongsTo(() => User)
 	userObject!: User;

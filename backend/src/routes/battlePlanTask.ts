@@ -11,7 +11,7 @@ router.post('/', requireLoggedIn, (req, res) => {
 		return;
 	}
 
-	const tasks = taskIds.map((taskId, index) => new BattlePlanTask({
+	const tasks = taskIds.map((taskId, index) => ({
 		user: req.authorizedUser!,
 		planOrder: index,
 		taskId

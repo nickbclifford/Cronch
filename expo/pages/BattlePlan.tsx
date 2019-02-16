@@ -1,8 +1,7 @@
 import bind from 'bind-decorator';
-import { Notifications, Permissions } from 'expo';
+import { Permissions } from 'expo';
 import * as React from 'react';
 import {
-	AsyncStorage,
 	Button as NativeButton,
 	Dimensions,
 	ImageStyle,
@@ -91,7 +90,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
 		console.log('battle plan notif status', status);
 		// const deniedNotifications = await AsyncStorage.getItem('deniedNotifications') === 'true';
-		if (status === 'undetermined') {
+		if (false && status === 'undetermined') {
 			this.props.navigation.navigate('AllowNotifications', { redirectTo: 'BattlePlan' });
 		} else {
 			this.props.navigation.navigate('Timer', { assignment });

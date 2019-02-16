@@ -1,7 +1,6 @@
-import {
-	BeforeFindAfterExpandIncludeAll,
-	Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import BattlePlanTask from './BattlePlanTask';
+import NotificationToken from './NotificationToken';
 import Response from './QuestionnaireResponse';
 import Timer from './Timer';
 import Timeslot from './Timeslot';
@@ -40,4 +39,7 @@ export default class User extends Model<User> {
 
 	@HasMany(() => BattlePlanTask)
 	battlePlanTasks!: BattlePlanTask[];
+
+	@HasMany(() => NotificationToken)
+	notificationTokens!: NotificationToken[];
 }
