@@ -1,7 +1,7 @@
 import bind from 'bind-decorator';
 import { WebBrowser } from 'expo';
 import * as React from 'react';
-import { Alert, ImageBackground, ImageStyle, StyleSheet, Text, View } from 'react-native';
+import { Alert, ImageBackground, ImageStyle, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
@@ -66,6 +66,7 @@ export default class CheckUrls extends React.Component<NavigationScreenProps, Ch
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.container}>
 					<Text style={[typography.h2, styles.error]}>
 						Looks like you haven't saved your {/**/}

@@ -1,12 +1,24 @@
 import bind from 'bind-decorator';
+import { Notifications, Permissions } from 'expo';
 import * as React from 'react';
-import { Button as NativeButton, StyleSheet, View } from 'react-native';
+import {
+	AsyncStorage,
+	Button as NativeButton,
+	Dimensions,
+	ImageStyle,
+	StatusBar,
+	StyleProp,
+	StyleSheet,
+	Text,
+	View
+} from 'react-native';
 import { Button } from 'react-native-elements';
+import Image from 'react-native-scalable-image';
 import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { NEUTRAL, SUCCESS } from '../common/StyleGuide';
+import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import DisplayAssignments from '../components/DisplayAssignments';
 
@@ -33,7 +45,19 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		this.state = { editMode: false };
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
+		// const asked = this.props.navigation.getParam('askedNotifications');
+
+		// console.log('asekd?', asked);
+		//
+		// if (asked === undefined) {
+		// 	const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+		// 	if (status !== 'granted') {
+		// 		this.props.navigation.setParams({
+		// 			askedNotifications: false
+		// 		});
+		// 	}
+		// }
 		this.updateHeader();
 	}
 
@@ -63,8 +87,15 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 	}
 
 	@bind
-	private navigateToTimer(assignment: Task) {
-		this.props.navigation.navigate('Timer', { assignment });
+	private async navigateToTimer(assignment: Task) {
+		const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+		console.log('battle plan notif status', status);
+		// const deniedNotifications = await AsyncStorage.getItem('deniedNotifications') === 'true';
+		if (status === 'undetermined') {
+			this.props.navigation.navigate('AllowNotifications', { redirectTo: 'BattlePlan' });
+		} else {
+			this.props.navigation.navigate('Timer', { assignment });
+		}
 	}
 
 	@bind
@@ -75,6 +106,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 	render() {
 		return (
 			<View style={styles.container}>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.addAssignmentsContainer}>
 					<Button
 						title='Add Assignments'
@@ -82,6 +114,16 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						buttonStyle={styles.addAssignmentsButton}
 						onPress={this.navigateToCreatePlan}
 					/>
+					{this.props.assignmentContext.assignments.length === 0 && (
+						<View style={styles.guideContainer}>
+							<Image
+								source={require('../assets/apples/preset/hewwo-uweseres.png')}
+								width={Dimensions.get('window').width * 0.65}
+								style={styles.guideImage as StyleProp<ImageStyle>}
+							/>
+							<Text style={[typography.h3, styles.guideText]}>Add an Assignment{'\n'}to get started!</Text>
+						</View>
+					)}
 				</View>
 				{this.state.editMode && (
 					<DisplayAssignments
@@ -129,10 +171,22 @@ const styles = StyleSheet.create({
 		zIndex: 1000,
 		top: 16,
 		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'center'
+		alignItems: 'center'
 	},
 	addAssignmentsButton: {
 		backgroundColor: SUCCESS[500]
+	},
+	guideContainer: {
+		display: 'flex',
+		alignItems: 'center'
+	},
+	guideImage: {
+		marginTop: 128,
+		marginBottom: 16,
+		opacity: 0.65
+	},
+	guideText: {
+		textAlign: 'center',
+		color: NEUTRAL[500]
 	}
 });

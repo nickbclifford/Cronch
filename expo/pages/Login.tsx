@@ -76,7 +76,7 @@ export default class Login extends React.Component<NavigationScreenProps> {
 			>
 				{props => (
 					<ImageBackground source={require('../assets/mymicds/blur.jpg')} style={styles.container}>
-						<StatusBar barStyle='light-content' />
+						<StatusBar barStyle='dark-content' animated={true} />
 						<View style={styles.colorOverlay} />
 						{/*<Image source={require('../assets/mymicds/logo.png')} style={styles.logo} />*/}
 						<Text style={[typography.h1, styles.title]}>Login to MyMICDS.net</Text>

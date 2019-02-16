@@ -1,13 +1,13 @@
 import bind from 'bind-decorator';
 import { Formik } from 'formik';
 import * as React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, {	WithAssignmentContextProps } from '../../common/AssignmentContext';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
-import { components, textInputPlaceholderColor, typography } from '../../common/StyleGuide';
+import { components, PRIMARY, textInputPlaceholderColor, typography } from '../../common/StyleGuide';
 import { createCustomTask } from '../../common/Task';
 
 interface CustomAssignmentsForm {
@@ -42,30 +42,33 @@ class CustomAssignments extends React.Component<NavigationScreenProps & WithAssi
 
 	render() {
 		return (
-			<Formik
-				initialValues={defaultFormValues}
-				onSubmit={this.addCustomTaskToPlan}
-			>
-				{props => (
-					<View style={styles.container}>
-						<Text style={typography.h2}>Custom Event Title</Text>
-						<TextInput
-							placeholder='Ex. College Apps'
-							onChangeText={props.handleChange('taskName')}
-							onBlur={props.handleBlur('taskName')}
-							value={props.values.taskName}
-							style={[typography.body, components.textInput, styles.input]}
-							placeholderTextColor={textInputPlaceholderColor}
-						/>
-						<Button
-							title='Add to Plan'
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-							onPress={props.handleSubmit as any}
-						/>
-					</View>
-				)}
-			</Formik>
+			<View>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
+				<Formik
+					initialValues={defaultFormValues}
+					onSubmit={this.addCustomTaskToPlan}
+				>
+					{props => (
+						<View style={styles.container}>
+							<Text style={typography.h2}>Custom Event Title</Text>
+							<TextInput
+								placeholder='Ex. College Apps'
+								onChangeText={props.handleChange('taskName')}
+								onBlur={props.handleBlur('taskName')}
+								value={props.values.taskName}
+								style={[typography.body, components.textInput, styles.input]}
+								placeholderTextColor={textInputPlaceholderColor}
+							/>
+							<Button
+								title='Add to Plan'
+								buttonStyle={components.buttonStyle}
+								titleStyle={components.buttonText}
+								onPress={props.handleSubmit as any}
+							/>
+						</View>
+					)}
+				</Formik>
+			</View>
 		);
 	}
 
