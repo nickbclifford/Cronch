@@ -74,8 +74,10 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		this.state = {
 			maxBreakTime: 15 * 60 * 1000,
 			maxWorkTime: 45 * 60 * 1000,
-			workTimeLeft: 0,
-			breakTimeLeft: 0,
+			workTimeLeft: 45 * 60 * 1000,
+			breakTimeLeft: 15 * 60 * 1000,
+			// workTimeLeft: 10 * 1000,
+			// breakTimeLeft: 10 * 1000,
 			onBreak: false,
 			paused: true,
 			alarmSelection: 0,
@@ -136,23 +138,25 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				console.log(res.user);
 				this.user = res.user;
 
-				this.setState({
-					alarmSelection: res.user.alarmSelection,
-					modeSelection: res.user.timerSelection
-				});
+				// YUH
+				// this.setState({
+				// 	alarmSelection: res.user.alarmSelection,
+				// 	modeSelection: res.user.timerSelection
+				// });
 			})
 			.then(() => getUserTimers())
 			.then(timers => {
 				console.log(timers);
 				const selectedTimer = timers[this.user.timerSelection];
 
-				if (selectedTimer) {
-					this.setTimerMode({
-						maxBreakTime: selectedTimer.break,
-						maxWorkTime: selectedTimer.work,
-						modeSelection: this.user.timerSelection
-					});
-				}
+				// YUH
+				// if (selectedTimer) {
+				// 	this.setTimerMode({
+				// 		maxBreakTime: selectedTimer.break,
+				// 		maxWorkTime: selectedTimer.work,
+				// 		modeSelection: this.user.timerSelection
+				// 	});
+				// }
 			})
 			.catch(e => {
 				Alert.alert('Error getting user', e.message);
@@ -212,13 +216,13 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	private async playAlarm(soundObject: Audio.Sound) {
 		// get alarm preference from backend
 		try {
-			const soundFile = alarmList[this.state.alarmSelection].file;
+			const soundFile = alarmList[0].file;
 			await soundObject.loadAsync(soundFile);
 			await soundObject.setIsLoopingAsync(true);
 			await soundObject.setPositionAsync(0);
 			await soundObject.playAsync();
 		} catch (error) {
-			Alert.alert('sound buh', error.message);
+			Alert.alert('Error Playing Sound', error.message);
 		}
 	}
 
@@ -239,7 +243,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				this.vibratePhone();
 				Alert.alert(
 					'Time for work!',
-					'Yuhyuhyuh',
+					'',
 					[
 						{ text: 'Continue', onPress: () => {
 							this.setState({
@@ -267,7 +271,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				this.vibratePhone();
 				Alert.alert(
 					'Time for a break!',
-					'Please select an option',
+					`Continue for your ${this.state.maxBreakTime / 60000}-minute break`,
 					[
 						{ text: 'Continue', onPress: () => {
 							this.setState({
@@ -480,6 +484,12 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 					)}
 				</View>
 				<View style={styles.actions}>
+					{/*<Button
+						title='Change Timer'
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
+						onPress={this.addCustom}
+					/>*/}
 					<Button
 						title='Change Assignment'
 						containerStyle={styles.changeAssignment}

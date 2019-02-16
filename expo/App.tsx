@@ -46,8 +46,7 @@ export default class App extends React.Component<{}, GlobalAppState> {
 
 	componentDidMount() {
 		MyMICDS.errors.subscribe(err => {
-			console.log('buh');
-			Alert.alert('Error', err.message);
+			Alert.alert('MyMICDS Error', err.message);
 		});
 
 		combineLatest(
