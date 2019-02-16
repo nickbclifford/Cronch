@@ -1,4 +1,3 @@
-import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import { Audio, PlaybackSource } from 'expo';
 import moment from 'moment';
@@ -16,6 +15,7 @@ import { Timer } from '../common/Timer';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { getUser, getUserTimers, User } from '../common/User';
 import { Omit } from '../common/Utils';
+import DisplayAssignment from '../components/DisplayAssignment';
 import DisplayTask from '../components/DisplayTask';
 
 export interface TimerState {
@@ -35,28 +35,32 @@ export interface TimerState {
 
 export default class HomeorkTimer extends React.Component<NavigationScreenProps, TimerState> {
 
-	static navigationOptions = ({ navigation }) => {
-		const task: Task = navigation.getParam('assignment');
+	// static navigationOptions = ({ navigation }) => {
+	// 	const task: Task = navigation.getParam('assignment');
+	//
+	// 	const navigateToBattlePlan = () => {
+	// 		navigation.navigate('BattlePlan');
+	// 	};
+	//
+	// 	return {
+	// 		headerStyle: {
+	// 			backgroundColor: task.class.color,
+	// 			height: 144
+	// 		},
+	// 		headerTintColor: task.class.textDark ? NEUTRAL[900] : NEUTRAL[100],
+	// 		headerTitle: <DisplayTask task={navigation.getParam('assignment')}/>,
+	// 		headerLeft: (
+	// 			<TouchableOpacity onPress={navigateToBattlePlan} style={styles.backButton}>
+	// 				<Icon name='angle-left' type='font-awesome' color={task.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}/>
+	// 			</TouchableOpacity>
+	// 		)
+	// 		// headerLeftContainerStyle: styles.backButtonContainer
+	// 	};
+	// }
 
-		const navigateToBattlePlan = () => {
-			navigation.navigate('BattlePlan');
-		};
-
-		return {
-			headerStyle: {
-				backgroundColor: task.class.color,
-				height: 144
-			},
-			headerTintColor: task.class.textDark ? NEUTRAL[900] : NEUTRAL[100],
-			headerTitle: <DisplayTask task={navigation.getParam('assignment')}/>,
-			headerLeft: (
-				<TouchableOpacity onPress={navigateToBattlePlan} style={styles.backButton}>
-					<Icon name='angle-left' type='font-awesome' color={task.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}/>
-				</TouchableOpacity>
-			)
-			// headerLeftContainerStyle: styles.backButtonContainer
-		};
-	}
+	static navigationOptions = {
+		header: null
+	};
 
 	private interval!: NodeJS.Timer;
 
@@ -344,7 +348,7 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 	}
 
 	@bind
-	private navigateToAssignmentDetails(assignment: CanvasEvent) {
+	private navigateToAssignmentDetails(assignment: Task) {
 		this.props.navigation.navigate('AssignmentDetails', { assignment });
 	}
 
@@ -362,51 +366,90 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 	private cancelVibrate() {
 		Vibration.cancel();
 	}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<View style={styles.displayAssignments}>
-					{this.state.onBreak ?
-						<Text>Break</Text> :
-						<Text>Work</Text>
-					}
-				</View>
-
-				<View style={styles.timerContainer}>
-					<View style={styles.timer}>
-					{/* {!this.state.onBreak ? */}
-						<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>
-						<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.breakTimeLeft)}</Text>
-					{/* } */}
-					</View>
-				</View>
-
-				<Button
-					title='Add Custom'
-					onPress={this.addCustom}
-					buttonStyle={components.buttonStyle}
-					titleStyle={components.buttonText}
+				<DisplayAssignment
+					assignment={this.state.assignment}
+					rightIcon='info-circle'
+					onAssignmentClick={this.navigateToAssignmentDetails}
 				/>
-
-				<Text>{this.state.paused.toString()}</Text>
-				<Text>{this.state.flipped.toString()}</Text>
-
-				<View style={styles.flipNotification}>
-					{ this.state.paused && (
-						<Button
-							title='Flip phone to start your timer!'
-							style={styles.flipNotificationText}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-					) }
+				<View style={styles.actions}>
+					<Button
+						title='Change Assignment'
+						containerStyle={styles.changeAssignment}
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
+					/>
+					<Button
+						title='Complete Assignment'
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
+					/>
 				</View>
 			</SafeAreaView>
 		);
 	}
+
+	// render() {
+	// 	return (
+	// 		<SafeAreaView style={styles.safeArea}>
+	// 			<View style={styles.displayAssignments}>
+	// 				{this.state.onBreak ?
+	// 					<Text>Break</Text> :
+	// 					<Text>Work</Text>
+	// 				}
+	// 			</View>
+	//
+	// 			<View style={styles.timerContainer}>
+	// 				<View style={styles.timer}>
+	// 				{/* {!this.state.onBreak ? */}
+	// 					<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.workTimeLeft)}</Text>
+	// 					<Text style={[typography.h1, styles.timerText]}>{this.formatTime(this.state.breakTimeLeft)}</Text>
+	// 				{/* } */}
+	// 				</View>
+	// 			</View>
+	//
+	// 			<Button
+	// 				title='Add Custom'
+	// 				onPress={this.addCustom}
+	// 				buttonStyle={components.buttonStyle}
+	// 				titleStyle={components.buttonText}
+	// 			/>
+	//
+	// 			<Text>{this.state.paused.toString()}</Text>
+	// 			<Text>{this.state.flipped.toString()}</Text>
+	//
+	// 			<View style={styles.flipNotification}>
+	// 				{ this.state.paused && (
+	// 					<Button
+	// 						title='Flip phone to start your timer!'
+	// 						style={styles.flipNotificationText}
+	// 						buttonStyle={components.buttonStyle}
+	// 						titleStyle={components.buttonText}
+	// 					/>
+	// 				) }
+	// 			</View>
+	// 		</SafeAreaView>
+	// 	);
+	// }
 }
 
 const styles = StyleSheet.create({
+	safeArea: {
+		height: '100%',
+		padding: 8,
+		display: 'flex',
+		justifyContent: 'space-between'
+	},
+	actions: {},
+	changeAssignment: {
+		marginBottom: 8
+	}
+});
+
+const oldStyles = StyleSheet.create({
 	safeArea: {
 		height: '100%'
 	},

@@ -1,4 +1,3 @@
-import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import { WebBrowser } from 'expo';
 import * as React from 'react';
@@ -9,14 +8,15 @@ import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import withAssignmentContext, {	WithAssignmentContextProps } from '../common/AssignmentContext';
 import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
+import Task from '../common/Task';
 import { humanReadableTimeUntil } from '../common/Utils';
 
 interface NavigationParameters {
-	assignment: CanvasEvent;
+	assignment: Task;
 }
 
 interface AssignmentDetailsState {
-	assignment: CanvasEvent;
+	assignment: Task;
 }
 
 class AssignmentDetails extends React.Component<
