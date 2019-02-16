@@ -1,11 +1,13 @@
 import { Font } from 'expo';
 import * as React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import { combineLatest } from 'rxjs';
 import { filter, first } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
+import { NEUTRAL } from '../common/StyleGuide';
 import { getUser } from '../common/User';
 import { getMissingURLs } from '../common/Utils';
 
@@ -32,9 +34,9 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 			Font.loadAsync({
 				'Nunito-Light': require('../assets/Nunito/Nunito-Light.ttf'),
 				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf'),
-				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf'),
-				'Nunito-ExtraBold': require('../assets/Nunito/Nunito-ExtraBold.ttf'),
-				'Nunito-Black': require('../assets/Nunito/Nunito-Black.ttf')
+				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf')
+				// 'Nunito-ExtraBold': require('../assets/Nunito/Nunito-ExtraBold.ttf'),
+				// 'Nunito-Black': require('../assets/Nunito/Nunito-Black.ttf')
 			})
 		).subscribe(async ([mymicdsAuth]) => {
 			if (mymicdsAuth === null) {
@@ -48,7 +50,6 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 					getUser()
 				).subscribe(
 					([mymicdsUser, { user: cronchUser }]) => {
-						console.log('my con', mymicdsUser, cronchUser);
 						if (cronchUser === null) {
 							MyMICDS.auth.logout().subscribe({
 								error: err => Alert.alert('Logout Error', err.message),
@@ -71,7 +72,11 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text>Loading...</Text>
+				<Image
+					source={require('../assets/splash.png')}
+					resizeMode='contain'
+					style={styles.image}
+				/>
 			</View>
 		);
 	}
@@ -80,8 +85,12 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
+		width: '100%',
+		height: '100%',
+		backgroundColor: NEUTRAL[100]
+	},
+	image: {
+		width: '100%',
+		height: '100%'
 	}
 });

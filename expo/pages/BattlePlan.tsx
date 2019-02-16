@@ -17,7 +17,7 @@ import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import DisplayAssignments from '../components/DisplayAssignments';
 
@@ -90,7 +90,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
 		console.log('battle plan notif status', status);
 		// const deniedNotifications = await AsyncStorage.getItem('deniedNotifications') === 'true';
-		if (false && status === 'undetermined') {
+		if (status === 'undetermined') {
 			this.props.navigation.navigate('AllowNotifications', { redirectTo: 'BattlePlan' });
 		} else {
 			this.props.navigation.navigate('Timer', { assignment });
@@ -110,7 +110,8 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 					<Button
 						title='Add Assignments'
 						raised={true}
-						buttonStyle={styles.addAssignmentsButton}
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
 						onPress={this.navigateToCreatePlan}
 					/>
 					{this.props.assignmentContext.assignments.length === 0 && (
@@ -131,7 +132,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						headers={false}
 						sort={false}
 						reorder={true}
-						paddingTop={72}
+						paddingTop={80}
 						paddingRight={8}
 						paddingLeft={8}
 						paddingBottom={32}
@@ -145,7 +146,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						headers={false}
 						sort={false}
 						reorder={false}
-						paddingTop={72}
+						paddingTop={80}
 						paddingRight={8}
 						paddingLeft={8}
 						paddingBottom={32}

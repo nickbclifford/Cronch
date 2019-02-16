@@ -21,7 +21,10 @@ router.post('/', requireLoggedIn, (req, res) => {
 	BattlePlanTask.destroy({ where: { user: req.authorizedUser! } })
 		.then(() => BattlePlanTask.bulkCreate(tasks))
 		.then(() => successResponse(res))
-		.catch(err => errorResponse(res, err));
+		.catch(err => {
+			console.error(err);
+			errorResponse(res, err);
+		});
 });
 
 export default router;

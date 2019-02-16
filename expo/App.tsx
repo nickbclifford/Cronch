@@ -1,7 +1,7 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
 import { Alert } from 'react-native';
-import { combineLatest, Subject } from 'rxjs';
+import { combineLatest, Subject, Subscription } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 
 import { AssignmentContext, AssignmentContextType } from './common/AssignmentContext';
@@ -16,6 +16,7 @@ interface GlobalAppState extends AssignmentContextType { }
 export default class App extends React.Component<{}, GlobalAppState> {
 
 	savePlan = new Subject<Task[]>();
+	authSubscription?: Subscription;
 
 	constructor(props: {}) {
 		super(props);
@@ -49,27 +50,35 @@ export default class App extends React.Component<{}, GlobalAppState> {
 			Alert.alert('MyMICDS Error', err.message);
 		});
 
-		combineLatest(
-			MyMICDS.canvas.getEvents(),
-			getUserBattlePlanTasks()
-		).subscribe(
-			([canvasRes, tasks]) => {
-				if (!canvasRes.hasURL) { return; }
-				const events = canvasRes.events;
+		this.authSubscription = MyMICDS.auth.$.subscribe(
+			possiblyJwt => {
+				if (possiblyJwt) {
+					combineLatest(
+						MyMICDS.canvas.getEvents(),
+						getUserBattlePlanTasks()
+					).subscribe(
+						([canvasRes, tasks]) => {
+							if (!canvasRes.hasURL) { return; }
+							const events = canvasRes.events;
 
-				tasks.sort((a, b) => a.planOrder - b.planOrder);
+							tasks.sort((a, b) => a.planOrder - b.planOrder);
 
-				const assignments: Task[] = [];
-				for (const task of tasks) {
-					const assignment = events.find(e => e._id === task.taskId);
-					if (typeof assignment === 'undefined') {
-						assignments.push(createCustomTask(task.taskId));
-					} else {
-						assignments.push(assignment);
-					}
+							const assignments: Task[] = [];
+							for (const task of tasks) {
+								const assignment = events.find(e => e._id === task.taskId);
+								if (typeof assignment === 'undefined') {
+									assignments.push(createCustomTask(task.taskId));
+								} else {
+									assignments.push(assignment);
+								}
+							}
+
+							this.setState({ assignments });
+						},
+						err => Alert.alert('Battle Plan Error', `Error getting battle plan! ${err.message}`)
+					);
+					this.authSubscription!.unsubscribe();
 				}
-
-				this.setState({ assignments });
 			},
 			err => Alert.alert('Battle Plan Error', `Error getting battle plan! ${err.message}`)
 		);

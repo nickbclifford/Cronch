@@ -45,7 +45,7 @@ export default class CanvasAssignments extends React.Component<NavigationScreenP
 
 	@bind
 	private navigateToAssignmentDetails(assignment: Task) {
-		this.props.navigation.navigate('AssignmentDetails', { assignment });
+		this.props.navigation.navigate('AssignmentDetails', { assignment, neuter: false });
 	}
 
 	render() {

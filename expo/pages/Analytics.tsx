@@ -1,15 +1,16 @@
 import bind from 'bind-decorator';
 import moment from 'moment';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
 import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+
+import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, PRIMARY } from '../common/StyleGuide';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
-import Hamburger from '../components/Hamburger';
 
 interface PieChartDataPoint {
 	label: string;
@@ -36,9 +37,7 @@ interface AnalyticsState {
 
 export default class Analytics extends React.Component<NavigationScreenProps, AnalyticsState> {
 
-	static navigationOptions = {
-		header: null
-	};
+	static navigationOptions = createNavigationOptions('Analytics');
 
 	constructor(props: any) {
 		super(props);
@@ -285,7 +284,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Hamburger toggle={this.props.navigation.toggleDrawer} />
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.verticalContainer}>
 				<Swiper horizontal={false}>
 				<View style={styles.verticalContainer}>

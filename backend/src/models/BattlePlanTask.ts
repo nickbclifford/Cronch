@@ -15,7 +15,6 @@ export default class BattlePlanTask extends Model<BattlePlanTask> {
 	@Column
 	planOrder!: number;
 
-	@Unique
 	@Column
 	taskId!: string; // Canvas ID or task title
 
