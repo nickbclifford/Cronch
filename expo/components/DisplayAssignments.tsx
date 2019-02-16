@@ -8,8 +8,6 @@ import {
 	StyleProp,
 	StyleSheet,
 	Text,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
 	View,
 	ViewStyle
 } from 'react-native';
@@ -20,6 +18,7 @@ import { NavigationScreenProps } from 'react-navigation';
 import { NEUTRAL, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { humanReadableTimeUntil } from '../common/Utils';
+import DisplayAssignment, { PressHandler } from './DisplayAssignment';
 
 type SectionedAssignments = Array<{ title: number, data: Task[] }>;
 
@@ -138,118 +137,42 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	@bind
 	private renderAssignment(props: SectionListRenderItemInfo<Task> | RenderItemInfo<Task>) {
 		const assignment = props.item;
-		const itemStyles = StyleSheet.create({
-			container: {
-				display: 'flex',
-				flexDirection: 'row',
-				marginRight: this.props.paddingRight,
-				marginLeft: this.props.paddingLeft,
-				marginBottom: 8,
-				padding: 8,
-				borderRadius: 5,
-				backgroundColor: assignment.class.color
-			},
-			leftIconContainer: {
-				display: 'flex',
-				justifyContent: 'center',
-				marginRight: 8
-			},
-			rightIconContainer: {
-				display: 'flex',
-				justifyContent: 'center',
-				marginLeft: 8
-			},
-			assignmentContainer: {
-				flexGrow: 1,
-				flexShrink: 1
-			},
-			title: {
-				color: assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]
-			},
-			class: {
-				color: assignment.class.textDark ? NEUTRAL[700] : NEUTRAL[300]
-			},
-			addContainer: {
-				display: 'flex',
-				flexDirection: 'column'
-			}
-		});
 
-		// tslint:disable:no-unnecessary-initializer
-		let moveHandler: (() => void) | undefined = undefined;
-		let moveEndHandler: (() => void) | undefined = undefined;
-		// tslint:enable:no-unnecessary-initializer
+		let leftIcon: string | undefined;
+		let leftIconOnPress: PressHandler | undefined;
+
+		let rightIcon: string | undefined;
+		let rightIconOnPressIn: PressHandler | undefined;
+		let rightIconOnPressOut: PressHandler | undefined;
 
 		if (this.shouldReorder) {
-			moveHandler = (props as RenderItemInfo<Task>).move;
-			moveEndHandler = (props as RenderItemInfo<Task>).moveEnd;
+			leftIcon = 'trash';
+			leftIconOnPress = () => {
+				const newAssignments = this.props.assignments.filter(event => event._id !== assignment._id);
+				this.updateAssignments(newAssignments);
+				if (this.props.onReorder) {
+					this.props.onReorder(newAssignments);
+				}
+			};
+
+			rightIcon = 'bars';
+			rightIconOnPressIn = (props as RenderItemInfo<Task>).move;
+			rightIconOnPressOut = (props as RenderItemInfo<Task>).moveEnd;
 		}
 
-		const trashHandler = () => {
-			const newAssignments = this.props.assignments.filter(event => event._id !== assignment._id);
-			this.updateAssignments(newAssignments);
-			if (this.props.onReorder) {
-				this.props.onReorder(newAssignments);
-			}
-		};
-
 		return (
-			<View style={this.props.itemStyle}>
-				<TouchableOpacity
-					activeOpacity={0.8}
-					onPress={this.handleAssignmentPress(assignment)}
-				>
-					<View style={itemStyles.container}>
-						{this.shouldReorder && (
-							<TouchableWithoutFeedback
-								hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
-								onPress={trashHandler}
-							>
-								<View style={itemStyles.leftIconContainer}>
-									<Icon
-										name='trash'
-										type='font-awesome'
-										size={20}
-										color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
-									/>
-								</View>
-							</TouchableWithoutFeedback>
-						)}
-						<View style={itemStyles.assignmentContainer}>
-							<Text
-								style={[typography.h3, itemStyles.class]}
-								numberOfLines={1}
-								ellipsizeMode='tail'
-							>
-								{assignment.class.name}
-							</Text>
-							<Text
-								style={[typography.h2, itemStyles.title]}
-								numberOfLines={1}
-								ellipsizeMode='tail'
-							>
-								{assignment.title}
-							</Text>
-						</View>
-						{this.shouldReorder && (
-							<TouchableWithoutFeedback
-								hitSlop={{ top: 16, left: 16, bottom: 16, right: 16 }}
-								onPressIn={moveHandler}
-								onPressOut={moveEndHandler}
-							>
-								<View style={itemStyles.rightIconContainer}>
-									<Icon
-										name='bars'
-										type='font-awesome'
-										size={20}
-										color={assignment.class.textDark ? NEUTRAL[900] : NEUTRAL[100]}
-									/>
-								</View>
-							</TouchableWithoutFeedback>
-						)}
-					</View>
-				</TouchableOpacity>
-			</View>
+			<DisplayAssignment
+				assignment={assignment}
+				leftIcon={leftIcon}
+				leftIconOnPress={leftIconOnPress}
+				rightIcon={rightIcon}
+				rightIconOnPressIn={rightIconOnPressIn}
+				rightIconOnPressOut={rightIconOnPressOut}
+				itemStyle={[styles.assignmentStyle, this.props.itemStyle]}
+				paddingRight={this.props.paddingRight}
+				paddingLeft={this.props.paddingLeft}
+				onAssignmentClick={this.props.onAssignmentClick}
+			/>
 		);
 	}
 
@@ -308,3 +231,9 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 }
+
+const styles = StyleSheet.create({
+	assignmentStyle: {
+		marginBottom: 8
+	}
+});

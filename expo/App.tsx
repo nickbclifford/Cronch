@@ -26,6 +26,12 @@ export default class App extends React.Component<{}, GlobalAppState> {
 			appendAssignment: newAssignment => {
 				const newAssignments = this.state.assignments;
 				newAssignments.push(newAssignment);
+				this.setState({ assignments: newAssignments });
+				this.updateNewAssignments(newAssignments);
+			},
+			deleteAssignment: id => {
+				const newAssignments = this.state.assignments.filter(assignment => assignment._id !== id);
+				this.setState({ assignments: newAssignments });
 				this.updateNewAssignments(newAssignments);
 			}
 		};
@@ -40,8 +46,7 @@ export default class App extends React.Component<{}, GlobalAppState> {
 
 	componentDidMount() {
 		MyMICDS.errors.subscribe(err => {
-			console.log('buh');
-			Alert.alert('Error', err.message);
+			Alert.alert('MyMICDS Error', err.message);
 		});
 
 		combineLatest(
@@ -74,7 +79,7 @@ export default class App extends React.Component<{}, GlobalAppState> {
 			switchMap(tasks => saveBattlePlanTasks(tasks.map(t => t._id)))
 		).subscribe(
 			() => console.log('saved battle plan'),
-			err => Alert.alert('Battle Plan Error', `Error saving battle plan! ${err.message}`)
+			err => Alert.alert('Saving Battle Plan Error', err.message)
 		);
 	}
 

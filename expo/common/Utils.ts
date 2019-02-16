@@ -80,3 +80,11 @@ export function handleFieldChangeFactory<T>(props: FormikProps<T>, field: keyof 
 		props.setFieldValue(field as string, value);
 	};
 }
+
+export function optionalFunction(func?: (...args: any) => void, ...args: any[]) {
+	return () => {
+		if (func) {
+			func(...args);
+		}
+	};
+}
