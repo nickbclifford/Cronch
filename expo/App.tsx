@@ -21,6 +21,11 @@ export default class App extends React.Component<{}, GlobalAppState> {
 				const newAssignments = this.state.assignments;
 				newAssignments.push(newAssignment);
 				this.setState({ assignments: newAssignments });
+			},
+			deleteAssignment: id => {
+				this.setState({
+					assignments: this.state.assignments.filter(assignment => assignment._id !== id)
+				});
 			}
 		};
 	}

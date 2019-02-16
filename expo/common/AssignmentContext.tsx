@@ -13,6 +13,7 @@ export interface AssignmentContextType {
 	assignments: Task[];
 	updateAssignments(newAssignments: Task[]): void;
 	appendAssignment(newAssignment: Task): void;
+	deleteAssignment(id: Task['_id']): void;
 }
 
 // tslint:disable-next-line:variable-name
@@ -20,7 +21,8 @@ export const AssignmentContext = React.createContext<AssignmentContextType>({
 	assignments: [],
 	// tslint:disable:no-empty
 	updateAssignments: () => {},
-	appendAssignment: () => {}
+	appendAssignment: () => {},
+	deleteAssignment: () => {}
 	// tslint:enable:no-empty
 });
 

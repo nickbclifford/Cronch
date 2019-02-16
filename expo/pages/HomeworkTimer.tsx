@@ -1,4 +1,3 @@
-import { CanvasEvent } from '@mymicds/sdk';
 import bind from 'bind-decorator';
 import { Audio, PlaybackSource } from 'expo';
 import moment from 'moment';
@@ -6,8 +5,10 @@ import * as React from 'react';
 import { Alert, Picker, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 
 import { alarmList } from '../common/Alarms';
+import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import flipped$ from '../common/PhoneAcrobatics';
 import { ColorPalette, components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
@@ -26,14 +27,13 @@ export interface TimerState {
 	onBreak: boolean;
 	paused: boolean;
 	modeSelection: number;
-	alarmSelection: number;
 	flipped: boolean;
 	assignment: Task;
 	currentTimeslotId: number | null;
 	vibrateDuration: number;
 }
 
-export default class HomeorkTimer extends React.Component<NavigationScreenProps, TimerState> {
+export class HomeworkTimer extends React.Component<NavigationScreenProps & WithAssignmentContextProps, TimerState> {
 
 	static navigationOptions = ({ navigation }) => {
 		const task: Task = navigation.getParam('assignment');
@@ -64,7 +64,6 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 
 	constructor(props: any) {
 		super(props);
-
 		this.state = {
 			maxBreakTime: 15 * 60 * 1000,
 			maxWorkTime: 45 * 60 * 1000,
@@ -76,8 +75,7 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 			flipped: false,
 			assignment: this.props.navigation.getParam('assignment'),
 			currentTimeslotId: null,
-			vibrateDuration: 500,
-			alarmSelection: 0
+			vibrateDuration: 500
 		};
 
 		// this.props.navigation.state.params.classColor = this.state.assignment.class.color;
@@ -291,6 +289,7 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 			});
 		}
 	}
+
 	private startRecordTimeslot() {
 		let timeslot: Omit<Timeslot, 'id' | 'end' | 'user'>;
 		timeslot = {
@@ -308,7 +307,9 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 		});
 	}
 
+	@bind
 	private endRecordTimeslot() {
+		console.log(this.state, 'current timeslot error');
 		if (this.state.currentTimeslotId) {
 			return endTimeslot(this.state.currentTimeslotId, new Date())
 			.then(() => {
@@ -362,6 +363,87 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 	private cancelVibrate() {
 		Vibration.cancel();
 	}
+
+	@bind
+	private nextAssignment() {
+		const assignmentList = this.props.assignmentContext.assignments;
+		let currentIndex = assignmentList.indexOf(this.state.assignment);
+		console.log(currentIndex, 'indexNumber', assignmentList.length, 'assignmentListLength');
+		let nextIndex = currentIndex + 1;
+		if (nextIndex === assignmentList.length) {
+			nextIndex = 0;
+		}
+		this.setState({
+			assignment: assignmentList[nextIndex],
+			paused: true
+		});
+		setTimeout(this.endRecordTimeslot);
+		setTimeout(this.updateHeader);
+		// THIS IS FOR CHECKING WHETHER IT IS CHECKED, SHOULD DO IT SOMEWHERE ELSE
+		// for (let i = 0; i < assignmentList.length; i++) {
+		// 	if (currentIndex === assignmentList.length - 1) {
+		// 		nextIndex = 0;
+		// 		console.log('finishedLoop');
+		// 	}
+		// 	// if (assignmentList[nextIndex].checked) {
+		// 	// 	currentIndex = nextIndex;
+		// 	// 	nextIndex += 1;
+		// 	// 	console.log('already checked');
+		// 	// } else {
+		// 		console.log(assignmentList[nextIndex], 'nextIndex');
+		// 		this.setState({
+		// 			assignment: assignmentList[nextIndex]
+		// 		});
+		// 		this.updateHeader();
+		// 		// break;
+		// 	// }
+		// 	// if finished and all have checked
+		// 	if (i === assignmentList.length - 1) {
+		// 		this.navigateToBattlePlan();
+		// 	}
+		// }
+	}
+	@bind
+	private previousAssignment() {
+		const assignmentList = this.props.assignmentContext.assignments;
+		let currentIndex = assignmentList.indexOf(this.state.assignment);
+		let nextIndex = currentIndex - 1;
+		if (currentIndex === 0) {
+			nextIndex = assignmentList.length - 1;
+		}
+		this.setState({
+			assignment: assignmentList[nextIndex],
+			paused: true
+		});
+		setTimeout(this.endRecordTimeslot);
+		setTimeout(this.updateHeader);
+	}
+	@bind
+	private doneAssignment() {
+		const tempID = this.state.assignment._id;
+		if (this.props.assignmentContext.assignments.length > 1) {
+			this.nextAssignment();
+		} else {
+			this.endRecordTimeslot
+		}
+		MyMICDS.planner.checkEvent({ id: tempID }).subscribe(
+			() => {
+				this.props.assignmentContext.deleteAssignment(tempID);
+				if (this.props.assignmentContext.assignments.length === 0) {
+					this.navigateToBattlePlan();
+				}
+			}
+		);
+	}
+
+	@bind
+	private updateHeader() {
+		console.log(this.state.assignment.title, 'updated header');
+		this.props.navigation.setParams({
+			assignment: this.state.assignment
+	});
+}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
@@ -371,7 +453,6 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 						<Text>Work</Text>
 					}
 				</View>
-
 				<View style={styles.timerContainer}>
 					<View style={styles.timer}>
 					{/* {!this.state.onBreak ? */}
@@ -390,7 +471,32 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 
 				<Text>{this.state.paused.toString()}</Text>
 				<Text>{this.state.flipped.toString()}</Text>
-
+				<View style={styles.buttonContainer}>
+				<Button
+					title='Previous'
+					raised={true}
+					onPress={this.previousAssignment}
+					style={styles.navButton}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
+				<Button
+					title='Done'
+					raised={true}
+					onPress={this.doneAssignment}
+					style={styles.navButton}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
+				<Button
+					title='Next'
+					raised={true}
+					onPress={this.nextAssignment}
+					style={styles.navButton}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
+				</View>
 				<View style={styles.flipNotification}>
 					{ this.state.paused && (
 						<Button
@@ -405,6 +511,8 @@ export default class HomeorkTimer extends React.Component<NavigationScreenProps,
 		);
 	}
 }
+
+export default withAssignmentContext(HomeworkTimer);
 
 const styles = StyleSheet.create({
 	safeArea: {
@@ -452,6 +560,17 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: '5%',
 		width: '100%',
+		height: '20%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	buttonContainer: {
+		display: 'flex',
+		flexDirection: 'row'
+	},
+	navButton: {
+		width: '33%',
 		height: '20%',
 		display: 'flex',
 		justifyContent: 'center',
