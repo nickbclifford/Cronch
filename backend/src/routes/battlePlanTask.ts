@@ -6,7 +6,7 @@ const router = Router();
 
 router.post('/', requireLoggedIn, (req, res) => {
 	const taskIds: string[] = req.body;
-	if (!(taskIds instanceof Array && taskIds.length > 0 && taskIds.every(t => typeof t === 'string'))) {
+	if (!(taskIds instanceof Array && taskIds.every(t => typeof t === 'string'))) {
 		errorResponse(res, new APIError('Invalid list of task IDs', 400));
 		return;
 	}

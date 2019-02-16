@@ -78,7 +78,7 @@ export default class App extends React.Component<{}, GlobalAppState> {
 			switchMap(tasks => saveBattlePlanTasks(tasks.map(t => t._id)))
 		).subscribe(
 			() => console.log('saved battle plan'),
-			err => Alert.alert('Battle Plan Error', `Error saving battle plan! ${err.message}`)
+			err => Alert.alert('Saving Battle Plan Error', err.message)
 		);
 	}
 
