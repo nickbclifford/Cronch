@@ -28,6 +28,7 @@ export interface TimerState {
 	breakTimeLeft: number;
 	onBreak: boolean;
 	paused: boolean;
+	alarmSelection: number;
 	modeSelection: number;
 	flipped: boolean;
 	assignment: Task;
@@ -77,6 +78,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			breakTimeLeft: 0,
 			onBreak: false,
 			paused: true,
+			alarmSelection: 0,
 			modeSelection: 0,
 			flipped: false,
 			assignment: this.props.navigation.getParam('assignment'),
@@ -432,7 +434,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		if (this.props.assignmentContext.assignments.length > 1) {
 			this.nextAssignment();
 		} else {
-			this.endRecordTimeslot;
+			this.endRecordTimeslot();
 		}
 		MyMICDS.planner.checkEvent({ id: tempID }).subscribe(
 			() => {

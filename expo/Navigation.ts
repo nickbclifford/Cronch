@@ -117,11 +117,11 @@ const Questionnaire = createQuestionnaire(
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer: TimerNavigator,
-		Avatar: createSingleStackNavigator(Avatar),
+		// Avatar: createSingleStackNavigator(Avatar),
 		Profile: createSingleStackNavigator(Profile),
 		About: createSingleStackNavigator(About),
-		Analytics: AnalyticsNavigator,
-		Questionnaire
+		Analytics: AnalyticsNavigator
+		// Questionnaire
 	},
 	{
 		initialRouteName: 'Timer'
