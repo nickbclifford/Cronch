@@ -462,12 +462,22 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 					rightIcon='info-circle'
 					onAssignmentClick={this.navigateToAssignmentDetails}
 				/>
-				<View style={styles.timerContainer}>
+				<View style={styles.container}>
 					<Circle color={PRIMARY[100]} containerStyle={[styles.circles, styles.largeCircle]} />
 					<Circle color={PRIMARY[300]} containerStyle={[styles.circles, styles.mediumCircle]} />
 					<Circle color={PRIMARY[500]} containerStyle={[styles.circles, styles.smallCircle]} />
-					<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
-					<Text style={[typography.h0, styles.timerTime]}>45:00</Text>
+					{!this.state.onBreak && (
+						<View style={styles.timerContainer}>
+							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
+							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.workTimeLeft)}</Text>
+						</View>
+					)}
+					{this.state.onBreak && (
+						<View style={styles.timerContainer}>
+							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
+							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.breakTimeLeft)}</Text>
+						</View>
+					)}
 				</View>
 				<View style={styles.actions}>
 					<Button
@@ -475,11 +485,13 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 						containerStyle={styles.changeAssignment}
 						buttonStyle={components.buttonStyle}
 						titleStyle={components.buttonText}
+						onPress={this.navigateToBattlePlan}
 					/>
 					<Button
 						title='Complete Assignment'
 						buttonStyle={components.buttonStyle}
 						titleStyle={components.buttonText}
+						onPress={this.doneAssignment}
 					/>
 				</View>
 			</SafeAreaView>
@@ -565,10 +577,15 @@ const styles = StyleSheet.create({
 		padding: 8,
 		display: 'flex'
 	},
-	timerContainer: {
+	container: {
 		flexGrow: 1,
 		flexShrink: 1,
 		position: 'relative',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	timerContainer: {
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center'
