@@ -373,7 +373,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	@bind
 	private nextAssignment() {
 		const assignmentList = this.props.assignmentContext.assignments;
-		let currentIndex = assignmentList.indexOf(this.state.assignment);
+		const currentIndex = assignmentList.indexOf(this.state.assignment);
 		console.log(currentIndex, 'indexNumber', assignmentList.length, 'assignmentListLength');
 		let nextIndex = currentIndex + 1;
 		if (nextIndex === assignmentList.length) {
@@ -409,10 +409,11 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		// 	}
 		// }
 	}
+
 	@bind
 	private previousAssignment() {
 		const assignmentList = this.props.assignmentContext.assignments;
-		let currentIndex = assignmentList.indexOf(this.state.assignment);
+		const currentIndex = assignmentList.indexOf(this.state.assignment);
 		let nextIndex = currentIndex - 1;
 		if (currentIndex === 0) {
 			nextIndex = assignmentList.length - 1;
@@ -424,13 +425,14 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		setTimeout(this.endRecordTimeslot);
 		setTimeout(this.updateHeader);
 	}
+
 	@bind
 	private doneAssignment() {
 		const tempID = this.state.assignment._id;
 		if (this.props.assignmentContext.assignments.length > 1) {
 			this.nextAssignment();
 		} else {
-			this.endRecordTimeslot
+			this.endRecordTimeslot;
 		}
 		MyMICDS.planner.checkEvent({ id: tempID }).subscribe(
 			() => {
@@ -447,8 +449,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		console.log(this.state.assignment.title, 'updated header');
 		this.props.navigation.setParams({
 			assignment: this.state.assignment
-	});
-}
+		});
+	}
 
 	render() {
 		return (
