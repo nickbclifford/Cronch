@@ -1,30 +1,27 @@
-import * as React from 'react';
-import './App.css';
-import logo from './logo.svg';
-import { Link } from 'react-router-dom';
+import { MuiThemeProvider } from '@material-ui/core';
+import React from 'react';
+import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
+import About from './About';
+import BattlePlan from './BattlePlan';
+import Navbar from './Navbar';
+import Profile from './Profile';
+import { theme } from './styles';
+import Timer from './Timer';
 
-class App extends React.Component {
-	render() {
-		return (
-			<div className='App'>
-				<header className='App-header'>
-					<img src={logo} className='App-logo' alt='logo' />
-					<p>
-						Edit <code>src/App.tsx</code> and save to reload.
-					</p>
-					<a
-						className='App-link'
-						href='https://reactjs.org'
-						target='_blank'
-						rel='noopener noreferrer'
-					>
-						Learn React
-					</a>
-					<Link to='/other-page'>buh</Link>
-				</header>
+// tslint:disable-next-line:variable-name
+const App = () => (
+	<MuiThemeProvider theme={theme}>
+		<BrowserRouter>
+			<div>
+				<Navbar />
+				<Route exact={true} path='/' component={BattlePlan} />
+				<Route path='/timer' component={Timer} />
+				<Route path='/profile' component={Profile} />
+				<Route path='/about' component={About} />
 			</div>
-		);
-	}
-}
+		</BrowserRouter>
+	</MuiThemeProvider>
+);
 
 export default App;
