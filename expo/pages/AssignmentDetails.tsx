@@ -7,16 +7,18 @@ import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import withAssignmentContext, {	WithAssignmentContextProps } from '../common/AssignmentContext';
-import { NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { humanReadableTimeUntil } from '../common/Utils';
 
 interface NavigationParameters {
 	assignment: Task;
+	neuter: boolean;
 }
 
 interface AssignmentDetailsState {
 	assignment: Task;
+	neuter: boolean;
 }
 
 class AssignmentDetails extends React.Component<
@@ -37,7 +39,10 @@ class AssignmentDetails extends React.Component<
 
 	constructor(props: any) {
 		super(props);
-		this.state = { assignment: this.props.navigation.getParam('assignment') };
+		this.state = {
+			assignment: this.props.navigation.getParam('assignment'),
+			neuter: this.props.navigation.getParam('neuter')
+		};
 	}
 
 	@bind
@@ -78,8 +83,15 @@ class AssignmentDetails extends React.Component<
 							onLinkPress={this.onLinkPress}
 						/>
 					</ScrollView>
-					<Button title='Add to Battle Plan' onPress={this.addToBattlePlan} buttonStyle={styles.workButton} />
-					<Button title='Mark as Completed' onPress={this.markAsCompleted} buttonStyle={styles.checkButton} />
+					{!this.state.neuter && (
+						<Button
+							title='Add to Battle Plan'
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+							onPress={this.addToBattlePlan}
+						/>
+					)}
+					{/*<Button title='Mark as Completed' onPress={this.markAsCompleted} buttonStyle={styles.checkButton} />*/}
 				</SafeAreaView>
 			</View>
 		);
@@ -94,11 +106,13 @@ const styles = StyleSheet.create({
 		// backgroundColor: PRIMARY[500]
 	},
 	safeArea: {
+		width: '100%',
 		height: '100%',
 		display: 'flex',
-		flexDirection: 'column'
+		alignItems: 'center'
 	},
 	detailsContainer: {
+		width: '100%',
 		padding: 16
 	},
 	assignmentMeta: {

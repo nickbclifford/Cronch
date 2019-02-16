@@ -109,7 +109,7 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 		}))
 		.then(() => {
 			this.props.navigation.state.params!.setTimerMode(timerMode);
-			this.props.navigation.navigate('Timer');
+			this.props.navigation.navigate('Homework');
 		}).catch((e: Error) => {
 			Alert.alert('Error creating new timer', e.message);
 		});

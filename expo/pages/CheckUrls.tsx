@@ -70,7 +70,7 @@ export default class CheckUrls extends React.Component<NavigationScreenProps, Ch
 				<View style={styles.container}>
 					<Text style={[typography.h2, styles.error]}>
 						Looks like you haven't saved your {/**/}
-						<Text style={nunito.black}>
+						<Text style={nunito.bold}>
 							{oxfordCommaList(this.state.missingURLs, 'or')} {/**/}
 							feed{this.state.missingURLs.length > 1 && 's'}
 						</Text>

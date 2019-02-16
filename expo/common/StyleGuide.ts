@@ -65,12 +65,12 @@ export const nunito = StyleSheet.create({
 	},
 	bold: {
 		fontFamily: 'Nunito-Bold'
-	},
-	extraBold: {
-		fontFamily: 'Nunito-ExtraBold'
-	},
-	black: {
-		fontFamily: 'Nunito-Black'
+	// },
+	// extraBold: {
+	// 	fontFamily: 'Nunito-ExtraBold'
+	// },
+	// black: {
+	// 	fontFamily: 'Nunito-Black'
 	}
 });
 

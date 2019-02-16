@@ -44,15 +44,6 @@ const AuthNavigator = createStackNavigator(
 	}
 );
 
-const AnalyticsNavigator = createStackNavigator(
-	{
-		Analytics
-	},
-	{
-		initialRouteName: 'Analytics'
-	}
-);
-
 const CreatePlan = createBottomTabNavigator(
 	{
 		CanvasAssignments,
@@ -116,15 +107,15 @@ const Questionnaire = createQuestionnaire(
 
 const AppNavigator = createDrawerNavigator(
 	{
-		Timer: TimerNavigator,
+		Homework: TimerNavigator,
+		Analytics: createSingleStackNavigator(Analytics),
 		// Avatar: createSingleStackNavigator(Avatar),
 		Profile: createSingleStackNavigator(Profile),
-		About: createSingleStackNavigator(About),
-		Analytics: AnalyticsNavigator
+		About: createSingleStackNavigator(About)
 		// Questionnaire
 	},
 	{
-		initialRouteName: 'Timer'
+		initialRouteName: 'Homework'
 	}
 );
 

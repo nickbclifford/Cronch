@@ -2,7 +2,7 @@ import bind from 'bind-decorator';
 import { Audio, PlaybackSource } from 'expo';
 import moment from 'moment';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { Alert, Picker, StatusBar, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
@@ -358,7 +358,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 	@bind
 	private navigateToAssignmentDetails(assignment: Task) {
-		this.props.navigation.navigate('AssignmentDetails', { assignment });
+		this.props.navigation.navigate('AssignmentDetails', { assignment, neuter: true });
 	}
 
 	@bind
@@ -461,6 +461,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
+				<StatusBar barStyle='dark-content' animated={true} />
 				<DisplayAssignment
 					assignment={this.state.assignment}
 					rightIcon='info-circle'
