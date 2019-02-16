@@ -4,7 +4,6 @@ import {
 	createDrawerNavigator,
 	createStackNavigator,
 	createSwitchNavigator,
-	NavigationScreenProps,
 	StackNavigatorConfig
 } from 'react-navigation';
 
@@ -12,8 +11,10 @@ import createNavigationOptions from './common/NavigationOptionsFactory';
 import createQuestionnaire from './components/QuestionnaireFactory';
 
 import About from './pages/About';
+import AllowNotifications from './pages/AllowNotifications';
 import Analytics from './pages/Analytics';
 import AssignmentDetails from './pages/AssignmentDetails';
+import Avatar from './pages/Avatar';
 import BattlePlan from './pages/BattlePlan';
 import CheckUrls from './pages/CheckUrls';
 import CanvasAssignments from './pages/create-plan/CanvasAssignments';
@@ -62,10 +63,22 @@ const CreatePlan = createBottomTabNavigator(
 	}
 );
 
-// Use custom trasition in the future
-const TimerNavigator = createStackNavigator(
+const BattlePlanAndAllowNotifications = createStackNavigator(
 	{
 		BattlePlan,
+		AllowNotifications
+	},
+	{
+		mode: 'modal',
+		navigationOptions: {
+			header: null
+		}
+	}
+);
+
+const TimerNavigator = createStackNavigator(
+	{
+		BattlePlan: BattlePlanAndAllowNotifications,
 		CreatePlan: {
 			screen: CreatePlan,
 			navigationOptions: createNavigationOptions('Create Plan', false)
@@ -104,6 +117,7 @@ const Questionnaire = createQuestionnaire(
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer: TimerNavigator,
+		Avatar: createSingleStackNavigator(Avatar),
 		Profile: createSingleStackNavigator(Profile),
 		About: createSingleStackNavigator(About),
 		Analytics: AnalyticsNavigator,

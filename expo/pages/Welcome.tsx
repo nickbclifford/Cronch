@@ -1,6 +1,6 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
@@ -20,6 +20,7 @@ export default class Welcome extends React.Component<NavigationScreenProps> {
 	render() {
 		return (
 			<View style={styles.container}>
+				<StatusBar barStyle='dark-content' animated={true} />
 				<Text style={[typography.h1, styles.greeting]}>Welcome to Cronch!</Text>
 				<Button
 					title='Get Started'

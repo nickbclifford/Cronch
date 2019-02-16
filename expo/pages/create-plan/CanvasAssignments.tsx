@@ -1,11 +1,12 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
 import MyMICDS from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
+import { PRIMARY } from '../../common/StyleGuide';
 import Task from '../../common/Task';
 import DisplayAssignments from '../../components/DisplayAssignments';
 
@@ -50,6 +51,7 @@ export default class CanvasAssignments extends React.Component<NavigationScreenP
 	render() {
 		return (
 			<View style={styles.container}>
+				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<DisplayAssignments
 					navigation={this.props.navigation}
 					assignments={this.state.assignments}
