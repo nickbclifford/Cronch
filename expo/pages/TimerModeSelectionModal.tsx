@@ -1,8 +1,8 @@
 import bind from 'bind-decorator';
 import { Formik } from 'formik';
 import * as React from 'react';
-import { Alert, Picker, StyleSheet, View } from 'react-native';
-import { Button } from 'react-native-elements';
+import { Alert, Picker, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import { components } from '../common/StyleGuide';
@@ -75,6 +75,15 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 	}
 
 	@bind
+	private deleteTimerMode(n: number) {
+		const newTimers = this.state.userCycles;
+		newTimers.splice(n, 1);
+		this.setState({
+			userCycles: newTimers
+		});
+	}
+
+	@bind
 	private setTimerMode(values: TimerSelectionValues) {
 		let timerMode = {
 			maxWorkTime: 0,
@@ -91,9 +100,10 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 		}
 
 		updateTimers(
-			this.state.userCycles
-			// timers with id are the ones already in DB, but also resave the new selection
-				.filter((timer, i) => !timer.id)
+			this.state.userCycles.map(t => {
+				delete t.id;
+				return t;
+			})
 		).then(() => changeUserInfo({
 			timerSelection: values.timerSelection
 		}))
@@ -108,66 +118,69 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Formik
-					initialValues={newTimerInitialValues}
-					onSubmit={this.addTimerMode}
-				>
-					{props => (
-					<View style={styles.newTimerContainer}>
-						<Picker
-							style={styles.newTimerPicker}
-							selectedValue={props.values.work}
-							onValueChange={handleFieldChangeFactory<NewTimerValues>(props, 'work')}
-						>
-							{new Array(12).fill(0).map((n, i) =>
-								<Picker.Item key={i} label={`${i * 5} minutes`} value={i * 5 * 60 * 1000}/>
-							)}
-						</Picker>
+				<ScrollView>
+					<Formik
+						initialValues={newTimerInitialValues}
+						onSubmit={this.addTimerMode}
+					>
+						{props => (
+						<View style={styles.newTimerContainer}>
+							<Picker
+								style={styles.newTimerPicker}
+								selectedValue={props.values.work}
+								onValueChange={handleFieldChangeFactory<NewTimerValues>(props, 'work')}
+							>
+								{new Array(12).fill(0).map((n, i) =>
+									<Picker.Item key={i} label={`${i * 5} minutes`} value={i * 5 * 60 * 1000}/>
+								)}
+							</Picker>
 
-						<Picker
-							style={styles.newTimerPicker}
-							selectedValue={props.values.break}
-							onValueChange={handleFieldChangeFactory<NewTimerValues>(props, 'break')}
-						>
-							{new Array(12).fill(0).map((n, i) =>
-								<Picker.Item key={i} label={`${i * 5} minutes`} value={i * 5 * 60 * 1000}/>
-							)}
-						</Picker>
-						<Button
-							title='Add'
-							onPress={props.handleSubmit as any}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-					</View>
-					)}
-				</Formik>
-
-				<Formik
-					initialValues={timerSelectionInitialValues}
-					onSubmit={this.setTimerMode}
-				>
-					{props => (
-						<View>
-							<ListSelect
-								selectedIndex={props.values.timerSelection}
-								onSelectItem={handleFieldChangeFactory<TimerSelectionValues>(props, 'timerSelection')}
-								items={this.state.userCycles.map((cycle, i) => {
-									return {
-										label: `work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`,
-										value: i
-									};
-								})}
-							/>
+							<Picker
+								style={styles.newTimerPicker}
+								selectedValue={props.values.break}
+								onValueChange={handleFieldChangeFactory<NewTimerValues>(props, 'break')}
+							>
+								{new Array(12).fill(0).map((n, i) =>
+									<Picker.Item key={i} label={`${i * 5} minutes`} value={i * 5 * 60 * 1000}/>
+								)}
+							</Picker>
 							<Button
-								title='Set Timer'
+								title='Add'
 								onPress={props.handleSubmit as any}
 								buttonStyle={components.buttonStyle}
 								titleStyle={components.buttonText}
 							/>
 						</View>
-					)}
-				</Formik>
+						)}
+					</Formik>
+
+					<Formik
+						initialValues={timerSelectionInitialValues}
+						onSubmit={this.setTimerMode}
+					>
+						{props => (
+							<View>
+								<ListSelect
+									selectedIndex={props.values.timerSelection}
+									onSelectItem={handleFieldChangeFactory<TimerSelectionValues>(props, 'timerSelection')}
+									items={this.state.userCycles.map((cycle, i) => {
+										return {
+											label: `work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`,
+											value: i
+										};
+									})}
+									onDelete={this.deleteTimerMode}
+								/>
+								<Button
+									title='Set Timer'
+									onPress={props.handleSubmit as any}
+									buttonStyle={components.buttonStyle}
+									titleStyle={components.buttonText}
+								/>
+							</View>
+						)}
+					</Formik>
+				</ScrollView>
 			</SafeAreaView>
 		);
 	}
