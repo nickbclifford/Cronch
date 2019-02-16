@@ -9,7 +9,7 @@ export enum Skin {
 	PeachySpeckles = 'PEACHY_SPECKLES'
 }
 
-export const skinImages = {
+export const skinImages: { [key: string]: any } = {
 	[Skin.GreenPlain]: require('../assets/apples/skins/green-plain.png'),
 	[Skin.GreenLightSpeckes]: require('../assets/apples/skins/green-light-speckles.png'),
 	[Skin.GreenWhiteSpeckles]: require('../assets/apples/skins/green-speckles.png'),
@@ -29,7 +29,7 @@ export enum Expression {
 	VeryConerned = 'VERY_CONCERNED'
 }
 
-export const expressionImages = {
+export const expressionImages: { [key: string]: any } = {
 	[Expression.Angerey]: require('../assets/apples/expressions/angey,.png'),
 	[Expression.Concerned]: require('../assets/apples/expressions/concerned.png'),
 	[Expression.Cry]: require('../assets/apples/expressions/cry.png'),
@@ -43,7 +43,7 @@ export enum Headwear {
 	SpongebobGlasses = 'SPONGEBOB_GLASSES'
 }
 
-export const headwearImages = {
+export const headwearImages: { [key: string]: any } = {
 	[Headwear.GenericGlasses]: require('../assets/apples/headwear/generic-glasses.png'),
 	[Headwear.SpongebobGlasses]: require('../assets/apples/headwear/spongebob-glasses.png')
 };
@@ -53,7 +53,7 @@ export enum Accessory {
 	SmashterSword = 'SMASHTER_SWORD'
 }
 
-export const accessoryImages = {
+export const accessoryImages: { [key: string]: any } = {
 	[Accessory.DiamondSword]: require('../assets/apples/accessories/diamond-sword.png'),
 	[Accessory.SmashterSword]: require('../assets/apples/accessories/smashter-sword.png')
 };

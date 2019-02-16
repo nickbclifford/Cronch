@@ -26,6 +26,7 @@ import Profile from './pages/Profile';
 import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
 import TimerModeSelection from './pages/TimerModeSelectionModal';
 import Welcome from './pages/Welcome';
+import AvatarStore from './pages/AvatarStore';
 
 // tslint:disable:variable-name
 
@@ -114,10 +115,20 @@ const Questionnaire = createQuestionnaire(
 	]
 );
 
+const AvatarNavigator = createStackNavigator(
+	{
+		Avatar,
+		AvatarStore
+	},
+	{
+		initialRouteName: 'Avatar'
+	}
+);
+
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer: TimerNavigator,
-		Avatar: createSingleStackNavigator(Avatar),
+		Avatar: AvatarNavigator,
 		Profile: createSingleStackNavigator(Profile),
 		About: createSingleStackNavigator(About),
 		Analytics: AnalyticsNavigator,
