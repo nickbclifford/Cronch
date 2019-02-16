@@ -24,7 +24,11 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "app.cronch.cronch",
       "supportsTablet": true
+    },
+    "android": {
+      "package": "app.cronch.cronch"
     }
   }
 }

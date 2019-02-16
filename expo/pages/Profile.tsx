@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
 	},
 	loggedInUser: {
 		textAlign: 'center',
-		lineHeight: 58
+		lineHeight: 75
 	}
 });
 
