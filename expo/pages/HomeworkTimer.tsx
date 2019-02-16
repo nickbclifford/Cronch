@@ -484,6 +484,17 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 					)}
 				</View>
 				<View style={styles.actions}>
+					{!this.state.onBreak && (
+						<View style={styles.flippyContainer}>
+							<Icon
+								name='refresh'
+								type='font-awesome'
+								size={20}
+								color={NEUTRAL[700]}
+							/>
+							<Text style={[typography.small, styles.flippy]}>Place your phone face-down to start the timer!</Text>
+						</View>
+					)}
 					{/*<Button
 						title='Change Timer'
 						buttonStyle={components.buttonStyle}
@@ -623,6 +634,17 @@ const styles = StyleSheet.create({
 	actions: {
 		flexGrow: 0,
 		flexShrink: 0
+	},
+	flippyContainer: {
+		marginBottom: 16,
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	flippy: {
+		marginLeft: 8,
+		color: NEUTRAL[500]
 	},
 	changeAssignment: {
 		marginBottom: 8

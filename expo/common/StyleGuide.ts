@@ -102,7 +102,7 @@ export const typography = StyleSheet.create({
 	},
 	small: {
 		...DEFAULT_TYPOGRAPHY_STYLES,
-		fontSize: 12
+		fontSize: 14
 	}
 });
 
