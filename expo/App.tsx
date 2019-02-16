@@ -52,6 +52,8 @@ export default class App extends React.Component<{}, GlobalAppState> {
 				if (!canvasRes.hasURL) { return; }
 				const events = canvasRes.events;
 
+				tasks.sort((a, b) => a.planOrder - b.planOrder);
+
 				const assignments: Task[] = [];
 				for (const task of tasks) {
 					const assignment = events.find(e => e._id === task.taskId);
