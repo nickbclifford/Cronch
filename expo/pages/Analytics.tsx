@@ -178,19 +178,15 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			}
 		}
 
-		console.log(classes);
-
 		this.setState({ classes });
 
 		const chartData: PieChartDataPoint[] = [];
 		// create the chartData for the day
 		for (const cl of classes) {
-			console.log(cl);
 			let totalHours = 0;
 			for (const slot of dailyTimes) {
 				if (slot.end != null && slot.classId === cl) {
 					const diff = Math.round(this.calcHourDiff(slot.start, slot.end));
-					console.log(`hour diff: ${diff}`);
 					totalHours += (diff === 0)? this.calcMinuteDiff(slot.start, slot.end): diff;
 				}
 			}
@@ -202,50 +198,57 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			});
 		}
 
-		console.log(chartData);
-
 		if (chartData.length > 0) {
 			this.setState({ pieChartData: chartData });
 		}
 	}
 
 	private findMostPracticedSubject(): string {
-		if (this.state.dailyTimes.length > 0) {
+		if (this.state.weeklyTimes.length > 0) {
 			let biggestClass = 0;
 
-			for (let i = 0; i < this.state.dailyTimes.length; i++) {
-				if (this.state.dailyTimes[i].end !== null && this.calcHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) > this.calcHourDiff(this.state.dailyTimes[biggestClass].start, this.state.dailyTimes[biggestClass].end)) {
+			for (let i = 0; i < this.state.weeklyTimes.length; i++) {
+				if (this.state.weeklyTimes[i].end !== null && this.calcHourDiff(this.state.weeklyTimes[i].start, this.state.weeklyTimes[i].end) > this.calcHourDiff(this.state.weeklyTimes[biggestClass].start, this.state.weeklyTimes[biggestClass].end)) {
+					// new class found, update index
+					biggestClass = i;
+				}
+			}
+			return this.state.weeklyTimes[biggestClass].classId;
+		} else {
+			return 'Not Available';
+		}
+	}
+
+	private findHeaviestNight(): string {
+		if (this.state.weeklyTimes.length > 0) {
+			let biggestClass = 0;
+
+			for (let i = 0; i < this.state.weeklyTimes.length; i++) {
+				if (this.state.weeklyTimes[i].end !== null && this.calcHourDiff(this.state.weeklyTimes[i].start, this.state.weeklyTimes[i].end) > this.calcHourDiff(this.state.weeklyTimes[biggestClass].start, this.state.weeklyTimes[biggestClass].end)) {
 					// new class found, update index
 					biggestClass = i;
 				}
 			}
 
-			return this.state.dailyTimes[biggestClass].classId;
+			return this.convertDay(this.state.weeklyTimes[biggestClass].start.getDay());
 		} else {
 			return 'Not Available';
 		}
 	}
 
-	private findLeastPracticedSubject(): string {
-		if (this.state.dailyTimes.length > 0) {
-			let smallestClass = 0;
-
-			for (let i = 0; i < this.state.dailyTimes.length; i++) {
-				if (this.state.dailyTimes[i].end !== null && this.calcHourDiff(this.state.dailyTimes[i].start, this.state.dailyTimes[i].end) < this.calcHourDiff(this.state.dailyTimes[smallestClass].start, this.state.dailyTimes[smallestClass].end)) {
-					// new class found, update index
-					smallestClass = i;
-				}
-			}
-
-			return this.state.dailyTimes[smallestClass].classId;
-		} else {
-			return 'Not Available';
+	private findWeekDeviation() {
+		let tempTotal = 0;
+		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
+		for (const val of this.state.weeklyTimes) {
+			if (val.end !== null)
+				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
 		}
+		return (Math.sqrt(tempTotal / (this.state.weeklyTimes.length - 1))).toFixed(2);
 	}
 
 	private findDayDeviation() {
 		let tempTotal = 0;
-		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
+		const average = this.state.dailyTotal / this.state.dailyTimes.length;
 		for (const val of this.state.dailyTimes) {
 			if (val.end !== null)
 				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
@@ -261,7 +264,6 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 	componentWillMount() {
 		getUserTimeslots().then(timeslots => {
 			this.setState({ times: timeslots });
-			console.log(timeslots);
 			this.makeWeeklyData();
 			this.makeDailyData();
 		});
@@ -273,7 +275,6 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		// showEvenNumberXaxisLabel={false}
 		getUserTimeslots().then(timeslots => {
 			this.setState({ times: timeslots });
-			console.log(timeslots);
 			this.makeWeeklyData();
 			this.makeDailyData();
 		});
@@ -304,16 +305,6 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 								<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
 							</View>
 						</View>
-						<View style={styles.verticalContainer}>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Most Active</Text>
-								<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
-							</View>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Least Active</Text>
-								<Text style={styles.text}>{this.findLeastPracticedSubject()}</Text>
-							</View>
-						</View>
 					</View>
 				</View>
 				<View style={styles.verticalContainer}>
@@ -332,18 +323,18 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 							<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
 						</View>
 						<View style={styles.verticalContainer}>
-							<Text style={styles.title}>Today's Total</Text>
-							<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
+							<Text style={styles.title}>Weekly Deviation</Text>
+							<Text style={styles.text}>{`${this.findWeekDeviation()}H`}</Text>
 						</View>
 					</View>
 					<View style={styles.verticalContainer}>
 						<View style={styles.verticalContainer}>
-							<Text style={styles.title}>Heaviest Night</Text>
-							<Text style={styles.text}>Coming Soon!</Text>
+							<Text style={styles.title}>Most Active</Text>
+							<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
 						</View>
 						<View style={styles.verticalContainer}>
-							<Text style={styles.title}>Lightest Night</Text>
-							<Text style={styles.text}>Coming Soon!</Text>
+							<Text style={styles.title}>Heaviest Night</Text>
+							<Text style={styles.text}>{this.findHeaviestNight()}</Text>
 						</View>
 					</View>
 				</View>
@@ -364,7 +355,8 @@ const styles = StyleSheet.create({
 	headerTitle: {
 		color: PRIMARY[700],
 		fontSize: 25,
-		fontFamily: 'Nunito-Regular'
+		fontFamily: 'Nunito-Regular',
+		marginBottom: 15
 	},
 	title: {
 		color: PRIMARY[900],
@@ -397,6 +389,7 @@ const styles = StyleSheet.create({
 	}
 });
 
+/*
 const mockData = [
 	{
 		seriesName: 'chem-512',
@@ -450,4 +443,4 @@ const pieMock = [
 		label: 'otherstuff',
 		color: 'blue'
 	}
-];
+];*/
