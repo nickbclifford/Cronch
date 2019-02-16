@@ -1,4 +1,5 @@
-import { Column, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import User from './User';
 
 @Table
 export default class NotificationToken extends Model<NotificationToken> {
@@ -6,5 +7,10 @@ export default class NotificationToken extends Model<NotificationToken> {
 	@Column
 	expoToken!: string;
 
-	// TODO: More data?
+	@ForeignKey(() => User)
+	@Column
+	user!: string;
+
+	@BelongsTo(() => User)
+	userObject!: User;
 }

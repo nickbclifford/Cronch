@@ -11,7 +11,7 @@ router.post('/', requireLoggedIn, (req, res) => {
 		return;
 	}
 
-	const token = new NotificationToken({ expoToken });
+	const token = new NotificationToken({ expoToken, user: req.authorizedUser! });
 
 	token.save()
 		.then(() => successResponse(res))
