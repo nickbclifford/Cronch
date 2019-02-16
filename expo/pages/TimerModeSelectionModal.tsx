@@ -9,6 +9,7 @@ import { components } from '../common/StyleGuide';
 import { Timer, updateTimers } from '../common/Timer';
 import { changeUserInfo, getUser, getUserTimers } from '../common/User';
 import { handleFieldChangeFactory, Omit } from '../common/Utils';
+import ListSelect from '../components/ListSelect';
 
 interface NewTimerValues {
 	work: number;
@@ -28,24 +29,34 @@ const newTimerInitialValues: NewTimerValues = {
 	break: 15 * 60 * 1000
 };
 
-export default class TimerModeSelection extends React.Component<NavigationScreenProps> {
+interface TimerModeSelectionState {
+	userCycles: Timer[];
+}
+
+export default class TimerModeSelection extends React.Component<NavigationScreenProps, TimerModeSelectionState> {
 
 	static navigationOptions = { };
 
-	private userCycles: Timer[] = [];
+	constructor(props: NavigationScreenProps) {
+		super(props);
+		this.state = {
+			userCycles: [{
+				work: 0.1 * 60 * 1000,
+				break: 0.1 * 60 * 1000
+			}, {
+				work: 0.5 * 60 * 1000,
+				break: 0.5 * 60 * 1000
+			}]
+		};
+	}
 
 	componentDidMount() {
-		this.userCycles = [{
-			work: 0.1 * 60 * 1000,
-			break: 0.1 * 60 * 1000
-		}, {
-			work: 0.5 * 60 * 1000,
-			break: 0.5 * 60 * 1000
-		}];
 
 		getUserTimers().then(timers => {
 			if (timers.length > 0) {
-				this.userCycles = timers;
+				this.setState({
+					userCycles: timers
+				});
 			}
 		})
 		.catch((e: Error) => {
@@ -58,7 +69,9 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 
 	@bind
 	private addTimerMode(values: NewTimerValues) {
-		this.userCycles.push(values);
+		this.setState({
+			userCycles: this.state.userCycles.concat([values])
+		});
 	}
 
 	@bind
@@ -71,14 +84,14 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 
 		if (values.timerSelection !== -1) {
 			timerMode = {
-				maxWorkTime: this.userCycles[values.timerSelection].work,
-				maxBreakTime: this.userCycles[values.timerSelection].break,
+				maxWorkTime: this.state.userCycles[values.timerSelection].work,
+				maxBreakTime: this.state.userCycles[values.timerSelection].break,
 				modeSelection: values.timerSelection
 			};
 		}
 
 		updateTimers(
-			this.userCycles
+			this.state.userCycles
 			// timers with id are the ones already in DB, but also resave the new selection
 				.filter((timer, i) => !timer.id)
 		).then(() => changeUserInfo({
@@ -136,19 +149,16 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 				>
 					{props => (
 						<View>
-							<Picker
-								selectedValue={props.values.timerSelection}
-								onValueChange={handleFieldChangeFactory<TimerSelectionValues>(props, 'timerSelection')}
-							>
-								{this.userCycles.map((cycle, i) =>
-									<Picker.Item
-										key={i}
-										label={`work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`}
-										value={i}
-									/>
-								)}
-								<Picker.Item key={-1} label='Manual Timer' value={-1}/>
-							</Picker>
+							<ListSelect
+								selectedIndex={props.values.timerSelection}
+								onSelectItem={handleFieldChangeFactory<TimerSelectionValues>(props, 'timerSelection')}
+								items={this.state.userCycles.map((cycle, i) => {
+									return {
+										label: `work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`,
+										value: i
+									};
+								})}
+							/>
 							<Button
 								title='Set Timer'
 								onPress={props.handleSubmit as any}
