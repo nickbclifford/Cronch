@@ -11,12 +11,13 @@ import { alarmList } from '../common/Alarms';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import flipped$ from '../common/PhoneAcrobatics';
-import { ColorPalette, components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
+import { ColorPalette, components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { Timer } from '../common/Timer';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { getUser, getUserTimers, User } from '../common/User';
 import { Omit } from '../common/Utils';
+import Circle from '../components/Circle';
 import DisplayAssignment from '../components/DisplayAssignment';
 import DisplayTask from '../components/DisplayTask';
 
@@ -457,6 +458,13 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 					rightIcon='info-circle'
 					onAssignmentClick={this.navigateToAssignmentDetails}
 				/>
+				<View style={styles.timerContainer}>
+					<Circle color={PRIMARY[100]} containerStyle={[styles.circles, styles.largeCircle]} />
+					<Circle color={PRIMARY[300]} containerStyle={[styles.circles, styles.mediumCircle]} />
+					<Circle color={PRIMARY[500]} containerStyle={[styles.circles, styles.smallCircle]} />
+					<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
+					<Text style={[typography.h0, styles.timerTime]}>45:00</Text>
+				</View>
 				<View style={styles.actions}>
 					<Button
 						title='Change Assignment'
@@ -551,10 +559,40 @@ const styles = StyleSheet.create({
 	safeArea: {
 		height: '100%',
 		padding: 8,
-		display: 'flex',
-		justifyContent: 'space-between'
+		display: 'flex'
 	},
-	actions: {},
+	timerContainer: {
+		flexGrow: 1,
+		flexShrink: 1,
+		position: 'relative',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	timerLabel: {
+		textAlign: 'center',
+		color: NEUTRAL[300]
+	},
+	timerTime: {
+		textAlign: 'center',
+		color: NEUTRAL[100]
+	},
+	circles: {
+		position: 'absolute'
+	},
+	smallCircle: {
+		width: '70%'
+	},
+	mediumCircle: {
+		width: '97.5%'
+	},
+	largeCircle: {
+		width: '120%'
+	},
+	actions: {
+		flexGrow: 0,
+		flexShrink: 0
+	},
 	changeAssignment: {
 		marginBottom: 8
 	}

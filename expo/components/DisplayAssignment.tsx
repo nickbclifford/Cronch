@@ -42,7 +42,6 @@ export default class DisplayAssignment extends React.Component<DisplayAssignment
 				flexDirection: 'row',
 				marginRight: this.props.paddingRight,
 				marginLeft: this.props.paddingLeft,
-				marginBottom: 8,
 				padding: 8,
 				borderRadius: 5,
 				backgroundColor: assignment.class.color

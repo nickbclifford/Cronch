@@ -168,7 +168,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 				rightIcon={rightIcon}
 				rightIconOnPressIn={rightIconOnPressIn}
 				rightIconOnPressOut={rightIconOnPressOut}
-				itemStyle={this.props.itemStyle}
+				itemStyle={[styles.assignmentStyle, this.props.itemStyle]}
 				paddingRight={this.props.paddingRight}
 				paddingLeft={this.props.paddingLeft}
 				onAssignmentClick={this.props.onAssignmentClick}
@@ -231,3 +231,9 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 	}
 
 }
+
+const styles = StyleSheet.create({
+	assignmentStyle: {
+		marginBottom: 8
+	}
+});
