@@ -6,7 +6,7 @@ import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
 import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { PRIMARY } from '../common/StyleGuide';
+import { components, PRIMARY } from '../common/StyleGuide';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
 import Hamburger from '../components/Hamburger';
@@ -342,7 +342,12 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 				</View>
 				</View>
 				</Swiper>
-				<Button title='Update' onPress={this.updateData} style={styles.buttonStyle} />
+				<Button
+					title='Update'
+					onPress={this.updateData}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
 				</View>
 			</SafeAreaView>
 		);
@@ -381,13 +386,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		flexDirection: 'row'
-	},
-	buttonStyle: {
-		paddingTop: 12,
-		paddingRight: 24,
-		paddingLeft: 24,
-		paddingBottom: 12,
-		backgroundColor: PRIMARY[700]
 	}
 });
 
