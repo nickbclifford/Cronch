@@ -25,7 +25,7 @@ export default class Timeslot extends Model<Timeslot> {
 	end!: Date | null;
 
 	@Column(DataType.STRING)
-	classId!: string | null; // Object ID from MyMICDS
+	classId!: string; // Object ID or task title
 
 	@ForeignKey(() => User)
 	@Column

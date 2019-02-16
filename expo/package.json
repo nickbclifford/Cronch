@@ -1,5 +1,5 @@
 {
-  "name": "empty-typescript-template",
+  "name": "cronch-mobile",
   "main": "node_modules/expo/AppEntry.js",
   "private": true,
   "scripts": {
@@ -23,12 +23,13 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
     "react-native-draggable-flatlist": "^1.1.7",
     "react-native-elements": "^1.0.0",
+    "react-native-picker-select": "^6.0.0",
     "react-native-pure-chart": "0.0.24",
     "react-native-render-html": "^3.10.0",
+    "react-native-scalable-image": "^0.5.0",
     "react-native-swiper": "^1.5.14",
     "react-navigation": "^3.0.9",
-    "rxjs": "^6.3.3",
-    "whatwg-fetch": "^2.0.4"
+    "rxjs": "^6.3.3"
   },
   "devDependencies": {
     "@mymicds/configs": "^1.1.0",
@@ -36,7 +37,6 @@
     "@types/react-navigation": "^3.0.1",
     "babel-preset-expo": "^5.0.0",
     "expo-cli": "^2.7.0",
-    "schedule": "^0.4.0",
     "tslint": "^5.12.1",
     "tslint-react": "^3.6.0",
     "typescript": "^3.2.4"

@@ -1,6 +1,6 @@
 import bind from 'bind-decorator';
-import * as React from 'react';
 import moment from 'moment';
+import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
@@ -83,10 +83,10 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			case 1: return 'Monday';
 			case 2: return 'Tuesday';
 			case 3: return 'Wednesday';
-			case 4 :return 'Thursday';
+			case 4 : return 'Thursday';
 			case 5: return 'Friday';
 			case 6: return 'Saturday';
-			default: return 'Day'
+			default: return 'Day';
 		}
 	}
 
@@ -113,13 +113,13 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 
 		// now that we have the available days of the week, we need to create the chartData
 		// we need one series that has each day
-		let chartData: LineChartDataPoint[] = [];
+		const chartData: LineChartDataPoint[] = [];
 
-		let thisWeekData: LineChartDataPoint = {
+		const thisWeekData: LineChartDataPoint = {
 			seriesName: 'Series',
 			data: [],
 			color: this.pickRandomColor()
-		}
+		};
 
 		for (let i = 0; i < 7; i++) {
 			// i is day of the week
@@ -129,8 +129,8 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 				if (time.end !== null && time.start.getDay() === i) {
 					dayTotal += this.calcHourDiff(time.start, time.end);
 				}
-			})
-			thisWeekData.data.push({x: this.convertDay(i), y: (dayTotal > 0)? parseFloat(dayTotal.toFixed(2)): dayTotal});
+			});
+			thisWeekData.data.push({x: this.convertDay(i), y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal});
 		}
 
 		chartData.push(thisWeekData);
@@ -187,7 +187,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			for (const slot of dailyTimes) {
 				if (slot.end != null && slot.classId === cl) {
 					const diff = Math.round(this.calcHourDiff(slot.start, slot.end));
-					totalHours += (diff === 0)? this.calcMinuteDiff(slot.start, slot.end): diff;
+					totalHours += (diff === 0) ? this.calcMinuteDiff(slot.start, slot.end) : diff;
 				}
 			}
 
@@ -240,8 +240,9 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		let tempTotal = 0;
 		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
 		for (const val of this.state.weeklyTimes) {
-			if (val.end !== null)
+			if (val.end !== null) {
 				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
+			}
 		}
 		return (Math.sqrt(tempTotal / (this.state.weeklyTimes.length - 1))).toFixed(2);
 	}
@@ -250,8 +251,9 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		let tempTotal = 0;
 		const average = this.state.dailyTotal / this.state.dailyTimes.length;
 		for (const val of this.state.dailyTimes) {
-			if (val.end !== null)
+			if (val.end !== null) {
 				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
+			}
 		}
 		return (Math.sqrt(tempTotal / (this.state.dailyTimes.length - 1))).toFixed(2);
 	}
@@ -267,7 +269,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			this.makeWeeklyData();
 			this.makeDailyData();
 		});
-		//this.updateData();
+		// this.updateData();
 	}
 
 	@bind

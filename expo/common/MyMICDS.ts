@@ -15,7 +15,7 @@ const mymicdsConfig: MyMICDSOptions = {
 		await AsyncStorage.removeItem(jwtKey);
 	},
 	updateBackground: false,
-	updateUserInfo: false
+	updateUserInfo: true
 };
 
 export default new MyMICDS(mymicdsConfig);

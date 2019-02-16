@@ -1,5 +1,9 @@
-import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+	BeforeFindAfterExpandIncludeAll,
+	Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import BattlePlanTask from './BattlePlanTask';
 import Response from './QuestionnaireResponse';
+import Timer from './Timer';
 import Timeslot from './Timeslot';
 
 export enum DataSharing {
@@ -22,4 +26,18 @@ export default class User extends Model<User> {
 
 	@HasMany(() => Response)
 	responses!: Response[];
+
+	@Default(0)
+	@Column(DataType.INTEGER)
+	alarmSelection!: number;
+
+	@Default(0)
+	@Column(DataType.INTEGER)
+	timerSelection!: number;
+
+	@HasMany(() => Timer)
+	timers!: Timer[];
+
+	@HasMany(() => BattlePlanTask)
+	battlePlanTasks!: BattlePlanTask[];
 }

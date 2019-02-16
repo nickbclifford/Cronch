@@ -1,8 +1,9 @@
+import { FormikProps } from 'formik';
 import moment from 'moment';
-
 import { AsyncStorage } from 'react-native';
+
 import Config from '../Config';
-import { jwtKey } from './MyMICDS';
+import { GetUserInfoResponse, jwtKey } from './MyMICDS';
 
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 
@@ -42,7 +43,40 @@ export function humanReadableTimeUntil(date: moment.Moment) {
 	});
 }
 
-export function oxfordCommaList(arr: string[]): string {
-	const last = arr.pop();
-	return `${arr.join(', ')}, and ${last}`;
+export function oxfordCommaList(arr: string[], separator = 'and'): string {
+	switch (arr.length) {
+		case 1:
+		return arr[0];
+		case 2:
+		return `${arr[0]} ${separator} ${arr[1]}`;
+		default:
+		const last = arr.pop();
+		return `${arr.join(', ')}, ${separator} ${last}`;
+	}
+}
+
+export function getMissingURLs(user: GetUserInfoResponse) {
+	const urls: string[] = [];
+	let hasRequired = false;
+
+	if (user.canvasURL === null) {
+		urls.push('Canvas');
+	} else {
+		hasRequired = true;
+	}
+
+	if (user.portalURLCalendar === null || user.portalURLClasses === null) {
+		urls.push('Portal');
+	}
+
+	return {
+		urls,
+		hasRequired
+	};
+}
+
+export function handleFieldChangeFactory<T>(props: FormikProps<T>, field: keyof T) {
+	return (value: any) => {
+		props.setFieldValue(field as string, value);
+	};
 }

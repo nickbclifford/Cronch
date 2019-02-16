@@ -11,16 +11,20 @@ import createNavigationOptions from './common/NavigationOptionsFactory';
 import createQuestionnaire from './components/QuestionnaireFactory';
 
 import About from './pages/About';
+import AllowNotifications from './pages/AllowNotifications';
 import Analytics from './pages/Analytics';
 import AssignmentDetails from './pages/AssignmentDetails';
+import Avatar from './pages/Avatar';
 import BattlePlan from './pages/BattlePlan';
+import CheckUrls from './pages/CheckUrls';
 import CanvasAssignments from './pages/create-plan/CanvasAssignments';
 import CustomAssignments from './pages/create-plan/CustomAssignments';
+import HomeworkTimer from './pages/HomeworkTimer';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
-import Timer from './pages/Timer';
 import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
+import TimerModeSelection from './pages/TimerModeSelectionModal';
 import Welcome from './pages/Welcome';
 
 // tslint:disable:variable-name
@@ -32,7 +36,8 @@ function createSingleStackNavigator(Component: any, config?: StackNavigatorConfi
 const AuthNavigator = createStackNavigator(
 	{
 		Welcome,
-		Login
+		Login,
+		CheckUrls
 	},
 	{
 		initialRouteName: 'Welcome'
@@ -58,30 +63,36 @@ const CreatePlan = createBottomTabNavigator(
 	}
 );
 
-const TimerAndModal = createStackNavigator(
+const BattlePlanAndAllowNotifications = createStackNavigator(
 	{
-		Timer,
-		ModeSelection: TimerModeSelectionModal
+		BattlePlan,
+		AllowNotifications
 	},
 	{
 		mode: 'modal',
-		headerMode: 'none'
+		navigationOptions: {
+			header: null
+		}
 	}
 );
 
-// Use custom trasition in the future
 const TimerNavigator = createStackNavigator(
 	{
-		BattlePlan,
+		BattlePlan: BattlePlanAndAllowNotifications,
 		CreatePlan: {
 			screen: CreatePlan,
 			navigationOptions: createNavigationOptions('Create Plan', false)
 		},
 		AssignmentDetails,
-		Timer: TimerAndModal
+		Timer: {
+			screen: HomeworkTimer
+		},
+		ModeSelection: TimerModeSelection
 	},
 	{
-		initialRouteName: 'BattlePlan'
+		initialRouteName: 'BattlePlan',
+		// Timer header would look back if this is other values
+		headerMode: 'screen'
 	}
 );
 
@@ -106,6 +117,7 @@ const Questionnaire = createQuestionnaire(
 const AppNavigator = createDrawerNavigator(
 	{
 		Timer: TimerNavigator,
+		Avatar: createSingleStackNavigator(Avatar),
 		Profile: createSingleStackNavigator(Profile),
 		About: createSingleStackNavigator(About),
 		Analytics: AnalyticsNavigator,
