@@ -1,5 +1,5 @@
 import bind from 'bind-decorator';
-import { Notifications, Permissions } from 'expo';
+// import { Notifications, Permissions } from 'expo';
 import * as React from 'react';
 import { AsyncStorage, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
@@ -28,28 +28,28 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 		this.state = { asking: false };
 	}
 
-	@bind
-	async askForPermission() {
-		this.setState({ asking: true });
-		console.log('asked');
-		const status = await getNotificationPermissions();
-		if (status !== 'granted') {
-			clearInterval(this.permissionSpamInterval);
-			await AsyncStorage.setItem('deniedNotifications', 'true');
-			return this.continue();
-		}
-		const token = await Notifications.getExpoPushTokenAsync();
-		await submitNotificationToken(token);
-		this.continue();
-	}
+	// @bind
+	// async askForPermission() {
+	// 	this.setState({ asking: true });
+	// 	console.log('asked');
+	// 	const status = await getNotificationPermissions();
+	// 	if (status !== 'granted') {
+	// 		clearInterval(this.permissionSpamInterval);
+	// 		await AsyncStorage.setItem('deniedNotifications', 'true');
+	// 		return this.continue();
+	// 	}
+	// 	const token = await Notifications.getExpoPushTokenAsync();
+	// 	await submitNotificationToken(token);
+	// 	this.continue();
+	// }
 
-	@bind
-	askForPermissionSpam() {
-		this.askForPermission();
-		this.permissionSpamInterval = setInterval(() => {
-			this.askForPermission();
-		}, 500);
-	}
+	// @bind
+	// askForPermissionSpam() {
+	// 	this.askForPermission();
+	// 	this.permissionSpamInterval = setInterval(() => {
+	// 		this.askForPermission();
+	// 	}, 500);
+	// }
 
 	@bind
 	continue() {
@@ -80,7 +80,7 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 					<Button
 						title='Enable Notifications'
 						loading={this.state.asking}
-						onPress={this.askForPermissionSpam}
+						// onPress={this.askForPermissionSpam}
 						containerStyle={styles.buttonContainer}
 						buttonStyle={components.buttonStyle}
 						titleStyle={components.buttonText}
