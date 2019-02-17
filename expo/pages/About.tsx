@@ -14,7 +14,7 @@ export default class About extends React.Component<NavigationScreenProps> {
 			<SafeAreaView style={styles.safeArea}>
 				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.container}>
-					<Text style={[typography.body, styles.message]}>Bugs? Feature requests? Compliments?</Text>
+					<Text style={[typography.body, styles.message]}>Bugs? Feature requests? Compliments? Roasts?</Text>
 					<Text style={[typography.h1, nunito.bold, styles.message]}>Email hello@cronch.app</Text>
 				</View>
 			</SafeAreaView>
