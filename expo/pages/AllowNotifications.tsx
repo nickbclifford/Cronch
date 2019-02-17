@@ -98,8 +98,7 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		height: '100%',
-		paddingLeft: 32,
-		paddingRight: 32,
+		padding: 32,
 		display: 'flex',
 		flexDirection: 'column',
 		justifyContent: 'flex-start',

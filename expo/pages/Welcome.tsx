@@ -48,7 +48,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	apple: {
-		width: '50%'
+		width: '50%',
+		maxWidth: 210
 	},
 	greeting: {
 		padding: 24

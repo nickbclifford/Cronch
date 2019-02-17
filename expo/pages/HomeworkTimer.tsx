@@ -1,25 +1,22 @@
 import bind from 'bind-decorator';
-import { Audio, PlaybackSource } from 'expo';
+import { Audio } from 'expo';
 import moment from 'moment';
 import * as React from 'react';
-import { Alert, Picker, StatusBar, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { Alert, StatusBar, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
+import MyMICDS from '../common/MyMICDS';
 
 import { alarmList } from '../common/Alarms';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
-import createNavigationOptions from '../common/NavigationOptionsFactory';
 import flipped$ from '../common/PhoneAcrobatics';
-import { ColorPalette, components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
-import { Timer } from '../common/Timer';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
 import { getUser, getUserTimers, User } from '../common/User';
 import { Omit } from '../common/Utils';
 import Circle from '../components/Circle';
 import DisplayAssignment from '../components/DisplayAssignment';
-import DisplayTask from '../components/DisplayTask';
 
 export interface TimerState {
 	maxWorkTime: number;
@@ -466,6 +463,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 					assignment={this.state.assignment}
 					rightIcon='info-circle'
 					onAssignmentClick={this.navigateToAssignmentDetails}
+					itemStyle={styles.currentTask}
 				/>
 				<View style={styles.container}>
 					<Circle color={PRIMARY[100]} containerStyle={[styles.circles, styles.largeCircle]} />
@@ -598,6 +596,9 @@ const styles = StyleSheet.create({
 		height: '100%',
 		padding: 8,
 		display: 'flex'
+	},
+	currentTask: {
+		marginTop: 8
 	},
 	container: {
 		flexGrow: 1,

@@ -86,6 +86,7 @@ class AssignmentDetails extends React.Component<
 					{!this.state.neuter && (
 						<Button
 							title='Add to Battle Plan'
+							containerStyle={styles.addToBattlePlan}
 							buttonStyle={components.buttonStyle}
 							titleStyle={components.buttonText}
 							onPress={this.addToBattlePlan}
@@ -118,10 +119,8 @@ const styles = StyleSheet.create({
 	assignmentMeta: {
 		// backgroundColor: NEUTRAL[300]
 	},
-	workButton: {
-		backgroundColor: PRIMARY[500],
-		borderBottomLeftRadius: 0,
-		borderBottomRightRadius: 0
+	addToBattlePlan: {
+		marginBottom: 16
 	},
 	checkButton: {
 		backgroundColor: SUCCESS[500],
