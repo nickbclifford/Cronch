@@ -13,7 +13,7 @@ import { components, NEUTRAL, nunito, typography } from '../common/StyleGuide';
 import { getUser, registerUser } from '../common/User';
 import { getMissingURLs } from '../common/Utils';
 
-export interface LoginForm {
+interface LoginForm {
 	user: string;
 	password: string;
 }
@@ -23,14 +23,24 @@ const defaultFormValues: LoginForm = {
 	password: ''
 };
 
-export default class Login extends React.Component<NavigationScreenProps> {
+interface LoginState {
+	loading: boolean;
+}
+
+export default class Login extends React.Component<NavigationScreenProps, LoginState> {
 
 	static navigationOptions = {
 		header: null
 	};
 
+	constructor(props: any) {
+		super(props);
+		this.state = { loading: false };
+	}
+
 	@bind
 	private login({ user, password }: LoginForm) {
+		this.setState({ loading: true });
 		MyMICDS.auth.login({
 			user,
 			password,
@@ -53,13 +63,17 @@ export default class Login extends React.Component<NavigationScreenProps> {
 			map(getMissingURLs)
 		).subscribe(
 			missing => {
+				this.setState({ loading: false });
 				if (missing.urls.length > 0) {
 					this.props.navigation.navigate('CheckUrls', missing);
 				} else {
 					this.props.navigation.navigate('App');
 				}
 			},
-			err => Alert.alert('Login Error', err.message)
+			err => {
+				this.setState({ loading: false });
+				Alert.alert('Login Error', err.message);
+			}
 		);
 	}
 
@@ -106,6 +120,7 @@ export default class Login extends React.Component<NavigationScreenProps> {
 						/>
 						<Button
 							title='Login'
+							loading={this.state.loading}
 							containerStyle={styles.buttonContainer}
 							buttonStyle={components.buttonStyle}
 							titleStyle={components.buttonText}
