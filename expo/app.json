@@ -3,6 +3,7 @@
     "name": "Cronch",
     "description": "The all-in-one app to manage your time",
     "slug": "cronch",
+    "scheme": "cronch",
     "privacy": "public",
     "sdkVersion": "31.0.0",
     "platforms": [
@@ -25,7 +26,8 @@
     ],
     "ios": {
       "bundleIdentifier": "app.cronch.cronch",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "buildNumber": "1.0.1"
     },
     "android": {
       "package": "app.cronch.cronch"
