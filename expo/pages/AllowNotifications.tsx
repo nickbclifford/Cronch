@@ -5,6 +5,7 @@ import { AsyncStorage, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
+import { async } from 'rxjs/internal/scheduler/async';
 import { Expression, Skin } from '../common/AvatarTypes';
 import { getNotificationPermissions, submitNotificationToken } from '../common/NotificationToken';
 import { components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
@@ -52,6 +53,7 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 
 	@bind
 	continue() {
+		AsyncStorage.setItem('permission_asked', 'true');
 		this.setState({ asking: false });
 		this.props.navigation.navigate(
 			this.props.navigation.getParam('redirectTo'),
