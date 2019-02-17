@@ -110,6 +110,7 @@ export const components = StyleSheet.create({
 	textInput: {
 		...StyleSheet.flatten(typography.body),
 		padding: 8,
+		maxWidth: 420,
 		backgroundColor: NEUTRAL[300],
 		color: NEUTRAL[700],
 		borderRadius: 5

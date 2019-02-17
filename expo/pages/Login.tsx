@@ -83,6 +83,7 @@ export default class Login extends React.Component<NavigationScreenProps> {
 						<View style={styles.usernameGroup}>
 							<TextInput
 								placeholder={'Username'}
+								autoCapitalize='none'
 								onChangeText={props.handleChange('user')}
 								onBlur={props.handleBlur('user')}
 								value={props.values.user}
@@ -95,6 +96,7 @@ export default class Login extends React.Component<NavigationScreenProps> {
 						</View>
 						<TextInput
 							placeholder={'Password'}
+							autoCapitalize='none'
 							secureTextEntry={true}
 							onChangeText={props.handleChange('password')}
 							onBlur={props.handleBlur('password')}
@@ -148,6 +150,7 @@ const styles = StyleSheet.create({
 	},
 	usernameGroup: {
 		width: '100%',
+		maxWidth: 420,
 		marginBottom: 8,
 		display: 'flex',
 		flexDirection: 'row'
