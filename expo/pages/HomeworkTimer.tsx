@@ -162,6 +162,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
+		flipped$.unsubscribe();
 		// TODO: Custom events bb
 		this.endRecordTimeslot();
 	}
