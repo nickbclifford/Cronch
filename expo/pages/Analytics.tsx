@@ -344,6 +344,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 				<Button
 					title='Update'
 					onPress={this.updateData}
+					containerStyle={styles.updateButton}
 					buttonStyle={components.buttonStyle}
 					titleStyle={components.buttonText}
 				/>
@@ -385,6 +386,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		flexDirection: 'row'
+	},
+	updateButton: {
+		marginBottom: 16
 	}
 });
 
