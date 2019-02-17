@@ -20,6 +20,8 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 		header: null
 	};
 
+	private permissionSpamInterval: any;
+
 	constructor(props: any) {
 		super(props);
 		this.state = { asking: false };
@@ -28,15 +30,24 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 	@bind
 	async askForPermission() {
 		this.setState({ asking: true });
+		console.log('asked');
 		const status = await getNotificationPermissions();
-		console.log('status after ask', status);
 		if (status !== 'granted') {
+			clearInterval(this.permissionSpamInterval);
 			await AsyncStorage.setItem('deniedNotifications', 'true');
 			return this.continue();
 		}
 		const token = await Notifications.getExpoPushTokenAsync();
 		await submitNotificationToken(token);
 		this.continue();
+	}
+
+	@bind
+	askForPermissionSpam() {
+		this.askForPermission();
+		this.permissionSpamInterval = setInterval(() => {
+			this.askForPermission();
+		}, 500);
 	}
 
 	@bind
@@ -67,7 +78,7 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 					<Button
 						title='Enable Notifications'
 						loading={this.state.asking}
-						onPress={this.askForPermission}
+						onPress={this.askForPermissionSpam}
 						containerStyle={styles.buttonContainer}
 						buttonStyle={components.buttonStyle}
 						titleStyle={components.buttonText}
