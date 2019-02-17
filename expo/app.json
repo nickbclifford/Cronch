@@ -27,7 +27,7 @@
     "ios": {
       "bundleIdentifier": "app.cronch.cronch",
       "supportsTablet": false,
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.1"
     },
     "android": {
       "package": "app.cronch.cronch"
