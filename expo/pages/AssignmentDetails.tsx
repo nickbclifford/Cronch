@@ -7,7 +7,7 @@ import HTML from 'react-native-render-html';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
 import withAssignmentContext, {	WithAssignmentContextProps } from '../common/AssignmentContext';
-import { components, NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, SUCCESS, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { humanReadableTimeUntil } from '../common/Utils';
 

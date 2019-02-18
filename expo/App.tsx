@@ -12,11 +12,7 @@ import Task, { createCustomTask } from './common/Task';
 import { getUserBattlePlanTasks } from './common/User';
 import AppContainer from './Navigation';
 
-interface GlobalAppState extends AssignmentContextType, OnLoginContextType {
-	loginEvents: Array<() => void>;
-}
-
-export default class App extends React.Component<{}, GlobalAppState> {
+export default class App extends React.Component<{}, AssignmentContextType & OnLoginContextType> {
 
 	savePlan = new Subject<Task[]>();
 
@@ -24,43 +20,37 @@ export default class App extends React.Component<{}, GlobalAppState> {
 		super(props);
 
 		this.state = {
-			onLoginEvent: callback => {
-				this.setState(prev => {
-					const newEvents = prev.loginEvents;
-					newEvents.push(callback);
-					return { loginEvents: newEvents };
-				});
+			loggedIn: () => {
+				this.state.onLoggedIn.next();
 			},
-			runEvents: () => {
-				for (const cb of this.state.loginEvents) {
-					cb();
-				}
-			},
-			loginEvents: [],
+			onLoggedIn: new Subject(),
 			assignments: [],
+			onAssignmentsChange: new Subject(),
 			updateAssignments: this.updateNewAssignments,
 			appendAssignment: newAssignment => {
 				const newAssignments = this.state.assignments;
-				// do not allow multiple of one assignment to be added
+
+				// Do not allow multiple of one assignment to be added
 				if (!this.state.assignments.find(a => a._id === newAssignment._id)) {
 					newAssignments.push(newAssignment);
-					this.setState({ assignments: newAssignments });
 					this.updateNewAssignments(newAssignments);
 				}
 			},
 			deleteAssignment: id => {
 				const newAssignments = this.state.assignments.filter(assignment => assignment._id !== id);
-				this.setState({ assignments: newAssignments });
 				this.updateNewAssignments(newAssignments);
 			}
 		};
 	}
 
 	@bind
-	private updateNewAssignments(newAssignments: Task[]) {
+	private updateNewAssignments(newAssignments: Task[], triggerSavePlan = true) {
 		// Submit to backend 5 seconds after last change
-		this.savePlan.next(newAssignments);
+		if (triggerSavePlan) {
+			this.savePlan.next(newAssignments);
+		}
 		this.setState({ assignments: newAssignments });
+		this.state.onAssignmentsChange.next(newAssignments);
 	}
 
 	componentDidMount() {
@@ -68,40 +58,40 @@ export default class App extends React.Component<{}, GlobalAppState> {
 			Alert.alert('MyMICDS Error', err.message);
 		});
 
-		this.state.onLoginEvent(() => {
-			combineLatest(
+		this.state.onLoggedIn.pipe(
+			switchMap(() => combineLatest(
 				MyMICDS.canvas.getEvents(),
 				getUserBattlePlanTasks()
-			).subscribe(
-				([canvasRes, tasks]) => {
-					if (!canvasRes.hasURL) {
-						return;
+			))
+		).subscribe(
+			([canvasRes, tasks]) => {
+				if (!canvasRes.hasURL) {
+					return;
+				}
+				const events = canvasRes.events;
+
+				tasks.sort((a, b) => a.planOrder - b.planOrder);
+
+				const assignments: Task[] = [];
+				for (const task of tasks) {
+					const assignment = events.find(e => e._id === task.taskId);
+					if (typeof assignment === 'undefined') {
+						assignments.push(createCustomTask(task.taskId));
+					} else {
+						assignments.push(assignment);
 					}
-					const events = canvasRes.events;
+				}
 
-					tasks.sort((a, b) => a.planOrder - b.planOrder);
-
-					const assignments: Task[] = [];
-					for (const task of tasks) {
-						const assignment = events.find(e => e._id === task.taskId);
-						if (typeof assignment === 'undefined') {
-							assignments.push(createCustomTask(task.taskId));
-						} else {
-							assignments.push(assignment);
-						}
-					}
-
-					this.setState({ assignments });
-				},
-				err => Alert.alert('Battle Plan Error', `Error getting battle plan! ${err.message}`)
-			);
-		});
+				this.updateNewAssignments(assignments, false);
+			},
+			err => Alert.alert('Battle Plan Error', `Error getting battle plan! ${err.message}`)
+		);
 
 		this.savePlan.pipe(
-			debounceTime(5000),
+			debounceTime(3000),
 			switchMap(tasks => saveBattlePlanTasks(tasks.map(t => t._id)))
 		).subscribe(
-			() => console.log('saved battle plan'),
+			() => console.log('Saved Battle Plan'),
 			err => Alert.alert('Saving Battle Plan Error', err.message)
 		);
 	}
