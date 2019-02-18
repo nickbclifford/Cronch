@@ -30,6 +30,7 @@ body {
 
 .not-bootstrap-container {
   overflow: hidden;
+  height: 200vh;
 }
 .not-bootstrap-container .jumbotron-thing {
   height: 88vh;
@@ -54,6 +55,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 1em;
 }
 .not-bootstrap-container .jumbotron-thing .big-title .logo .logo-image {
   height: 10em;
@@ -64,10 +66,41 @@ body {
   font-weight: 100;
   font-size: 10em;
 }
-.not-bootstrap-container .jumbotron-thing .big-title .download-button {
-  height: 4em;
-  width: 15em;
-  border-radius: 2em;
+.not-bootstrap-container .jumbotron-thing .big-title .download {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-button {
+  height: 10rem;
+  width: 36rem;
+  border-radius: 5em;
+  font-size: 2.5em;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-height: 6rem;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .apple, .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android {
+  height: 4rem;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android {
+  margin: -0.5rem;
+}
+@media screen and (max-width: 576px) {
+  .not-bootstrap-container .jumbotron-thing .big-title {
+    flex-direction: row;
+  }
+  .not-bootstrap-container .jumbotron-thing .big-title .download-button {
+    height: 6rem;
+    width: 20rem;
+    border-radius: 3em;
+    font-size: 1.5em;
+  }
 }
 
 /*# sourceMappingURL=index.css.map */

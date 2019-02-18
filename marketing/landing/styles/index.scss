@@ -4,6 +4,8 @@
 */
 $gradient: linear-gradient( 135deg, #CE9FFC 10%, #7367F0 100%);
 
+$break-small: 576px;
+
 body {
 	font-family: 'Nunito';
 	overflow: hidden;
@@ -32,6 +34,7 @@ body {
 
 .not-bootstrap-container {
 	overflow: hidden;
+	height: 200vh;
 	.jumbotron-thing {
 		height: 88vh;
 		width: 120%;
@@ -53,6 +56,7 @@ body {
 				display: flex;
 				justify-content: center;
 				align-items: center;
+				margin: 1em;
 				.logo-image {
 					height: 10em;
 					width: 10em;
@@ -63,11 +67,43 @@ body {
 					font-size: 10em;
 				}
 			}
-			.download-button {
-				height: 4em;
-				width: 15em;
-				border-radius: 2em;
+			.download{
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				.download-button {
+					height: 10rem;
+					width: 36rem;
+					border-radius: 5em;
+					font-size: 2.5em;
+				}
+				.download-platforms {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					flex-direction: column;
+					max-height: 6rem;
+					.apple, .android {
+						height: 4rem;
+					}
+					.android {
+						margin: -0.5rem;
+					}
+				}
+			}
+
+			@media screen and (max-width: $break-small) {
+				flex-direction: row;
+				.download-button {
+					height: 6rem;
+					width: 20rem;
+					border-radius: 3em;
+					font-size: 1.5em;
+				}	
 			}
 		}
 	}
 }
+
+
