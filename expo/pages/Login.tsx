@@ -89,7 +89,10 @@ export default class Login extends React.Component<NavigationScreenProps, LoginS
 					}
 				} else {
 					console.log('navigate toe quesiton');
-					this.props.navigation.navigate('InitialQuestionaire', { redirectAfter: checkUrls ? 'CheckUrls' : 'App', redirectAfterParams: missing });
+					this.props.navigation.navigate('InitialQuestionaire', {
+						redirectAfter: checkUrls ? 'CheckUrls' : 'App',
+						redirectAfterParams: missing
+					});
 				}
 			},
 			err => {

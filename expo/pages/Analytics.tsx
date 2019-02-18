@@ -194,13 +194,20 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 				}
 			}
 
-			const classData = this.props.assignmentContext.assignments.find(a => a._id === cl)!.class;
-
-			chartData.push({
-				label: classData.name,
-				value: +(totalHours).toFixed(2),
-				color: classData.color
-			});
+			if (cl.startsWith('event-assignment-')) {
+				const classData = this.props.assignmentContext.assignments.find(a => a._id === cl)!.class;
+				chartData.push({
+					label: classData.name,
+					value: +(totalHours).toFixed(2),
+					color: classData.color
+				});
+			} else {
+				chartData.push({
+					label: cl,
+					value: +(totalHours).toFixed(2),
+					color: this.pickRandomColor()
+				});
+			}
 		}
 
 		if (chartData.length > 0) {
@@ -220,10 +227,15 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 					biggestClass = i;
 				}
 			}
+			const biggestId = this.state.weeklyTimes[biggestClass].classId;
 
-			return this.props.assignmentContext.assignments
-				.find(a => a._id === this.state.weeklyTimes[biggestClass].classId)!
-				.class.name;
+			if (biggestId.startsWith('event-assignment-')) {
+				return this.props.assignmentContext.assignments
+					.find(a => a._id === biggestId)!
+					.class.name;
+			} else {
+				return biggestId;
+			}
 		} else {
 			return 'Not Available';
 		}

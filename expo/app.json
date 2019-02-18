@@ -30,7 +30,8 @@
       "buildNumber": "1.0.2"
     },
     "android": {
-      "package": "app.cronch.cronch"
+      "package": "app.cronch.cronch",
+      "permissions": []
     }
   }
 }
