@@ -1,6 +1,6 @@
 function getMobileOperatingSystem() {
 	var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-  
+
 	// Windows Phone must come first because its UA also contains 'Android'
 	if (/windows phone/i.test(userAgent)) {
 		return 'Windows Phone';
@@ -14,16 +14,14 @@ function getMobileOperatingSystem() {
 	if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
 		return 'iOS';
 	}
-  
+
 	return 'unknown';
   }
 
   function redirectDownload() {
-		if (getMobileOperatingSystem() === 'iOS') {
-			window.location.href = 'https://itunes.apple.com/app/id1453301936';
-		} else if (getMobileOperatingSystem() === 'Android') {
+		if (getMobileOperatingSystem() === 'Android') {
 			window.location.href = 'https://play.google.com/store/apps/details?id=app.cronch.cronch';
 		} else {
-			alert('Coming soon!');
+			window.location.href = 'https://itunes.apple.com/app/id1453301936';
 		}
   }
