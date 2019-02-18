@@ -1,10 +1,11 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
+import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { submitResponse } from '../common/QuestionnaireResponse';
 import { QuestionnaireInfo } from '../common/Questionnaires';
-import { PRIMARY } from '../common/StyleGuide';
+import { components, NEUTRAL } from '../common/StyleGuide';
 import Question from './Question';
 
 export interface QuestionnaireState {
@@ -75,20 +76,21 @@ export default function createQuestionnaire(questionnaireInfo: QuestionnaireInfo
 		render() {
 			const lastQuestion = this.state.questionIndex === questionnaireInfo.questions.length - 1;
 			return (
-				<SafeAreaView style={styles.safeArea}>
-					<View style={styles.container}>
-						<Question
-							{...questionnaireInfo.questions[this.state.questionIndex]}
-							selectedId={this.state.responseId}
-							onSelectResponse={this.onSelectResponse}
-						/>
-						<Button
-							color={PRIMARY[700]}
-							title={lastQuestion ? 'Submit' : 'Next'}
-							onPress={lastQuestion ? this.onSubmit : this.onNextQuestion}
-							disabled={this.state.responseId === null}
-						/>
-					</View>
+				<SafeAreaView style={styles.container}>
+					<StatusBar barStyle='dark-content' animated={true} />
+					<Question
+						{...questionnaireInfo.questions[this.state.questionIndex]}
+						selectedId={this.state.responseId}
+						onSelectResponse={this.onSelectResponse}
+					/>
+					<Button
+						title={lastQuestion ? 'Submit' : 'Next'}
+						containerStyle={styles.next}
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
+						onPress={lastQuestion ? this.onSubmit : this.onNextQuestion}
+						disabled={this.state.responseId === null}
+					/>
 				</SafeAreaView>
 			);
 		}
@@ -99,12 +101,22 @@ export default function createQuestionnaire(questionnaireInfo: QuestionnaireInfo
 }
 
 const styles = StyleSheet.create({
-	safeArea: {
-		height: '100%'
-	},
 	container: {
-		flex: 1,
+		width: '100%',
+		height: '100%',
+		padding: 32,
+		display: 'flex',
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
+		backgroundColor: NEUTRAL[100],
+		borderWidth: 2,
+		borderColor: 'purple'
+	},
+	question: {
+		width: '100%'
+	},
+	next: {
+		marginTop: 32 - 8,
+		marginBottom: 16
 	}
 });

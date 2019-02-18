@@ -1,10 +1,10 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { CheckBox } from 'react-native-elements';
+import { CheckBox, Icon } from 'react-native-elements';
 
 import { QuestionInfo } from '../common/Questionnaires';
-import { typography } from '../common/StyleGuide';
+import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 
 export interface QuestionProps extends QuestionInfo {
 	selectedId: number | null;
@@ -12,10 +12,6 @@ export interface QuestionProps extends QuestionInfo {
 }
 
 export default class Question extends React.Component<QuestionProps> {
-
-	constructor(props: QuestionProps) {
-		super(props);
-	}
 
 	@bind
 	private onRadioPress(id: number) {
@@ -25,20 +21,38 @@ export default class Question extends React.Component<QuestionProps> {
 	}
 
 	render() {
+		const checkedIcon = (
+			<Icon
+				name='check'
+				type='font-awesome'
+				size={20}
+				color={PRIMARY[700]}
+				containerStyle={styles.emptyIcon}
+			/>
+		);
+
+		// color={NEUTRAL[900]}
+
+		const emptyIcon = (
+			<View style={styles.emptyIcon} />
+		);
+
 		const responseRadios = this.props.responses.map(response => (
 			<CheckBox
 				center={false}
 				title={response.answer}
 				checked={this.props.selectedId === response.id}
-				checkedIcon='dot-circle-o'
-				uncheckedIcon='circle-o'
+				checkedIcon={checkedIcon}
+				uncheckedIcon={emptyIcon}
+				containerStyle={styles.option}
+				textStyle={[typography.body]}
 				onPress={this.onRadioPress(response.id)}
 				key={response.id.toString()}
 			/>
 		));
 		return (
 			<View style={styles.container}>
-				<Text style={[typography.h3, styles.text]}>{this.props.question}</Text>
+				<Text style={[typography.h2, styles.text]}>{this.props.question}</Text>
 				{responseRadios}
 			</View>
 		);
@@ -48,9 +62,22 @@ export default class Question extends React.Component<QuestionProps> {
 
 const styles = StyleSheet.create({
 	container: {
-		minHeight: 200
+		width: '100%',
+		display: 'flex',
+		justifyContent: 'space-between'
 	},
 	text: {
-		alignSelf: 'center'
+		marginBottom: 32
+	},
+	option: {
+		margin: 0,
+		marginLeft: 0,
+		marginRight: 0,
+		marginBottom: 8,
+		backgroundColor: NEUTRAL[300],
+		borderWidth: 0
+	},
+	emptyIcon: {
+		width: 20
 	}
 });

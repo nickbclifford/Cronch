@@ -70,11 +70,11 @@ const questionnaires: { [key: string]: QuestionnaireInfo } = {
 			},
 			{
 				id: 2,
-				question: 'How stressful have you recently felt with regards to schoolwork?',
+				question: 'Recently, how much stress have you experienced from school workloads?',
 				responses: [
 					{
 						id: 5,
-						answer: 'Very much'
+						answer: 'A lot'
 					},
 					{
 						id: 4,
