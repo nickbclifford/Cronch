@@ -4,6 +4,7 @@ import {
 	createDrawerNavigator,
 	createStackNavigator,
 	createSwitchNavigator,
+	NavigationComponent,
 	StackNavigatorConfig
 } from 'react-navigation';
 
@@ -15,7 +16,6 @@ import About from './pages/About';
 import AllowNotifications from './pages/AllowNotifications';
 import Analytics from './pages/Analytics';
 import AssignmentDetails from './pages/AssignmentDetails';
-import Avatar from './pages/Avatar';
 import BattlePlan from './pages/BattlePlan';
 import CheckUrls from './pages/CheckUrls';
 import CanvasAssignments from './pages/create-plan/CanvasAssignments';
@@ -24,13 +24,12 @@ import HomeworkTimer from './pages/HomeworkTimer';
 import Loading from './pages/Loading';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
-import TimerModeSelectionModal from './pages/TimerModeSelectionModal';
 import TimerModeSelection from './pages/TimerModeSelectionModal';
 import Welcome from './pages/Welcome';
 
 // tslint:disable:variable-name
 
-function createSingleStackNavigator(Component: any, config?: StackNavigatorConfig) {
+function createSingleStackNavigator(Component: NavigationComponent, config?: StackNavigatorConfig) {
 	return createStackNavigator({ Component }, config);
 }
 

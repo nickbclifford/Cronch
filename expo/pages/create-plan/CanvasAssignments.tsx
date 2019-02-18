@@ -18,12 +18,12 @@ export default class CanvasAssignments extends React.Component<NavigationScreenP
 
 	static navigationOptions = createNavigationOptions('Canvas', false, () => {
 		return {
-			tabBarIcon: ({ tintColor }: { tintColor: string }) => {
+			tabBarIcon: ({ tintColor }: { tintColor: string | null }) => {
 				return (
 					<Icon
 						name='graduation-cap'
 						type='font-awesome'
-						color={tintColor}
+						color={tintColor!}
 					/>
 				);
 			}

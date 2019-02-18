@@ -20,7 +20,7 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 		header: null
 	};
 
-	private permissionSpamInterval: any;
+	private permissionSpamInterval!: ReturnType<typeof setInterval>;
 
 	constructor(props: any) {
 		super(props);

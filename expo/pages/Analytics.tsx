@@ -22,7 +22,10 @@ interface PieChartDataPoint {
 
 interface LineChartDataPoint {
 	seriesName: string;
-	data: any[];
+	data: Array<{
+		x: string,
+		y: number
+	}>;
 	color: string;
 }
 

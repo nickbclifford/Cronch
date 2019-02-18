@@ -6,16 +6,16 @@ import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import bind from 'bind-decorator';
 import { PRIMARY } from '../common/StyleGuide';
 
-export interface ListSelectProps {
+export interface ListSelectProps<T> {
 	selectedIndex: number;
 	onSelectItem(index: number): void;
-	items: Array<{ label: string, value: any }>;
+	items: Array<{ label: string, value: T }>;
 	onDelete(index: number): void;
 }
 
-export default class ListSelect extends React.Component<ListSelectProps> {
+export default class ListSelect<T> extends React.Component<ListSelectProps<T>> {
 
-	constructor(props: ListSelectProps) {
+	constructor(props: ListSelectProps<T>) {
 		super(props);
 	}
 

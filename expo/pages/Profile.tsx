@@ -16,6 +16,7 @@ import { handleFieldChangeFactory } from '../common/Utils';
 import CronchyUser from '../components/CronchyUser';
 import Question from '../components/Question';
 
+// TODO: What's the deal with this component's state?
 interface ProfileState {
 }
 
@@ -181,7 +182,12 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 					<Text style={[typography.body, styles.loggedInAs]}>Logged in as</Text>
 					<Text style={[typography.h0, styles.loggedInUser]}>{MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}</Text>
 				</View>
-				<Button title='Logout' onPress={this.logout} buttonStyle={components.buttonStyle} titleStyle={components.buttonText}/>
+				<Button
+					title='Logout'
+					onPress={this.logout}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
 				{/*<Formik
 					initialValues={settingsFormInitialValues}
 					onSubmit={this.saveSettings}

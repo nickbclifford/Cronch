@@ -1,20 +1,20 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
-import { NavigationScreenProps } from 'react-navigation';
+import { NavigationScreenOptions, NavigationScreenProps } from 'react-navigation';
 import { NEUTRAL, PRIMARY } from '../common/StyleGuide';
 
 export default function generateNavigationOptions<Props extends NavigationScreenProps>(
-	title: string | null,
+	title?: string,
 	menuButton = true,
-	additionalInfo?: (props: Props) => { [key: string]: any }
-): (props: Props) => { [key: string]: any } {
+	additionalInfo?: (props: Props) => NavigationScreenOptions
+): (props: Props) => NavigationScreenOptions {
 	return props => {
 		const onPressLeft = () => {
 			props.navigation.toggleDrawer();
 		};
 
-		const options: { [key: string]: any } = {
+		const options: NavigationScreenOptions = {
 			title,
 			headerStyle: {
 				backgroundColor: PRIMARY[500]
