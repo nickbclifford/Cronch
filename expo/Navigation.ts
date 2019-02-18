@@ -8,6 +8,7 @@ import {
 } from 'react-navigation';
 
 import createNavigationOptions from './common/NavigationOptionsFactory';
+import questionnaires from './common/Questionnaires';
 import createQuestionnaire from './components/QuestionnaireFactory';
 
 import About from './pages/About';
@@ -37,6 +38,7 @@ const AuthNavigator = createStackNavigator(
 	{
 		Welcome,
 		Login,
+		InitialQuestionaire: createQuestionnaire(questionnaires.initial),
 		CheckUrls
 	},
 	{
@@ -87,24 +89,6 @@ const TimerNavigator = createStackNavigator(
 	}
 );
 
-const Questionnaire = createQuestionnaire(
-	'About',
-	[
-		{
-			question: 'question 1',
-			responses: ['response a', 'response b', 'response c', 'response d', 'response e']
-		},
-		{
-			question: 'buh?',
-			responses: ['buh.', '¿buh?', 'buh!', '...buh']
-		},
-		{
-			question: 'foo',
-			responses: ['bar', 'baz', 'quux']
-		}
-	]
-);
-
 const AppNavigator = createDrawerNavigator(
 	{
 		Homework: TimerNavigator,
@@ -112,7 +96,6 @@ const AppNavigator = createDrawerNavigator(
 		// Avatar: createSingleStackNavigator(Avatar),
 		Profile: createSingleStackNavigator(Profile),
 		About: createSingleStackNavigator(About)
-		// Questionnaire
 	},
 	{
 		initialRouteName: 'Homework'

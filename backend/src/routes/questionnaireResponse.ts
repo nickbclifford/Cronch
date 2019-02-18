@@ -5,13 +5,16 @@ import { APIError, errorResponse, requireLoggedIn, successResponse } from '../ut
 const router = Router();
 
 router.post('/', requireLoggedIn, (req, res) => {
+	const questionnaire = req.body.questionnaire;
+	if (typeof questionnaire !== 'number') { errorResponse(res, new APIError('Invalid question', 400)); return; }
+
 	const question = req.body.question;
-	if (typeof question !== 'string') { errorResponse(res, new APIError('Invalid question', 400)); return; }
+	if (typeof question !== 'number') { errorResponse(res, new APIError('Invalid question', 400)); return; }
 
 	const answer = req.body.answer;
-	if (typeof answer !== 'string') { errorResponse(res, new APIError('Invalid answer', 400)); return; }
+	if (typeof answer !== 'number') { errorResponse(res, new APIError('Invalid answer', 400)); return; }
 
-	const response = new QuestionnaireResponse({ question, answer, user: req.authorizedUser! });
+	const response = new QuestionnaireResponse({ questionnaire, question, answer, user: req.authorizedUser! });
 	response.save()
 		.then(() => successResponse(res))
 		.catch(err => errorResponse(res, err));

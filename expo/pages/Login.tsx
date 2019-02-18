@@ -5,10 +5,12 @@ import * as React from 'react';
 import { Alert, ImageBackground, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
-import { throwError } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { combineLatest, throwError } from 'rxjs';
+import { first, map, switchMap } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
+import { getIfAnsweredQuestionnaire } from '../common/QuestionnaireResponse';
+import questionnaires from '../common/Questionnaires';
 import { components, NEUTRAL, nunito, typography } from '../common/StyleGuide';
 import { getUser, registerUser } from '../common/User';
 import { getMissingURLs } from '../common/Utils';
@@ -59,15 +61,35 @@ export default class Login extends React.Component<NavigationScreenProps, LoginS
 				}
 			}),
 			// Make sure that the user has all their URLs intact
-			switchMap(() => MyMICDS.user.getInfo()),
-			map(getMissingURLs)
+			switchMap(() => combineLatest(
+				MyMICDS.user.getInfo(),
+				getIfAnsweredQuestionnaire(questionnaires.initial.id)
+			)),
+			// switchMap(() => MyMICDS.user.getInfo()),
+			map(([mymicdsUser, answeredQuestionnaire]) => {
+				return {
+					missing: getMissingURLs(mymicdsUser),
+					answeredQuestionnaire: answeredQuestionnaire.answered
+				};
+			}),
+			first()
 		).subscribe(
-			missing => {
+			({ missing, answeredQuestionnaire }) => {
 				this.setState({ loading: false });
-				if (missing.urls.length > 0) {
-					this.props.navigation.navigate('CheckUrls', missing);
+
+				const checkUrls = missing.urls.length > 0;
+
+				console.log('answered questionaire', answeredQuestionnaire, missing);
+
+				if (answeredQuestionnaire) {
+					if (checkUrls) {
+						this.props.navigation.navigate('CheckUrls', missing);
+					} else {
+						this.props.navigation.navigate('App');
+					}
 				} else {
-					this.props.navigation.navigate('App');
+					console.log('navigate toe quesiton');
+					this.props.navigation.navigate('InitialQuestionaire', { redirectAfter: checkUrls ? 'CheckUrls' : 'App', redirectAfterParams: missing });
 				}
 			},
 			err => {

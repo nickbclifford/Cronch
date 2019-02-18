@@ -3,16 +3,12 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 
+import { QuestionInfo } from '../common/Questionnaires';
 import { typography } from '../common/StyleGuide';
 
-export interface QuestionInfo {
-	question: string;
-	responses: string[];
-}
-
 export interface QuestionProps extends QuestionInfo {
-	selectedIndex: number | null;
-	onSelectResponse(index: number): void;
+	selectedId: number | null;
+	onSelectResponse(id: number): void;
 }
 
 export default class Question extends React.Component<QuestionProps> {
@@ -22,22 +18,22 @@ export default class Question extends React.Component<QuestionProps> {
 	}
 
 	@bind
-	private onRadioPress(index: number) {
+	private onRadioPress(id: number) {
 		return () => {
-			this.props.onSelectResponse(index);
+			this.props.onSelectResponse(id);
 		};
 	}
 
 	render() {
-		const responseRadios = this.props.responses.map((res, i) => (
+		const responseRadios = this.props.responses.map(response => (
 			<CheckBox
 				center={false}
-				title={res}
-				checked={this.props.selectedIndex === i}
+				title={response.answer}
+				checked={this.props.selectedId === response.id}
 				checkedIcon='dot-circle-o'
 				uncheckedIcon='circle-o'
-				onPress={this.onRadioPress(i)}
-				key={i.toString()}
+				onPress={this.onRadioPress(response.id)}
+				key={response.id.toString()}
 			/>
 		));
 		return (

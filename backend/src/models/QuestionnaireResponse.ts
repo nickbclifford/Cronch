@@ -18,10 +18,13 @@ export default class QuestionnaireResponse extends Model<QuestionnaireResponse> 
 	id!: number;
 
 	@Column
-	question!: string;
+	questionnaire!: number;
 
 	@Column
-	answer!: string;
+	question!: number;
+
+	@Column
+	answer!: number;
 
 	@ForeignKey(() => User)
 	@Column

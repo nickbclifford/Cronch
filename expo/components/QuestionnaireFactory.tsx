@@ -3,15 +3,17 @@ import * as React from 'react';
 import { Button, StyleSheet, View } from 'react-native';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { submitResponse } from '../common/QuestionnaireResponse';
+import { QuestionnaireInfo } from '../common/Questionnaires';
 import { PRIMARY } from '../common/StyleGuide';
-import Question, { QuestionInfo} from './Question';
+import Question from './Question';
 
 export interface QuestionnaireState {
+	loading: boolean;
 	questionIndex: number;
-	responseIndex: number | null;
+	responseId: number | null;
 }
 
-export default function createQuestionnaire(submitRoute: string, questions: QuestionInfo[]) {
+export default function createQuestionnaire(questionnaireInfo: QuestionnaireInfo, redirectAfter?: string, redirectAfterParams?: { [key: string]: any }) {
 	class Questionnaire extends React.Component<NavigationScreenProps, QuestionnaireState> {
 
 		static navigationOptions = {
@@ -20,45 +22,71 @@ export default function createQuestionnaire(submitRoute: string, questions: Ques
 
 		constructor(props: NavigationScreenProps) {
 			super(props);
-
-			this.state = { questionIndex: 0, responseIndex: null };
+			this.state = { loading: false, questionIndex: 0, responseId: null };
 		}
 
 		@bind
-		private onSelectResponse(index: number) {
-			this.setState({ responseIndex: index });
+		private onSelectResponse(id: number) {
+			this.setState({ responseId: id });
 		}
 
 		@bind
 		private async onNextQuestion() {
-			const question = questions[this.state.questionIndex];
-			await submitResponse(question.question, question.responses[this.state.responseIndex!]);
-			this.setState(prev => ({ questionIndex: prev.questionIndex + 1, responseIndex: null }));
+			await this.saveSelectedResponse();
+			this.setState(prev => ({ questionIndex: prev.questionIndex + 1, responseId: null }));
 		}
 
 		@bind
 		private async onSubmit() {
-			const question = questions[this.state.questionIndex];
-			await submitResponse(question.question, question.responses[this.state.responseIndex!]);
-			this.props.navigation.navigate(submitRoute);
-			this.setState({ questionIndex: 0, responseIndex: null });
+			await this.saveSelectedResponse();
+			this.setState({ questionIndex: 0, responseId: null });
+
+			let submitRoute: string | null = null;
+			let submitParams: any | undefined;
+
+			const redirectParam = this.props.navigation.getParam('redirectAfter');
+			const redirectParamsParam = this.props.navigation.getParam('redirectAfterParams');
+
+			if (typeof redirectParam === 'string') {
+				submitRoute = redirectParam;
+				submitParams = redirectParamsParam;
+
+			} else if (typeof redirectAfter === 'string') {
+				submitRoute = redirectAfter;
+
+				if (redirectAfterParams) {
+					submitParams = redirectAfterParams;
+				}
+			}
+
+			if (submitRoute) {
+				this.props.navigation.navigate(submitRoute, submitParams);
+			}
+		}
+
+		private async saveSelectedResponse() {
+			if (this.state.responseId === null) { return; }
+			this.setState({ loading: true });
+			const question = questionnaireInfo.questions[this.state.questionIndex];
+			await submitResponse(questionnaireInfo.id, question.id, this.state.responseId);
+			this.setState({ loading: false });
 		}
 
 		render() {
-			const lastQuestion = this.state.questionIndex === questions.length - 1;
+			const lastQuestion = this.state.questionIndex === questionnaireInfo.questions.length - 1;
 			return (
 				<SafeAreaView style={styles.safeArea}>
 					<View style={styles.container}>
 						<Question
-							{...questions[this.state.questionIndex]}
-							selectedIndex={this.state.responseIndex}
+							{...questionnaireInfo.questions[this.state.questionIndex]}
+							selectedId={this.state.responseId}
 							onSelectResponse={this.onSelectResponse}
 						/>
 						<Button
 							color={PRIMARY[700]}
-							title={lastQuestion ? 'Submit' : 'Next Question'}
+							title={lastQuestion ? 'Submit' : 'Next'}
 							onPress={lastQuestion ? this.onSubmit : this.onNextQuestion}
-							disabled={this.state.responseIndex === null}
+							disabled={this.state.responseId === null}
 						/>
 					</View>
 				</SafeAreaView>
