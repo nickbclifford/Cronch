@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { CheckBox, Icon } from 'react-native-elements';
 
 import { QuestionInfo } from '../common/Questionnaires';
-import { NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
+import { NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
 
 export interface QuestionProps extends QuestionInfo {
 	selectedId: number | null;
@@ -52,7 +52,7 @@ export default class Question extends React.Component<QuestionProps> {
 		));
 		return (
 			<View style={styles.container}>
-				<Text style={[typography.h2, styles.text]}>{this.props.question}</Text>
+				<Text style={[typography.h2, nunito.bold, styles.text]}>{this.props.question}</Text>
 				{responseRadios}
 			</View>
 		);
