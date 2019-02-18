@@ -1,5 +1,7 @@
+import { PlaybackSource } from 'expo';
+
 export interface CronchAlarm {
-	file: any;
+	file: PlaybackSource;
 	displayName: string;
 }
 

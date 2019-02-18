@@ -2,7 +2,7 @@ import bind from 'bind-decorator';
 import * as React from 'react';
 import { StatusBar, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
-import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { NavigationParams, NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { submitResponse } from '../common/QuestionnaireResponse';
 import { QuestionnaireInfo } from '../common/Questionnaires';
 import { components, NEUTRAL } from '../common/StyleGuide';
@@ -14,7 +14,11 @@ export interface QuestionnaireState {
 	responseId: number | null;
 }
 
-export default function createQuestionnaire(questionnaireInfo: QuestionnaireInfo, redirectAfter?: string, redirectAfterParams?: { [key: string]: any }) {
+export default function createQuestionnaire(
+	questionnaireInfo: QuestionnaireInfo,
+	redirectAfter?: string,
+	redirectAfterParams?: NavigationParams
+) {
 	class Questionnaire extends React.Component<NavigationScreenProps, QuestionnaireState> {
 
 		static navigationOptions = {
@@ -43,7 +47,7 @@ export default function createQuestionnaire(questionnaireInfo: QuestionnaireInfo
 			this.setState({ questionIndex: 0, responseId: null });
 
 			let submitRoute: string | null = null;
-			let submitParams: any | undefined;
+			let submitParams: NavigationParams | undefined;
 
 			const redirectParam = this.props.navigation.getParam('redirectAfter');
 			const redirectParamsParam = this.props.navigation.getParam('redirectAfterParams');

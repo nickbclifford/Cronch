@@ -163,12 +163,10 @@ export default class TimerModeSelection extends React.Component<NavigationScreen
 								<ListSelect
 									selectedIndex={props.values.timerSelection}
 									onSelectItem={handleFieldChangeFactory<TimerSelectionValues>(props, 'timerSelection')}
-									items={this.state.userCycles.map((cycle, i) => {
-										return {
-											label: `work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`,
-											value: i
-										};
-									})}
+									items={this.state.userCycles.map((cycle, i) => ({
+										label: `work ${cycle.work / 60000} minutes, break ${cycle.break / 60000} minutes`,
+										value: i
+									}))}
 									onDelete={this.deleteTimerMode}
 								/>
 								<Button

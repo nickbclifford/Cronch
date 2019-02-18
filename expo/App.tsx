@@ -10,6 +10,7 @@ import MyMICDS from './common/MyMICDS';
 import { OnLoginContext, OnLoginContextType } from './common/OnLoginContext';
 import Task, { createCustomTask } from './common/Task';
 import { getUserBattlePlanTasks } from './common/User';
+import { pickProps } from './common/Utils';
 import AppContainer from './Navigation';
 
 export default class App extends React.Component<{}, AssignmentContextType & OnLoginContextType> {
@@ -97,9 +98,18 @@ export default class App extends React.Component<{}, AssignmentContextType & OnL
 	}
 
 	render() {
+		const assignmentState: AssignmentContextType = pickProps(this.state, [
+			'assignments',
+			'onAssignmentsChange',
+			'updateAssignments',
+			'appendAssignment',
+			'deleteAssignment'
+		]);
+		const onLoginState: OnLoginContextType = pickProps(this.state, ['loggedIn', 'onLoggedIn']);
+
 		return (
-			<AssignmentContext.Provider value={this.state}>
-				<OnLoginContext.Provider value={this.state}>
+			<AssignmentContext.Provider value={assignmentState}>
+				<OnLoginContext.Provider value={onLoginState}>
 					<AppContainer />
 				</OnLoginContext.Provider>
 			</AssignmentContext.Provider>

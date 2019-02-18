@@ -34,7 +34,7 @@ interface BattlePlanState {
 
 class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 
-	static navigationOptions = createNavigationOptions<BattlePlanProps>(null, true, ({ navigation }) => {
+	static navigationOptions = createNavigationOptions<BattlePlanProps>(undefined, true, ({ navigation }) => {
 		return {
 			title: navigation.getParam('title'),
 			headerRight: navigation.getParam('editButton')
@@ -84,7 +84,12 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		this.props.navigation.setParams({
 			title: this.state.editMode ? 'Edit Battle Plan' : 'Battle Plan',
 			editButton: (
-				<Button title={this.state.editMode ? 'Done' : 'Edit'} type='clear' titleStyle={menuStyle} onPress={this.toggleEditMode} />
+				<Button
+					title={this.state.editMode ? 'Done' : 'Edit'}
+					type='clear'
+					titleStyle={menuStyle}
+					onPress={this.toggleEditMode}
+				/>
 			)
 		});
 	}

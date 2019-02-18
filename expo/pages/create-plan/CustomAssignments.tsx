@@ -22,12 +22,12 @@ class CustomAssignments extends React.Component<NavigationScreenProps & WithAssi
 
 	static navigationOptions = createNavigationOptions('Custom', false, () => {
 		return {
-			tabBarIcon: ({ tintColor }: { tintColor: string }) => {
+			tabBarIcon: ({ tintColor }: { tintColor: string | null }) => {
 				return (
 					<Icon
 						name='plus'
 						type='font-awesome'
-						color={tintColor}
+						color={tintColor!}
 					/>
 				);
 			}

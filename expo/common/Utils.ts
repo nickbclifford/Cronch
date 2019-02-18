@@ -81,10 +81,21 @@ export function handleFieldChangeFactory<T>(props: FormikProps<T>, field: keyof 
 	};
 }
 
-export function optionalFunction(func?: (...args: any) => void, ...args: any[]) {
+export function optionalFunction<T extends any[]>(func?: (...args: T) => void, ...args: T) {
 	return () => {
 		if (func) {
 			func(...args);
 		}
 	};
+}
+
+// tfw exactly what the Pick<T, K> type was designed for
+export function pickProps<T, K extends keyof T>(obj: T, keys: K[]) {
+	const newObj: Partial<Pick<T, K>> = {};
+
+	for (const key of keys) {
+		newObj[key] = obj[key];
+	}
+
+	return newObj as Pick<T, K>;
 }

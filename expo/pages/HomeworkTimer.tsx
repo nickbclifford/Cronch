@@ -169,7 +169,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		this.endRecordTimeslot();
 	}
 
-	componentWillUpdate(nextProps: any, nextState: any) {
+	componentWillUpdate(nextProps: any, nextState: TimerState) {
 		if (this.state.paused !== nextState.paused) {
 			if (this.state.paused) {
 				this.startRecordTimeslot();
@@ -337,7 +337,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		})
 		.then(() => {
 			console.log(`Timeslot started for task id ${timeslot.classId}`);
-		}).catch((e: any) => {
+		}).catch(e => {
 			Alert.alert('Error saving time slot.', e.message);
 		});
 	}
@@ -350,7 +350,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				console.log(`Timeslot ended for task id ${this.state.currentTimeslotId}`);
 				this.setState({ currentTimeslotId: null });
 			})
-			.catch((e: any) => {
+			.catch(e => {
 				Alert.alert('Error ending time slot.', e.message);
 			});
 		}
