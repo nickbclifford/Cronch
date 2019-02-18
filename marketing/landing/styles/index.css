@@ -1,10 +1,10 @@
 /**
- * index.scss
- * - Add any styles you want here!
- */
+* index.scss
+* - Add any styles you want here!
+*/
 body {
   font-family: "Nunito";
-  overflow: none;
+  overflow: hidden;
 }
 
 .background {
@@ -20,6 +20,7 @@ body {
 .btn {
   color: white;
   text-transform: uppercase;
+  box-shadow: none !important;
 }
 
 .btn-primary {
@@ -27,7 +28,10 @@ body {
   border: none;
 }
 
-.jumbotron-thing {
+.not-bootstrap-container {
+  overflow: hidden;
+}
+.not-bootstrap-container .jumbotron-thing {
   height: 88vh;
   width: 120%;
   background-color: white;
@@ -39,28 +43,28 @@ body {
   justify-content: center;
   align-items: center;
 }
-.jumbotron-thing .big-title {
+.not-bootstrap-container .jumbotron-thing .big-title {
   transform: rotate(5deg);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.jumbotron-thing .big-title .logo {
+.not-bootstrap-container .jumbotron-thing .big-title .logo {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.jumbotron-thing .big-title .logo .logo-image {
+.not-bootstrap-container .jumbotron-thing .big-title .logo .logo-image {
   height: 10em;
   width: 10em;
   margin-right: 1.5em;
 }
-.jumbotron-thing .big-title .logo .logo-text {
+.not-bootstrap-container .jumbotron-thing .big-title .logo .logo-text {
   font-weight: 100;
   font-size: 10em;
 }
-.jumbotron-thing .big-title .download-button {
+.not-bootstrap-container .jumbotron-thing .big-title .download-button {
   height: 4em;
   width: 15em;
   border-radius: 2em;
