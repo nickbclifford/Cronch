@@ -5,7 +5,6 @@ import { AsyncStorage, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
-import { async } from 'rxjs/internal/scheduler/async';
 import { Expression, Skin } from '../common/AvatarTypes';
 import { getNotificationPermissions, submitNotificationToken } from '../common/NotificationToken';
 import { components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
@@ -33,11 +32,12 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 		this.setState({ asking: true });
 		console.log('asked');
 		const status = await getNotificationPermissions();
+		clearInterval(this.permissionSpamInterval);
 		if (status !== 'granted') {
-			clearInterval(this.permissionSpamInterval);
 			await AsyncStorage.setItem('deniedNotifications', 'true');
 			return this.continue();
 		}
+
 		const token = await Notifications.getExpoPushTokenAsync();
 		await submitNotificationToken(token);
 		this.continue();
@@ -52,8 +52,8 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 	}
 
 	@bind
-	continue() {
-		AsyncStorage.setItem('permission_asked', 'true');
+	async continue() {
+		await AsyncStorage.setItem('permission_asked', 'true');
 		this.setState({ asking: false });
 		this.props.navigation.navigate(
 			this.props.navigation.getParam('redirectTo'),

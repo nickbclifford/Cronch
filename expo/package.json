@@ -16,7 +16,7 @@
     "@types/react": "^16.4.18",
     "@types/react-native": "^0.57.7",
     "bind-decorator": "^1.0.11",
-    "expo": "^31.0.2",
+    "expo": "^32.0.6",
     "formik": "^1.5.0",
     "moment": "^2.24.0",
     "react": "^16.5.0",
