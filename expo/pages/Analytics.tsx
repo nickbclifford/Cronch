@@ -6,6 +6,7 @@ import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
 import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { Platform } from 'react-native';
 
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, PRIMARY } from '../common/StyleGuide';
@@ -31,6 +32,7 @@ interface AnalyticsState {
 	weeklyTotal: number;
 	dailyTimes: Timeslot[];
 	dailyTotal: number;
+	dailyView: boolean;
 	pieChartData: PieChartDataPoint[];
 	lineChartData: LineChartDataPoint[];
 }
@@ -55,7 +57,8 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			weeklyTotal: 0,
 			dailyTimes: [],
 			dailyTotal: 0,
-			lineChartData: []
+			lineChartData: [],
+			dailyView: true
 		};
 	}
 
@@ -281,76 +284,182 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		});
 	}
 
+	private swapView() {
+		this.setState({dailyView: !this.state.dailyView});
+	}
+
 	render() {
-		return (
-			<SafeAreaView style={styles.safeArea}>
-				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
-				<View style={styles.verticalContainer}>
-				<Swiper horizontal={false}>
-				<View style={styles.verticalContainer}>
-					<Text style={styles.headerTitle}>Today (in hours)</Text>
-					<PureChart
-						type='pie'
-						data={this.state.pieChartData}
-						width={'100%'}
-						height={400}
-					/>
-					<View style={styles.horizontalContainer}>
+		if (Platform.OS === 'android') {
+			if (this.state.dailyView) {
+				// daily view
+				return (
+					<SafeAreaView style={styles.safeArea}>
+						<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
+						<View style={styles.verticalContainer}>
+						<View style={styles.verticalContainer}>
+							<Text style={styles.headerTitle}>Today (in hours)</Text>
+							<PureChart
+								type='pie'
+								data={this.state.pieChartData}
+								width={'100%'}
+								height={400}
+							/>
+							<View style={styles.horizontalContainer}>
+								<View style={styles.verticalContainer}>
+									<View style={styles.verticalContainer}>
+										<Text style={styles.title}>Today's Total</Text>
+										<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
+									</View>
+									<View style={styles.verticalContainer}>
+										<Text style={styles.title}>Today's Deviation</Text>
+										<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
+									</View>
+								</View>
+							</View>
+						</View>
+						<Button
+							title='Weekly'
+							onPress={this.swapView}
+							containerStyle={styles.updateButton}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+						<Button
+							title='Weekly'
+							onPress={this.updateData}
+							containerStyle={styles.updateButton}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+						</View>
+					</SafeAreaView>
+				);
+			}
+			else {
+				// weekly view
+				<SafeAreaView style={styles.safeArea}>
+					<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
+					<View style={styles.verticalContainer}>
+						<Text style={styles.headerTitle}>This week (in hours)</Text>
+						<PureChart
+							type='bar'
+							data={this.state.lineChartData}
+							width={'100%'}
+							height={200}
+							showEvenNumberXaxisLabel={false}
+						/>
+						<View style={styles.horizontalContainer}>
 						<View style={styles.verticalContainer}>
 							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Today's Total</Text>
-								<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
+								<Text style={styles.title}>Weekly Average</Text>
+								<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
 							</View>
 							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Today's Deviation</Text>
-								<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
+								<Text style={styles.title}>Weekly Deviation</Text>
+								<Text style={styles.text}>{`${this.findWeekDeviation()}H`}</Text>
+							</View>
+						</View>
+						<View style={styles.verticalContainer}>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Most Active</Text>
+								<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Heaviest Night</Text>
+								<Text style={styles.text}>{this.findHeaviestNight()}</Text>
 							</View>
 						</View>
 					</View>
-				</View>
-				<View style={styles.verticalContainer}>
-					<Text style={styles.headerTitle}>This week (in hours)</Text>
-					<PureChart
-						type='bar'
-						data={this.state.lineChartData}
-						width={'100%'}
-						height={200}
-						showEvenNumberXaxisLabel={false}
+					<Button
+							title='Daily'
+							onPress={this.swapView}
+							containerStyle={styles.updateButton}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+					<Button
+						title='Update'
+						onPress={this.updateData}
+						containerStyle={styles.updateButton}
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
 					/>
-					<View style={styles.horizontalContainer}>
+					</View>
+				</SafeAreaView>
+			}
+			
+		}
+		else {
+			return (
+				<SafeAreaView style={styles.safeArea}>
+					<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 					<View style={styles.verticalContainer}>
-						<View style={styles.verticalContainer}>
-							<Text style={styles.title}>Weekly Average</Text>
-							<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
-						</View>
-						<View style={styles.verticalContainer}>
-							<Text style={styles.title}>Weekly Deviation</Text>
-							<Text style={styles.text}>{`${this.findWeekDeviation()}H`}</Text>
+					<Swiper horizontal={false}>
+					<View style={styles.verticalContainer}>
+						<Text style={styles.headerTitle}>Today (in hours)</Text>
+						<PureChart
+							type='pie'
+							data={this.state.pieChartData}
+							width={'100%'}
+							height={400}
+						/>
+						<View style={styles.horizontalContainer}>
+							<View style={styles.verticalContainer}>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Today's Total</Text>
+									<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
+								</View>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Today's Deviation</Text>
+									<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
+								</View>
+							</View>
 						</View>
 					</View>
 					<View style={styles.verticalContainer}>
+						<Text style={styles.headerTitle}>This week (in hours)</Text>
+						<PureChart
+							type='bar'
+							data={this.state.lineChartData}
+							width={'100%'}
+							height={200}
+							showEvenNumberXaxisLabel={false}
+						/>
+						<View style={styles.horizontalContainer}>
 						<View style={styles.verticalContainer}>
-							<Text style={styles.title}>Most Active</Text>
-							<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Weekly Average</Text>
+								<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Weekly Deviation</Text>
+								<Text style={styles.text}>{`${this.findWeekDeviation()}H`}</Text>
+							</View>
 						</View>
 						<View style={styles.verticalContainer}>
-							<Text style={styles.title}>Heaviest Night</Text>
-							<Text style={styles.text}>{this.findHeaviestNight()}</Text>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Most Active</Text>
+								<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Heaviest Night</Text>
+								<Text style={styles.text}>{this.findHeaviestNight()}</Text>
+							</View>
 						</View>
 					</View>
-				</View>
-				</View>
-				</Swiper>
-				<Button
-					title='Update'
-					onPress={this.updateData}
-					containerStyle={styles.updateButton}
-					buttonStyle={components.buttonStyle}
-					titleStyle={components.buttonText}
-				/>
-				</View>
-			</SafeAreaView>
-		);
+					</View>
+					</Swiper>
+					<Button
+						title='Update'
+						onPress={this.updateData}
+						containerStyle={styles.updateButton}
+						buttonStyle={components.buttonStyle}
+						titleStyle={components.buttonText}
+					/>
+					</View>
+				</SafeAreaView>
+			);
+		}
 	}
 
 }
