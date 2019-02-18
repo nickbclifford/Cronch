@@ -1,4 +1,4 @@
-// import { Permissions } from 'expo';
+import { Permissions } from 'expo';
 import { fetchWithJwt } from './Utils';
 
 export interface NotificationToken {
@@ -6,7 +6,7 @@ export interface NotificationToken {
 }
 
 export function getNotificationPermissions() {
-	// return Permissions.askAsync(Permissions.NOTIFICATIONS).then(p => p.status);
+	return Permissions.askAsync(Permissions.NOTIFICATIONS).then(p => p.status);
 }
 
 export function submitNotificationToken(expoToken: string) {
