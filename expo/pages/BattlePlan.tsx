@@ -2,7 +2,6 @@ import bind from 'bind-decorator';
 import { Permissions } from 'expo';
 import * as React from 'react';
 import {
-	AsyncStorage,
 	Dimensions,
 	ImageStyle,
 	StatusBar,
@@ -14,6 +13,7 @@ import {
 import { Button } from 'react-native-elements';
 import Image from 'react-native-scalable-image';
 import { NavigationScreenProps } from 'react-navigation';
+import { Subscription } from 'rxjs';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions, { menuStyle } from '../common/NavigationOptionsFactory';
@@ -28,6 +28,7 @@ interface BattlePlanProps extends NavigationScreenProps, WithAssignmentContextPr
 
 interface BattlePlanState {
 	editMode: boolean;
+	tasks: Task[];
 }
 
 class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
@@ -39,12 +40,14 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		};
 	});
 
+	battlePlanSubscription?: Subscription;
+
 	constructor(props: any) {
 		super(props);
-		this.state = { editMode: false };
+		this.state = { editMode: false, tasks: [] };
 	}
 
-	async componentDidMount() {
+	componentDidMount() {
 		// const asked = this.props.navigation.getParam('askedNotifications');
 
 		// console.log('asekd?', asked);
@@ -58,6 +61,15 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		// 	}
 		// }
 		this.updateHeader();
+		this.battlePlanSubscription = this.props.assignmentContext.onAssignmentsChange.subscribe(tasks => {
+			this.setState({ tasks });
+		});
+	}
+
+	componentWillMount() {
+		if (this.battlePlanSubscription) {
+			this.battlePlanSubscription.unsubscribe();
+		}
 	}
 
 	@bind
@@ -73,12 +85,6 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 			editButton: (
 				<Button title={this.state.editMode ? 'Done' : 'Edit'} type='clear' titleStyle={menuStyle} onPress={this.toggleEditMode} />
 			)
-
-			// <NativeButton
-			// 	title={this.state.editMode ? 'Done' : 'Edit'}
-			// 	color={NEUTRAL[300]}
-			// 	onPress={this.toggleEditMode}
-			// />
 		});
 	}
 
@@ -117,7 +123,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 						titleStyle={components.buttonText}
 						onPress={this.navigateToCreatePlan}
 					/>
-					{this.props.assignmentContext.assignments.length === 0 && (
+					{this.state.tasks.length === 0 && (
 						<View style={styles.guideContainer}>
 							<Image
 								source={require('../assets/apples/preset/hewwo-uweseres.png')}
@@ -131,7 +137,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 				{this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
-						assignments={this.props.assignmentContext.assignments}
+						assignments={this.state.tasks}
 						headers={false}
 						sort={false}
 						reorder={true}
@@ -145,7 +151,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 				{!this.state.editMode && (
 					<DisplayAssignments
 						navigation={this.props.navigation}
-						assignments={this.props.assignmentContext.assignments}
+						assignments={this.state.tasks}
 						headers={false}
 						sort={false}
 						reorder={false}

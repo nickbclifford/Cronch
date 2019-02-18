@@ -76,7 +76,7 @@ class Login extends React.Component<NavigationScreenProps & WithOnLoginContextPr
 			first()
 		).subscribe(
 			({ missing, answeredQuestionnaire }) => {
-				this.props.onLoginContext.runEvents();
+				this.props.onLoginContext.loggedIn();
 				this.setState({ loading: false });
 
 				const checkUrls = missing.urls.length > 0;

@@ -1,4 +1,4 @@
-import { Font } from 'expo';
+import * as Font from 'expo-font';
 import * as React from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Image } from 'react-native-elements';
@@ -7,11 +7,12 @@ import { combineLatest } from 'rxjs';
 import { filter, first } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
+import withOnLoginContext, { WithOnLoginContextProps } from '../common/OnLoginContext';
 import { NEUTRAL } from '../common/StyleGuide';
 import { getUser } from '../common/User';
 import { getMissingURLs } from '../common/Utils';
 
-export default class Loading extends React.Component<NavigationScreenProps> {
+export class Loading extends React.Component<NavigationScreenProps & WithOnLoginContextProps> {
 
 	static navigationOptions = {
 		header: null
@@ -56,6 +57,7 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 								complete: () => this.props.navigation.navigate('Auth')
 							});
 						} else {
+							this.props.onLoginContext.loggedIn();
 							const missing = getMissingURLs(mymicdsUser!);
 							if (missing.hasRequired) {
 								this.props.navigation.navigate('App');
@@ -82,6 +84,8 @@ export default class Loading extends React.Component<NavigationScreenProps> {
 	}
 
 }
+
+export default withOnLoginContext(Loading);
 
 const styles = StyleSheet.create({
 	container: {

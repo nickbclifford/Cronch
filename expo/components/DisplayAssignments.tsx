@@ -12,10 +12,9 @@ import {
 	ViewStyle
 } from 'react-native';
 import DraggableFlatList, { OnMoveEndInfo, RenderItemInfo } from 'react-native-draggable-flatlist';
-import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 
-import { NEUTRAL, typography } from '../common/StyleGuide';
+import { typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { humanReadableTimeUntil } from '../common/Utils';
 import DisplayAssignment, { PressHandler } from './DisplayAssignment';
@@ -162,6 +161,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 		return (
 			<DisplayAssignment
+				key={`${props.index}-${assignment._id}`}
 				assignment={assignment}
 				leftIcon={leftIcon}
 				leftIconOnPress={leftIconOnPress}
@@ -174,15 +174,6 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 				onAssignmentClick={this.props.onAssignmentClick}
 			/>
 		);
-	}
-
-	@bind
-	private handleAssignmentPress(assignment: Task) {
-		return () => {
-			if (this.props.onAssignmentClick) {
-				this.props.onAssignmentClick(assignment);
-			}
-		};
 	}
 
 	@bind

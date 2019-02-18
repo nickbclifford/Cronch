@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Subject } from 'rxjs';
+
 import withContextFactory from './HigherOrderConsumerFactory';
 
 export interface WithOnLoginContextProps {
@@ -6,15 +8,15 @@ export interface WithOnLoginContextProps {
 }
 
 export interface OnLoginContextType {
-	onLoginEvent(callback: () => void): void;
-	runEvents(): void;
+	onLoggedIn: Subject<void>;
+	loggedIn: () => void;
 }
 
 // tslint:disable-next-line:variable-name
 export const OnLoginContext = React.createContext<OnLoginContextType>({
 	// tslint:disable:no-empty
-	onLoginEvent: () => {},
-	runEvents: () => {}
+	onLoggedIn: new Subject(),
+	loggedIn: () => {}
 	// tslint:enable:no-empty
 });
 
