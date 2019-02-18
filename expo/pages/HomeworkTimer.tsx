@@ -5,10 +5,10 @@ import * as React from 'react';
 import { Alert, StatusBar, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import MyMICDS from '../common/MyMICDS';
 
 import { alarmList } from '../common/Alarms';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
+import MyMICDS from '../common/MyMICDS';
 import flipped$ from '../common/PhoneAcrobatics';
 import { components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
@@ -431,20 +431,19 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 	@bind
 	private doneAssignment() {
-		const tempID = this.state.assignment._id;
-		if (this.props.assignmentContext.assignments.length > 1) {
-			this.nextAssignment();
-		} else {
-			this.endRecordTimeslot();
-		}
-		MyMICDS.planner.checkEvent({ id: tempID }).subscribe(
-			() => {
-				this.props.assignmentContext.deleteAssignment(tempID);
-				if (this.props.assignmentContext.assignments.length === 0) {
-					this.navigateToBattlePlan();
-				}
+		const id = this.state.assignment._id;
+		// if (this.props.assignmentContext.assignments.length > 1) {
+		// 	this.nextAssignment();
+		// } else {
+		// 	// this.endRecordTimeslot();
+		// }
+
+		MyMICDS.planner.checkEvent({ id }).subscribe({
+			complete: () => {
+				this.props.assignmentContext.deleteAssignment(id);
+				this.navigateToBattlePlan();
 			}
-		);
+		});
 	}
 
 	@bind
