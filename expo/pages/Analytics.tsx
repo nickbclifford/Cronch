@@ -2,12 +2,13 @@ import bind from 'bind-decorator';
 import moment from 'moment';
 import * as React from 'react';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Platform } from 'react-native';
 import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
 import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import { Platform } from 'react-native';
 
+import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, PRIMARY } from '../common/StyleGuide';
 import { Timeslot } from '../common/Timeslot';
@@ -37,7 +38,7 @@ interface AnalyticsState {
 	lineChartData: LineChartDataPoint[];
 }
 
-export default class Analytics extends React.Component<NavigationScreenProps, AnalyticsState> {
+class Analytics extends React.Component<NavigationScreenProps & WithAssignmentContextProps, AnalyticsState> {
 
 	static navigationOptions = createNavigationOptions('Analytics');
 
@@ -193,10 +194,12 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 				}
 			}
 
+			const classData = this.props.assignmentContext.assignments.find(a => a._id === cl)!.class;
+
 			chartData.push({
-				label: cl,
+				label: classData.name,
 				value: +(totalHours).toFixed(2),
-				color: this.pickRandomColor()
+				color: classData.color
 			});
 		}
 
@@ -210,12 +213,17 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			let biggestClass = 0;
 
 			for (let i = 0; i < this.state.weeklyTimes.length; i++) {
-				if (this.state.weeklyTimes[i].end !== null && this.calcHourDiff(this.state.weeklyTimes[i].start, this.state.weeklyTimes[i].end) > this.calcHourDiff(this.state.weeklyTimes[biggestClass].start, this.state.weeklyTimes[biggestClass].end)) {
+				if (this.state.weeklyTimes[i].end !== null &&
+					this.calcHourDiff(this.state.weeklyTimes[i].start, this.state.weeklyTimes[i].end!) >
+					this.calcHourDiff(this.state.weeklyTimes[biggestClass].start, this.state.weeklyTimes[biggestClass].end!)) {
 					// new class found, update index
 					biggestClass = i;
 				}
 			}
-			return this.state.weeklyTimes[biggestClass].classId;
+
+			return this.props.assignmentContext.assignments
+				.find(a => a._id === this.state.weeklyTimes[biggestClass].classId)!
+				.class.name;
 		} else {
 			return 'Not Available';
 		}
@@ -226,7 +234,9 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 			let biggestClass = 0;
 
 			for (let i = 0; i < this.state.weeklyTimes.length; i++) {
-				if (this.state.weeklyTimes[i].end !== null && this.calcHourDiff(this.state.weeklyTimes[i].start, this.state.weeklyTimes[i].end) > this.calcHourDiff(this.state.weeklyTimes[biggestClass].start, this.state.weeklyTimes[biggestClass].end)) {
+				if (this.state.weeklyTimes[i].end !== null &&
+					this.calcHourDiff(this.state.weeklyTimes[i].start, this.state.weeklyTimes[i].end!) >
+					this.calcHourDiff(this.state.weeklyTimes[biggestClass].start, this.state.weeklyTimes[biggestClass].end!)) {
 					// new class found, update index
 					biggestClass = i;
 				}
@@ -246,7 +256,13 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
 			}
 		}
-		return (Math.sqrt(tempTotal / (this.state.weeklyTimes.length - 1))).toFixed(2);
+
+		const deviation = (Math.sqrt(tempTotal / (this.state.weeklyTimes.length - 1)));
+		if (isNaN(deviation)) {
+			return 'None';
+		} else {
+			return deviation.toFixed(2) + 'h';
+		}
 	}
 
 	private findDayDeviation() {
@@ -257,12 +273,18 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
 			}
 		}
-		return (Math.sqrt(tempTotal / (this.state.dailyTimes.length - 1))).toFixed(2);
+
+		const deviation = (Math.sqrt(tempTotal / (this.state.dailyTimes.length - 1)));
+		if (isNaN(deviation)) {
+			return 'None';
+		} else {
+			return deviation.toFixed(2) + 'h';
+		}
 	}
 
 	private beautifyMinutes(num: number) {
 		// TODO: get the beautify minutes working
-		return `${Math.round(num)}H`;
+		return `${Math.round(num)}h`;
 	}
 
 	componentWillMount() {
@@ -284,8 +306,9 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 		});
 	}
 
+	@bind
 	private swapView() {
-		this.setState({dailyView: !this.state.dailyView});
+		this.setState(prev => ({ dailyView: !prev.dailyView }));
 	}
 
 	render() {
@@ -312,7 +335,7 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 									</View>
 									<View style={styles.verticalContainer}>
 										<Text style={styles.title}>Today's Deviation</Text>
-										<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
+										<Text style={styles.text}>{this.findDayDeviation()}</Text>
 									</View>
 								</View>
 							</View>
@@ -325,7 +348,60 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 							titleStyle={components.buttonText}
 						/>
 						<Button
-							title='Weekly'
+							title='Update'
+							onPress={this.updateData}
+							containerStyle={styles.updateButton}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+						</View>
+					</SafeAreaView>
+				);
+			} else {
+				// weekly view
+				return (
+					<SafeAreaView style={styles.safeArea}>
+						<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
+						<View style={styles.verticalContainer}>
+							<Text style={styles.headerTitle}>This week (in hours)</Text>
+							<PureChart
+								type='bar'
+								data={this.state.lineChartData}
+								width={'100%'}
+								height={200}
+								showEvenNumberXaxisLabel={false}
+							/>
+							<View style={styles.horizontalContainer}>
+							<View style={styles.verticalContainer}>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Weekly Average</Text>
+									<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
+								</View>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Weekly Deviation</Text>
+									<Text style={styles.text}>{this.findWeekDeviation()}</Text>
+								</View>
+							</View>
+							<View style={styles.verticalContainer}>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Most Active</Text>
+									<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
+								</View>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Heaviest Night</Text>
+									<Text style={styles.text}>{this.findHeaviestNight()}</Text>
+								</View>
+							</View>
+						</View>
+						<Button
+							title='Daily'
+							onPress={this.swapView}
+							containerStyle={styles.updateButton}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+						<Button
+							title='Update'
 							onPress={this.updateData}
 							containerStyle={styles.updateButton}
 							buttonStyle={components.buttonStyle}
@@ -335,61 +411,8 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 					</SafeAreaView>
 				);
 			}
-			else {
-				// weekly view
-				<SafeAreaView style={styles.safeArea}>
-					<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
-					<View style={styles.verticalContainer}>
-						<Text style={styles.headerTitle}>This week (in hours)</Text>
-						<PureChart
-							type='bar'
-							data={this.state.lineChartData}
-							width={'100%'}
-							height={200}
-							showEvenNumberXaxisLabel={false}
-						/>
-						<View style={styles.horizontalContainer}>
-						<View style={styles.verticalContainer}>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Weekly Average</Text>
-								<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
-							</View>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Weekly Deviation</Text>
-								<Text style={styles.text}>{`${this.findWeekDeviation()}H`}</Text>
-							</View>
-						</View>
-						<View style={styles.verticalContainer}>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Most Active</Text>
-								<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
-							</View>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Heaviest Night</Text>
-								<Text style={styles.text}>{this.findHeaviestNight()}</Text>
-							</View>
-						</View>
-					</View>
-					<Button
-							title='Daily'
-							onPress={this.swapView}
-							containerStyle={styles.updateButton}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-					<Button
-						title='Update'
-						onPress={this.updateData}
-						containerStyle={styles.updateButton}
-						buttonStyle={components.buttonStyle}
-						titleStyle={components.buttonText}
-					/>
-					</View>
-				</SafeAreaView>
-			}
-			
-		}
-		else {
+
+		} else {
 			return (
 				<SafeAreaView style={styles.safeArea}>
 					<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
@@ -463,6 +486,8 @@ export default class Analytics extends React.Component<NavigationScreenProps, An
 	}
 
 }
+
+export default withAssignmentContext(Analytics);
 
 const styles = StyleSheet.create({
 	safeArea: {
