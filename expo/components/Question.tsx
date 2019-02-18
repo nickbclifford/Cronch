@@ -1,48 +1,58 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { CheckBox } from 'react-native-elements';
+import { CheckBox, Icon } from 'react-native-elements';
 
-import { typography } from '../common/StyleGuide';
-
-export interface QuestionInfo {
-	question: string;
-	responses: string[];
-}
+import { QuestionInfo } from '../common/Questionnaires';
+import { NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
 
 export interface QuestionProps extends QuestionInfo {
-	selectedIndex: number | null;
-	onSelectResponse(index: number): void;
+	selectedId: number | null;
+	onSelectResponse(id: number): void;
 }
 
 export default class Question extends React.Component<QuestionProps> {
 
-	constructor(props: QuestionProps) {
-		super(props);
-	}
-
 	@bind
-	private onRadioPress(index: number) {
+	private onRadioPress(id: number) {
 		return () => {
-			this.props.onSelectResponse(index);
+			this.props.onSelectResponse(id);
 		};
 	}
 
 	render() {
-		const responseRadios = this.props.responses.map((res, i) => (
+		const checkedIcon = (
+			<Icon
+				name='check'
+				type='font-awesome'
+				size={20}
+				color={PRIMARY[700]}
+				containerStyle={styles.emptyIcon}
+			/>
+		);
+
+		// color={NEUTRAL[900]}
+
+		const emptyIcon = (
+			<View style={styles.emptyIcon} />
+		);
+
+		const responseRadios = this.props.responses.map(response => (
 			<CheckBox
 				center={false}
-				title={res}
-				checked={this.props.selectedIndex === i}
-				checkedIcon='dot-circle-o'
-				uncheckedIcon='circle-o'
-				onPress={this.onRadioPress(i)}
-				key={i.toString()}
+				title={response.answer}
+				checked={this.props.selectedId === response.id}
+				checkedIcon={checkedIcon}
+				uncheckedIcon={emptyIcon}
+				containerStyle={styles.option}
+				textStyle={[typography.body]}
+				onPress={this.onRadioPress(response.id)}
+				key={response.id.toString()}
 			/>
 		));
 		return (
 			<View style={styles.container}>
-				<Text style={[typography.h3, styles.text]}>{this.props.question}</Text>
+				<Text style={[typography.h2, nunito.bold, styles.text]}>{this.props.question}</Text>
 				{responseRadios}
 			</View>
 		);
@@ -52,9 +62,22 @@ export default class Question extends React.Component<QuestionProps> {
 
 const styles = StyleSheet.create({
 	container: {
-		minHeight: 200
+		width: '100%',
+		display: 'flex',
+		justifyContent: 'space-between'
 	},
 	text: {
-		alignSelf: 'center'
+		marginBottom: 32
+	},
+	option: {
+		margin: 0,
+		marginLeft: 0,
+		marginRight: 0,
+		marginBottom: 8,
+		backgroundColor: NEUTRAL[300],
+		borderWidth: 0
+	},
+	emptyIcon: {
+		width: 20
 	}
 });

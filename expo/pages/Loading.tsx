@@ -1,6 +1,6 @@
 import { Font } from 'expo';
 import * as React from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Image } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import { combineLatest } from 'rxjs';

@@ -64,7 +64,7 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<StatusBar barStyle='dark-content' backgroundColor={PRIMARY[500]} animated={true} />
+				<StatusBar barStyle='dark-content' animated={true} />
 				<View style={styles.container}>
 					<Text style={[typography.h2, nunito.bold, styles.header]}>
 						Hey, we need you to enable notifications!
