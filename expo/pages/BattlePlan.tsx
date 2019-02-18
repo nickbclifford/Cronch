@@ -3,7 +3,6 @@ import { Permissions } from 'expo';
 import * as React from 'react';
 import {
 	AsyncStorage,
-	Button as NativeButton,
 	Dimensions,
 	ImageStyle,
 	StatusBar,
@@ -17,7 +16,7 @@ import Image from 'react-native-scalable-image';
 import { NavigationScreenProps } from 'react-navigation';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
-import createNavigationOptions from '../common/NavigationOptionsFactory';
+import createNavigationOptions, { menuStyle } from '../common/NavigationOptionsFactory';
 import { components, NEUTRAL, PRIMARY, SUCCESS, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import DisplayAssignments from '../components/DisplayAssignments';
@@ -72,12 +71,14 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		this.props.navigation.setParams({
 			title: this.state.editMode ? 'Edit Battle Plan' : 'Battle Plan',
 			editButton: (
-				<NativeButton
-					title={this.state.editMode ? 'Done' : 'Edit'}
-					color={NEUTRAL[300]}
-					onPress={this.toggleEditMode}
-				/>
+				<Button title={this.state.editMode ? 'Done' : 'Edit'} type='clear' titleStyle={menuStyle} onPress={this.toggleEditMode} />
 			)
+
+			// <NativeButton
+			// 	title={this.state.editMode ? 'Done' : 'Edit'}
+			// 	color={NEUTRAL[300]}
+			// 	onPress={this.toggleEditMode}
+			// />
 		});
 	}
 

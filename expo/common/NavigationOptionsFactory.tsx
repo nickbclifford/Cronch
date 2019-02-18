@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Button } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import { NEUTRAL, PRIMARY } from '../common/StyleGuide';
 
@@ -22,7 +23,7 @@ export default function generateNavigationOptions<Props extends NavigationScreen
 		};
 
 		if (menuButton) {
-			options.headerLeft = <Button title='Menu' color={NEUTRAL[300]} onPress={onPressLeft} />;
+			options.headerLeft = <Button title='Menu' type='clear' titleStyle={styles.menu} onPress={onPressLeft} />;
 		}
 
 		if (additionalInfo) {
@@ -33,3 +34,11 @@ export default function generateNavigationOptions<Props extends NavigationScreen
 		}
 	};
 }
+
+const styles = StyleSheet.create({
+	menu: {
+		color: NEUTRAL[300]
+	}
+});
+
+export const menuStyle = styles.menu;
