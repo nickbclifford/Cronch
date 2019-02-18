@@ -99,8 +99,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
 		console.log('battle plan notif status', status);
 		const deniedNotifications = await AsyncStorage.getItem('permission_asked') === 'true';
-		// if (status === 'undetermined' && !deniedNotifications) {
-		if (true) {
+		if (status === 'undetermined' && !deniedNotifications) {
 			this.props.navigation.navigate('AllowNotifications', { redirectTo: 'BattlePlan' });
 		} else {
 			this.props.navigation.navigate('Timer', { assignment });
