@@ -20,10 +20,9 @@ function getMobileOperatingSystem() {
 
   function redirectDownload() {
 		if (getMobileOperatingSystem() === 'iOS') {
-			window.location.href = 'https://itunes.apple.com/app/id1453301936'
+			window.location.href = 'https://itunes.apple.com/app/id1453301936';
 		} else if (getMobileOperatingSystem() === 'Android') {
-			// window.location.href = ''
-			alert('Coming soon!');
+			window.location.href = 'https://play.google.com/store/apps/details?id=app.cronch.cronch';
 		} else {
 			alert('Coming soon!');
 		}

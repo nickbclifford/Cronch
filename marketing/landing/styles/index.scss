@@ -107,6 +107,9 @@ body {
 
 				@media screen and (min-width: $break-small) {
 					flex-direction: row;
+					.download-platforms {
+						margin-top: 0;
+					}
 					.download-button {
 						height: 6rem;
 						width: 20rem;

@@ -108,6 +108,9 @@ body {
   .not-bootstrap-container .jumbotron-thing .big-title .download {
     flex-direction: row;
   }
+  .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms {
+    margin-top: 0;
+  }
   .not-bootstrap-container .jumbotron-thing .big-title .download .download-button {
     height: 6rem;
     width: 20rem;
