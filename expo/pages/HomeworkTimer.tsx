@@ -5,10 +5,10 @@ import * as React from 'react';
 import { Alert, StatusBar, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import MyMICDS from '../common/MyMICDS';
 
 import { alarmList } from '../common/Alarms';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
-import MyMICDS from '../common/MyMICDS';
 import flipped$ from '../common/PhoneAcrobatics';
 import { components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
@@ -96,15 +96,20 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			assignment: this.state.assignment
 		});
 
+		let startTime = new Date().valueOf();
 		this.interval = setInterval(() => {
+			const currentTime = new Date().valueOf();
+			const timeLapsed = currentTime - startTime;
+			startTime = currentTime;
+
 			if (!this.state.paused) {
 				if (this.state.modeSelection === -1) {
-					this.tickManual();
+					this.tickManual(timeLapsed);
 				} else {
-					this.tick();
+					this.tick(timeLapsed);
 				}
 			}
-		}, 1000);
+		}, 500);
 
 		flipped$.subscribe(flipped => {
 			this.setState({
@@ -124,6 +129,14 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				}
 				this.setState({ onBreak: !flipped });
 			}
+		});
+
+		await Audio.setAudioModeAsync({
+			playsInSilentModeIOS: true,
+			allowsRecordingIOS: false,
+			interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+			shouldDuckAndroid: true,
+			interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
 		});
 
 		this.prepareSound();
@@ -224,10 +237,10 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	}
 
 	@bind
-	tick() {
+	tick(timeLapsed: number) {
 		if (this.state.onBreak) {
 			this.setState({
-				breakTimeLeft: this.state.breakTimeLeft - 1000
+				breakTimeLeft: this.state.breakTimeLeft - timeLapsed
 			});
 
 			// Reset and switch when timer reaches 0
@@ -256,7 +269,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			}
 		} else {
 			this.setState({
-				workTimeLeft: this.state.workTimeLeft - 1000
+				workTimeLeft: this.state.workTimeLeft - timeLapsed
 			});
 
 			if (this.state.workTimeLeft <= 0) {
@@ -286,15 +299,15 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	}
 
 	@bind
-	tickManual() {
+	tickManual(timeLapsed: number) {
 		if (this.state.onBreak) {
 			this.setState({
-				breakTimeLeft: this.state.breakTimeLeft + 1000
+				breakTimeLeft: this.state.breakTimeLeft + timeLapsed
 			});
 
 		} else {
 			this.setState({
-				workTimeLeft: this.state.workTimeLeft + 1000
+				workTimeLeft: this.state.workTimeLeft + timeLapsed
 			});
 		}
 	}
@@ -345,11 +358,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				shouldDuckAndroid: true,
 				interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
 			});
-			// .then(err => {
-			// 	console.log('this is setting audio error ', err);
-			// });
 		} catch (error) {
-			Alert.alert('sound buh', error.message());
+			Alert.alert('sound buh', error.message);
 		}
 	}
 
@@ -431,19 +441,20 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 	@bind
 	private doneAssignment() {
-		const id = this.state.assignment._id;
-		// if (this.props.assignmentContext.assignments.length > 1) {
-		// 	this.nextAssignment();
-		// } else {
-		// 	// this.endRecordTimeslot();
-		// }
-
-		MyMICDS.planner.checkEvent({ id }).subscribe({
-			complete: () => {
-				this.props.assignmentContext.deleteAssignment(id);
-				this.navigateToBattlePlan();
+		const tempID = this.state.assignment._id;
+		if (this.props.assignmentContext.assignments.length > 1) {
+			this.nextAssignment();
+		} else {
+			this.endRecordTimeslot();
+		}
+		MyMICDS.planner.checkEvent({ id: tempID }).subscribe(
+			() => {
+				this.props.assignmentContext.deleteAssignment(tempID);
+				if (this.props.assignmentContext.assignments.length === 0) {
+					this.navigateToBattlePlan();
+				}
 			}
-		});
+		);
 	}
 
 	@bind
