@@ -5,10 +5,10 @@ import * as React from 'react';
 import { Alert, StatusBar, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
-import MyMICDS from '../common/MyMICDS';
 
 import { alarmList } from '../common/Alarms';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
+import MyMICDS from '../common/MyMICDS';
 import flipped$ from '../common/PhoneAcrobatics';
 import { components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
@@ -118,7 +118,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 			// Only pause when user is not on break
 			if (!this.state.onBreak && this.state.modeSelection !== -1) {
-				console.log('buh', flipped);
+				console.log('Flipped?', flipped);
 				this.setState({ paused: !flipped });
 			}
 
@@ -130,16 +130,6 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				this.setState({ onBreak: !flipped });
 			}
 		});
-
-		await Audio.setAudioModeAsync({
-			playsInSilentModeIOS: true,
-			allowsRecordingIOS: false,
-			interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-			shouldDuckAndroid: true,
-			interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
-		});
-
-		this.prepareSound();
 
 		getUser()
 			.then(res => {
@@ -180,7 +170,6 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	}
 
 	componentWillUpdate(nextProps: any, nextState: any) {
-		console.log(this.state.paused, nextState.paused);
 		if (this.state.paused !== nextState.paused) {
 			if (this.state.paused) {
 				this.startRecordTimeslot();
@@ -223,21 +212,29 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	}
 
 	@bind
-	private async playAlarm(soundObject: Audio.Sound) {
-		// get alarm preference from backend
-		try {
-			const soundFile = alarmList[0].file;
-			await soundObject.loadAsync(soundFile);
-			await soundObject.setIsLoopingAsync(true);
-			await soundObject.setPositionAsync(0);
-			await soundObject.playAsync();
-		} catch (error) {
-			Alert.alert('Error Playing Sound', error.message);
-		}
+	private async playAlarm() {
+		/** @todo Get alarm preference from backend */
+
+		await Audio.setAudioModeAsync({
+			playsInSilentModeIOS: true,
+			allowsRecordingIOS: false,
+			interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+			shouldDuckAndroid: false,
+			interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+			playThroughEarpieceAndroid: true
+		} as any);
+
+		const soundObject = new Audio.Sound();
+		const soundFile = alarmList[0].file;
+		await soundObject.loadAsync(soundFile);
+		await soundObject.setIsLoopingAsync(true);
+		await soundObject.setPositionAsync(0);
+		await soundObject.playAsync();
+		return soundObject;
 	}
 
 	@bind
-	tick(timeLapsed: number) {
+	async tick(timeLapsed: number) {
 		if (this.state.onBreak) {
 			this.setState({
 				breakTimeLeft: this.state.breakTimeLeft - timeLapsed
@@ -248,8 +245,13 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				this.setState({
 					paused: true
 				});
-				const soundObject = new Audio.Sound();
-				this.playAlarm(soundObject);
+
+				let soundObject: Audio.Sound;
+				try {
+					soundObject = await this.playAlarm();
+				} catch (err) {
+					Alert.alert('Error Playing Sound', err.message);
+				}
 				this.vibratePhone();
 				Alert.alert(
 					'Time for work!',
@@ -261,7 +263,9 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 								onBreak: false,
 								paused: true
 							});
-							soundObject.stopAsync();
+							if (soundObject) {
+								soundObject.stopAsync();
+							}
 							this.cancelVibrate();
 						} }
 					]
@@ -276,8 +280,13 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				this.setState({
 					paused: true
 				});
-				const soundObject = new Audio.Sound();
-				this.playAlarm(soundObject);
+
+				let soundObject: Audio.Sound;
+				try {
+					soundObject = await this.playAlarm();
+				} catch (err) {
+					Alert.alert('Error Playing Sound', err.message);
+				}
 				this.vibratePhone();
 				Alert.alert(
 					'Time for a break!',
@@ -289,7 +298,9 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 								onBreak: true,
 								paused: false
 							});
-							soundObject.stopAsync();
+							if (soundObject) {
+								soundObject.stopAsync();
+							}
 							this.cancelVibrate();
 						} }
 					]
@@ -323,7 +334,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			this.setState({ currentTimeslotId: res.id });
 		})
 		.then(() => {
-			console.log('buh started');
+			console.log(`Timeslot started for task id ${timeslot.classId}`);
 		}).catch((e: any) => {
 			Alert.alert('Error saving time slot.', e.message);
 		});
@@ -331,35 +342,15 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 	@bind
 	private endRecordTimeslot() {
-		console.log(this.state, 'current timeslot error');
 		if (this.state.currentTimeslotId) {
 			return endTimeslot(this.state.currentTimeslotId, new Date())
 			.then(() => {
-				console.log('buh ended');
+				console.log(`Timeslot ended for task id ${this.state.currentTimeslotId}`);
 				this.setState({ currentTimeslotId: null });
 			})
 			.catch((e: any) => {
 				Alert.alert('Error ending time slot.', e.message);
 			});
-		}
-	}
-
-	// private toggleRecordTimeslot() {
-	// 	if (!this.state.currentTimeslotId) {
-	// 	} else {
-	// 	}
-	// }
-	private async prepareSound() {
-		try {
-			await Audio.setAudioModeAsync({
-				playsInSilentModeIOS: true,
-				allowsRecordingIOS: false,
-				interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-				shouldDuckAndroid: true,
-				interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
-			});
-		} catch (error) {
-			Alert.alert('sound buh', error.message);
 		}
 	}
 
