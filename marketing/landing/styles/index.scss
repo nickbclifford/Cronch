@@ -1,0 +1,69 @@
+/**
+ * index.scss
+ * - Add any styles you want here!
+ */
+ $gradient: linear-gradient( 135deg, #CE9FFC 10%, #7367F0 100%);
+
+ body {
+   font-family: 'Nunito';
+   overflow: none;
+ }
+ 
+ .background {
+   z-index: -1;
+   position: fixed;
+   top: 0;
+   left: 0;
+	 background-image: $gradient;
+	 height: 100vh;
+	 width : 100vw;
+ }
+ 
+ .btn {
+   color: white;
+   text-transform: uppercase;
+ }
+ 
+ .btn-primary {
+   background-image: $gradient;
+   border: none;
+ }
+ 
+ .jumbotron-thing {
+   height: 88vh;
+   width: 120%;
+   background-color: white;
+   box-shadow: 0px 0px 50px 0px rgba(0, 0, 0, 0.50);
+   transform-origin: 0 100%;
+   transform: rotate(-5deg);
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   .big-title {
+	 transform: rotate(5deg);
+	 display: flex;
+	 flex-direction: column;
+	 justify-content: center;
+	 align-items: center;
+	 .logo {
+	   display: flex;
+	   justify-content: center;
+	   align-items: center;
+	   .logo-image {
+		 height: 10em;
+		 width: 10em;
+		 margin-right: 1.5em;
+	   }
+	   .logo-text {
+		 font-weight: 100;
+		 font-size: 10em;
+	   }
+	 }
+	 .download-button {
+	   height: 4em;
+	   width: 15em;
+	   border-radius: 2em;
+	 }
+   }
+ }
