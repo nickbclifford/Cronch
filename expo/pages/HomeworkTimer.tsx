@@ -243,7 +243,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			// Reset and switch when timer reaches 0
 			if (this.state.breakTimeLeft <= 0) {
 				this.setState({
-					paused: true
+					paused: true,
+					breakTimeLeft: 0
 				});
 
 				let soundObject: Audio.Sound;
@@ -278,7 +279,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 			if (this.state.workTimeLeft <= 0) {
 				this.setState({
-					paused: true
+					paused: true,
+					workTimeLeft: 0
 				});
 
 				let soundObject: Audio.Sound;
