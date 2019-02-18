@@ -58,13 +58,25 @@ body {
 				align-items: center;
 				margin: 1em;
 				.logo-image {
-					height: 10em;
-					width: 10em;
-					margin-right: 1.5em;
+					height: 5em;
+					width: 5em;
+					margin-right: 0.5em;
 				}
 				.logo-text {
 					font-weight: 100;
-					font-size: 10em;
+					font-size: 5em;
+					margin-bottom: 0;
+				}
+				@media screen and (min-width: $break-small) {
+					.logo-text {
+						font-weight: 100;
+						font-size: 10em;
+					}
+					.logo-image {
+						height: 10em;
+						width: 10em;
+						margin-right: 1.5em;
+					}
 				}
 			}
 			.download{
@@ -73,10 +85,10 @@ body {
 				align-items: center;
 				flex-direction: column;
 				.download-button {
-					height: 10rem;
-					width: 36rem;
-					border-radius: 5em;
-					font-size: 2.5em;
+					height: 4rem;
+					width: 14rem;
+					border-radius: 3em;
+					font-size: 1em;
 				}
 				.download-platforms {
 					display: flex;
@@ -84,6 +96,7 @@ body {
 					align-items: center;
 					flex-direction: column;
 					max-height: 6rem;
+					margin-top: 1em;
 					.apple, .android {
 						height: 4rem;
 					}
@@ -91,16 +104,16 @@ body {
 						margin: -0.5rem;
 					}
 				}
-			}
 
-			@media screen and (max-width: $break-small) {
-				flex-direction: row;
-				.download-button {
-					height: 6rem;
-					width: 20rem;
-					border-radius: 3em;
-					font-size: 1.5em;
-				}	
+				@media screen and (min-width: $break-small) {
+					flex-direction: row;
+					.download-button {
+						height: 6rem;
+						width: 20rem;
+						border-radius: 3em;
+						font-size: 1.5em;
+					}
+				}
 			}
 		}
 	}
