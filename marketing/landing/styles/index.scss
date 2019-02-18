@@ -99,6 +99,9 @@ body {
 					margin-top: 1em;
 					.apple, .android {
 						height: 4rem;
+						&:hover {
+							cursor: pointer;
+						}
 					}
 					.android {
 						margin: -0.5rem;

@@ -20,8 +20,16 @@ function getMobileOperatingSystem() {
 
   function redirectDownload() {
 		if (getMobileOperatingSystem() === 'Android') {
-			window.location.href = 'https://play.google.com/store/apps/details?id=app.cronch.cronch';
+			redirectToGooglePlay();
 		} else {
-			window.location.href = 'https://itunes.apple.com/app/id1453301936';
+			redirectToAppStore();
 		}
+  }
+
+  function redirectToAppStore() {
+	window.location.href = 'https://itunes.apple.com/app/id1453301936';
+  }
+
+  function redirectToGooglePlay() {
+	window.location.href = 'https://play.google.com/store/apps/details?id=app.cronch.cronch';
   }

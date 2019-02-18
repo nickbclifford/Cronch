@@ -101,6 +101,9 @@ body {
 .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .apple, .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android {
   height: 4rem;
 }
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .apple:hover, .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android:hover {
+  cursor: pointer;
+}
 .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android {
   margin: -0.5rem;
 }
