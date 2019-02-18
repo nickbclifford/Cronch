@@ -96,15 +96,20 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			assignment: this.state.assignment
 		});
 
+		let startTime = new Date().valueOf();
 		this.interval = setInterval(() => {
+			const currentTime = new Date().valueOf();
+			const timeLapsed = currentTime - startTime;
+			startTime = currentTime;
+
 			if (!this.state.paused) {
 				if (this.state.modeSelection === -1) {
-					this.tickManual();
+					this.tickManual(timeLapsed);
 				} else {
-					this.tick();
+					this.tick(timeLapsed);
 				}
 			}
-		}, 1000);
+		}, 500);
 
 		flipped$.subscribe(flipped => {
 			this.setState({
@@ -210,14 +215,6 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	private async playAlarm() {
 		/** @todo Get alarm preference from backend */
 
-		// await Audio.setAudioModeAsync({
-		// 	playsInSilentModeIOS: true,
-		// 	allowsRecordingIOS: false,
-		// 	interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-		// 	shouldDuckAndroid: true,
-		// 	interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
-		// });
-
 		await Audio.setAudioModeAsync({
 			playsInSilentModeIOS: true,
 			allowsRecordingIOS: false,
@@ -237,10 +234,10 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	}
 
 	@bind
-	async tick() {
+	async tick(timeLapsed: number) {
 		if (this.state.onBreak) {
 			this.setState({
-				breakTimeLeft: this.state.breakTimeLeft - 1000
+				breakTimeLeft: this.state.breakTimeLeft - timeLapsed
 			});
 
 			// Reset and switch when timer reaches 0
@@ -276,7 +273,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			}
 		} else {
 			this.setState({
-				workTimeLeft: this.state.workTimeLeft - 1000
+				workTimeLeft: this.state.workTimeLeft - timeLapsed
 			});
 
 			if (this.state.workTimeLeft <= 0) {
@@ -313,15 +310,15 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	}
 
 	@bind
-	tickManual() {
+	tickManual(timeLapsed: number) {
 		if (this.state.onBreak) {
 			this.setState({
-				breakTimeLeft: this.state.breakTimeLeft + 1000
+				breakTimeLeft: this.state.breakTimeLeft + timeLapsed
 			});
 
 		} else {
 			this.setState({
-				workTimeLeft: this.state.workTimeLeft + 1000
+				workTimeLeft: this.state.workTimeLeft + timeLapsed
 			});
 		}
 	}
@@ -435,19 +432,20 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 
 	@bind
 	private doneAssignment() {
-		const id = this.state.assignment._id;
-		// if (this.props.assignmentContext.assignments.length > 1) {
-		// 	this.nextAssignment();
-		// } else {
-		// 	// this.endRecordTimeslot();
-		// }
-
-		MyMICDS.planner.checkEvent({ id }).subscribe({
-			complete: () => {
-				this.props.assignmentContext.deleteAssignment(id);
-				this.navigateToBattlePlan();
+		const tempID = this.state.assignment._id;
+		if (this.props.assignmentContext.assignments.length > 1) {
+			this.nextAssignment();
+		} else {
+			this.endRecordTimeslot();
+		}
+		MyMICDS.planner.checkEvent({ id: tempID }).subscribe(
+			() => {
+				this.props.assignmentContext.deleteAssignment(tempID);
+				if (this.props.assignmentContext.assignments.length === 0) {
+					this.navigateToBattlePlan();
+				}
 			}
-		});
+		);
 	}
 
 	@bind
