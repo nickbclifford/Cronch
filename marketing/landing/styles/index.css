@@ -1,0 +1,119 @@
+/**
+* index.scss
+* - Add any styles you want here!
+*/
+body {
+  font-family: "Nunito";
+  overflow: hidden;
+}
+
+.background {
+  z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-image: linear-gradient(135deg, #CE9FFC 10%, #7367F0 100%);
+  height: 100vh;
+  width: 100vw;
+}
+
+.btn {
+  color: white;
+  text-transform: uppercase;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background-image: linear-gradient(135deg, #CE9FFC 10%, #7367F0 100%);
+  border: none;
+}
+
+.not-bootstrap-container {
+  overflow: hidden;
+  height: 200vh;
+}
+.not-bootstrap-container .jumbotron-thing {
+  height: 88vh;
+  width: 120%;
+  background-color: white;
+  box-shadow: 0px 0px 50px 0px rgba(0, 0, 0, 0.5);
+  transform-origin: 0 100%;
+  transform: rotate(-5deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.not-bootstrap-container .jumbotron-thing .big-title {
+  transform: rotate(5deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1em;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .logo .logo-image {
+  height: 5em;
+  width: 5em;
+  margin-right: 0.5em;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .logo .logo-text {
+  font-weight: 100;
+  font-size: 5em;
+  margin-bottom: 0;
+}
+@media screen and (min-width: 576px) {
+  .not-bootstrap-container .jumbotron-thing .big-title .logo .logo-text {
+    font-weight: 100;
+    font-size: 10em;
+  }
+  .not-bootstrap-container .jumbotron-thing .big-title .logo .logo-image {
+    height: 10em;
+    width: 10em;
+    margin-right: 1.5em;
+  }
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-button {
+  height: 4rem;
+  width: 14rem;
+  border-radius: 3em;
+  font-size: 1em;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-height: 6rem;
+  margin-top: 1em;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .apple, .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android {
+  height: 4rem;
+}
+.not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android {
+  margin: -0.5rem;
+}
+@media screen and (min-width: 576px) {
+  .not-bootstrap-container .jumbotron-thing .big-title .download {
+    flex-direction: row;
+  }
+  .not-bootstrap-container .jumbotron-thing .big-title .download .download-button {
+    height: 6rem;
+    width: 20rem;
+    border-radius: 3em;
+    font-size: 1.5em;
+  }
+}
+
+/*# sourceMappingURL=index.css.map */
