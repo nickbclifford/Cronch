@@ -9,6 +9,7 @@ import { combineLatest, throwError } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 
 import MyMICDS from '../common/MyMICDS';
+import withOnLoginContext, { WithOnLoginContextProps } from '../common/OnLoginContext';
 import { getIfAnsweredQuestionnaire } from '../common/QuestionnaireResponse';
 import questionnaires from '../common/Questionnaires';
 import { components, NEUTRAL, nunito, typography } from '../common/StyleGuide';
@@ -29,7 +30,7 @@ interface LoginState {
 	loading: boolean;
 }
 
-export default class Login extends React.Component<NavigationScreenProps, LoginState> {
+class Login extends React.Component<NavigationScreenProps & WithOnLoginContextProps, LoginState> {
 
 	static navigationOptions = {
 		header: null
@@ -75,6 +76,7 @@ export default class Login extends React.Component<NavigationScreenProps, LoginS
 			first()
 		).subscribe(
 			({ missing, answeredQuestionnaire }) => {
+				this.props.onLoginContext.runEvents();
 				this.setState({ loading: false });
 
 				const checkUrls = missing.urls.length > 0;
@@ -160,6 +162,8 @@ export default class Login extends React.Component<NavigationScreenProps, LoginS
 		);
 	}
 }
+
+export default withOnLoginContext(Login);
 
 const styles = StyleSheet.create({
 	container: {
