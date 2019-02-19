@@ -486,12 +486,14 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 						<View style={styles.timerContainer}>
 							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
 							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.workTimeLeft)}</Text>
+							<Icon name='gear' type='font-awesome' size={50} color={NEUTRAL[300]}/>
 						</View>
 					)}
 					{this.state.onBreak && (
 						<View style={styles.timerContainer}>
 							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
 							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.breakTimeLeft)}</Text>
+							<Icon name='gear' type='font-awesome' size={50} color={NEUTRAL[300]}/>
 						</View>
 					)}
 				</View>
@@ -502,7 +504,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 								name='refresh'
 								type='font-awesome'
 								size={20}
-								color={NEUTRAL[700]}
+								color={NEUTRAL[500]}
 							/>
 							<Text style={[typography.small, styles.flippy]}>Place your phone face-down to start the timer!</Text>
 						</View>
@@ -628,7 +630,8 @@ const styles = StyleSheet.create({
 	},
 	timerLabel: {
 		textAlign: 'center',
-		color: NEUTRAL[300]
+		color: NEUTRAL[300],
+		height: 50
 	},
 	timerTime: {
 		textAlign: 'center',
