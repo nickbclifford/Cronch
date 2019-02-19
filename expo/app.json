@@ -32,6 +32,18 @@
     "android": {
       "package": "app.cronch.cronch",
       "permissions": []
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "cronch",
+            "project": "cronch-mobile",
+            "authToken": "9834486e982a4fb79e86c51002d75e997fb77feb1ce14b1c9d3d06385299449b"
+          }
+        }
+      ]
     }
   }
 }

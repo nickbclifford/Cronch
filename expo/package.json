@@ -1,5 +1,6 @@
 {
   "name": "cronch-mobile",
+  "version": "1.0.3",
   "main": "node_modules/expo/AppEntry.js",
   "private": true,
   "scripts": {
@@ -31,6 +32,7 @@
     "react-navigation": "^3.0.9",
     "rxjs": "^6.3.3",
     "schedule": "^0.4.0",
+    "sentry-expo": "^1.11.2",
     "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {

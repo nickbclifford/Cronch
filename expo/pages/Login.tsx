@@ -7,6 +7,7 @@ import { Button } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import { combineLatest, throwError } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
+import Sentry from 'sentry-expo';
 
 import MyMICDS from '../common/MyMICDS';
 import withOnLoginContext, { WithOnLoginContextProps } from '../common/OnLoginContext';
@@ -99,14 +100,19 @@ class Login extends React.Component<NavigationScreenProps & WithOnLoginContextPr
 			},
 			err => {
 				this.setState({ loading: false });
+				Sentry.captureException(err);
 				Alert.alert('Login Error', err.message);
 			}
 		);
 	}
 
 	@bind
-	register() {
-		WebBrowser.openBrowserAsync('https://mymicds.net/register');
+	async register() {
+		try {
+			await WebBrowser.openBrowserAsync('https://mymicds.net/register');
+		} catch (err) {
+			Sentry.captureException(err);
+		}
 	}
 
 	render() {

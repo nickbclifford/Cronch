@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Alert } from 'react-native';
 import { combineLatest, Subject} from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
+import Sentry from 'sentry-expo';
 
 import { AssignmentContext, AssignmentContextType } from './common/AssignmentContext';
 import { saveBattlePlanTasks } from './common/BattlePlanTask';
@@ -12,6 +13,10 @@ import Task, { createCustomTask } from './common/Task';
 import { getUserBattlePlanTasks } from './common/User';
 import { pickProps } from './common/Utils';
 import AppContainer from './Navigation';
+
+// Sentry error tracking
+// Sentry.enableInExpoDevelopment = true;
+Sentry.config('https://cfb0dd6414524ac39d87a8fac2bd55af@sentry.io/1396954').install();
 
 export default class App extends React.Component<{}, AssignmentContextType & OnLoginContextType> {
 
@@ -56,6 +61,7 @@ export default class App extends React.Component<{}, AssignmentContextType & OnL
 
 	componentDidMount() {
 		MyMICDS.errors.subscribe(err => {
+			Sentry.captureException(err);
 			Alert.alert('MyMICDS Error', err.message);
 		});
 
@@ -88,7 +94,10 @@ export default class App extends React.Component<{}, AssignmentContextType & OnL
 
 				this.updateNewAssignments(assignments, false);
 			},
-			err => Alert.alert('Battle Plan Error', `Error getting battle plan! ${err.message}`)
+			err => {
+				Sentry.captureException(err);
+				Alert.alert('Error Getting Battle Plan', err.message);
+			}
 		);
 
 		this.savePlan.pipe(
@@ -96,7 +105,10 @@ export default class App extends React.Component<{}, AssignmentContextType & OnL
 			switchMap(tasks => saveBattlePlanTasks(tasks.map(t => t._id)))
 		).subscribe(
 			() => console.log('Saved Battle Plan'),
-			err => Alert.alert('Saving Battle Plan Error', err.message)
+			err => {
+				Sentry.captureException(err);
+				Alert.alert('Saving Battle Plan Error', err.message);
+			}
 		);
 	}
 

@@ -15,6 +15,7 @@ import { Button } from 'react-native-elements';
 import Image from 'react-native-scalable-image';
 import { NavigationScreenProps } from 'react-navigation';
 import { Subscription } from 'rxjs';
+import Sentry from 'sentry-expo';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions, { menuStyle } from '../common/NavigationOptionsFactory';
@@ -62,9 +63,12 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		// 	}
 		// }
 		this.updateHeader();
-		this.battlePlanSubscription = this.props.assignmentContext.onAssignmentsChange.subscribe(tasks => {
-			this.setState({ tasks });
-		});
+		this.battlePlanSubscription = this.props.assignmentContext.onAssignmentsChange.subscribe(
+			tasks => {
+				this.setState({ tasks });
+			},
+			err => Sentry.captureException(err)
+		);
 	}
 
 	componentWillMount() {
