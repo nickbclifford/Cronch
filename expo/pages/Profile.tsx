@@ -3,7 +3,7 @@ import { Formik, FormikProps } from 'formik';
 import { number } from 'prop-types';
 import * as React from 'react';
 import { Alert, Picker, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { Button, CheckBox } from 'react-native-elements';
+import { Button, CheckBox, Divider } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import Sentry from 'sentry-expo';
 
@@ -180,24 +180,17 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
-				<ScrollView contentContainerStyle={styles.main}>
+				<ScrollView contentContainerStyle={styles.mainContainer}>
 					<View style={styles.user}>
 						<CronchyUser style={styles.avatar} user={MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : null} />
-						<View style={styles.loggedInAsAndLogout}>
-							<View style={styles.loggedInAsContainer}>
+						<View style={styles.loginText}>
 								<Text style={[typography.body, styles.loggedInAs]}>Logged in as</Text>
 								<Text style={[typography.h0, styles.loggedInUser]} adjustsFontSizeToFit={true} numberOfLines={1}>
 									{MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}
 								</Text>
-							</View>
-							<Button
-								title='Logout'
-								onPress={this.logout}
-								buttonStyle={components.buttonStyle}
-								titleStyle={components.buttonText}
-							/>
 						</View>
 					</View>
+					<Divider style={{ width: '100%' }}/>
 					<Formik
 						initialValues={settingsFormInitialValues}
 						onSubmit={this.saveSettings}
@@ -223,14 +216,23 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 								/>
 
 								<Button
-									title='Save'
+									title='Save Changes'
 									onPress={props.handleSubmit as any}
-									buttonStyle={components.buttonStyle}
+									buttonStyle={[components.buttonStyle, styles.submit]}
 									titleStyle={components.buttonText}
 								/>
 							</View>
 						)}
 					</Formik>
+					<Divider style={{ width: '100%' }}/>
+					<View style={styles.logoutContainer}>
+						<Button
+							title='Logout'
+							onPress={this.logout}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+					</View>
 				</ScrollView>
 			</SafeAreaView>
 		);
@@ -245,25 +247,28 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		alignItems: 'center'
 	},
-	main: {
+	mainContainer: {
 		display: 'flex',
-		alignItems: 'center'
+		alignItems: 'center',
+		// justifyContent: 'flex-start',
+		minHeight: '100%'
 	},
 	user: {
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'space-around',
+		justifyContent: 'center',
 		maxWidth: '100%',
-		width: '100%'
+		width: '100%',
+		marginBottom: 20,
+		marginTop: 20
 	},
-	loggedInAsAndLogout: {
-		display: 'flex'
+	loginText: {
+		display: 'flex',
+		justifyContent: 'center',
+		marginLeft: 40
 	},
 	avatar: {
 		width: '35%'
-	},
-	loggedInAsContainer: {
-		marginBottom: 16
 	},
 	loggedInAs: {
 		textAlign: 'center',
@@ -276,7 +281,9 @@ const styles = StyleSheet.create({
 	},
 	settingsForm: {
 		marginTop: 20,
-		width: '100%'
+		width: '100%',
+		display: 'flex',
+		justifyContent: 'center'
 	},
 	alarmPicker: {
 		width: '100%'
@@ -284,6 +291,14 @@ const styles = StyleSheet.create({
 	dataSharingPicker: {},
 	alarmPickerLabel: {
 		alignSelf: 'center'
+	},
+	submit: {
+		width: '100%',
+		marginBottom: 40
+	},
+	logoutContainer: {
+		width: '100%',
+		marginTop: 'auto'
 	}
 });
 
