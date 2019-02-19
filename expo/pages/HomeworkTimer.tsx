@@ -1,5 +1,5 @@
 import bind from 'bind-decorator';
-import { Audio } from 'expo';
+import { Audio, KeepAwake } from 'expo';
 import moment from 'moment';
 import * as React from 'react';
 import { Alert, StatusBar, StyleSheet, Text, Vibration, View } from 'react-native';
@@ -161,6 +161,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			.catch(e => {
 				Alert.alert('Error getting user', e.message);
 			});
+
+		KeepAwake.activate();
 	}
 
 	componentWillUnmount() {
@@ -461,6 +463,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	render() {
 		return (
 			<SafeAreaView style={styles.safeArea}>
+				<KeepAwake/>
 				<StatusBar barStyle='dark-content' animated={true} />
 				<DisplayAssignment
 					assignment={this.state.assignment}
