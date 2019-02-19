@@ -44,6 +44,12 @@ body {
   justify-content: center;
   align-items: center;
 }
+.not-bootstrap-container .jumbotron-thing .rotato {
+  position: absolute;
+  top: 5em;
+  left: 10em;
+  width: 40em;
+}
 .not-bootstrap-container .jumbotron-thing .big-title {
   transform: rotate(5deg);
   display: flex;

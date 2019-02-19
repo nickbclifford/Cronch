@@ -46,6 +46,12 @@ body {
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		.rotato {
+			position: absolute;
+			top: 5em;
+			left: 10em;
+			width: 40em;
+		}
 		.big-title {
 			transform: rotate(5deg);
 			display: flex;
