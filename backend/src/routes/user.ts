@@ -79,7 +79,13 @@ router.get('/timers', requireLoggedIn, (req, res) => {
 
 router.get('/battle-plan-tasks', requireLoggedIn, (req, res) => {
 	User.findByPk(req.authorizedUser!, { include: [BattlePlanTask] })
-		.then(user => successResponse(res, user!.battlePlanTasks.map(t => t.toJSON())))
+		.then(user => {
+			if (user) {
+				successResponse(res, user.battlePlanTasks.map(t => t.toJSON()));
+			} else {
+				successResponse(res, []);
+			}
+		})
 		.catch(err => errorResponse(res, err));
 });
 
