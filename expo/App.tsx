@@ -2,7 +2,7 @@ import bind from 'bind-decorator';
 import * as React from 'react';
 import { Alert } from 'react-native';
 import { combineLatest, Subject} from 'rxjs';
-import { debounceTime, switchMap } from 'rxjs/operators';
+import { debounceTime, switchMap, tap } from 'rxjs/operators';
 
 import { AssignmentContext, AssignmentContextType } from './common/AssignmentContext';
 import { saveBattlePlanTasks } from './common/BattlePlanTask';
@@ -60,6 +60,9 @@ export default class App extends React.Component<{}, AssignmentContextType & OnL
 		});
 
 		this.state.onLoggedIn.pipe(
+			tap(() => {
+				console.log(MyMICDS.auth.snapshot);
+			}),
 			switchMap(() => combineLatest(
 				MyMICDS.canvas.getEvents(),
 				getUserBattlePlanTasks()
