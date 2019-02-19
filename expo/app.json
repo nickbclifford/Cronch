@@ -31,7 +31,8 @@
     },
     "android": {
       "package": "app.cronch.cronch",
-      "permissions": []
+      "permissions": [],
+      "versionCode": 2
     },
     "hooks": {
       "postPublish": [
