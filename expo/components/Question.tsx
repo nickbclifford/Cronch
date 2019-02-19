@@ -9,7 +9,6 @@ import { NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
 export interface QuestionProps extends QuestionInfo {
 	selectedId: number | null;
 	onSelectResponse(id: number): void;
-	scroll?: boolean;
 	expandable?: boolean;
 	containerStyle?: StyleProp<ViewStyle>;
 }
@@ -92,11 +91,16 @@ export default class Question extends React.Component<QuestionProps, QuestionSta
 			/>
 			);
 
-		const questionTitle = (
+		const questionTitle = this.props.expandable ? (
 			<TouchableOpacity style={styles.questionTitle} onPress={this.onExpandPress}>
 				<Text style={[typography.h2, nunito.bold, styles.text]}>{this.props.question}</Text>
 				{expandChevron}
 			</TouchableOpacity>
+		) :
+		(
+			<View style={styles.questionTitle}>
+				<Text style={[typography.h2, nunito.bold, styles.text]}>{this.props.question}</Text>
+			</View>
 		);
 
 		return (

@@ -208,7 +208,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 									responses={alarmList.map((alarm, i) => ({ id: i, answer: alarm.displayName }))}
 									onSelectResponse={handleFieldChangeFactory<SettingsFormValues>(props, 'alarmSelection')}
 									selectedId={props.values.alarmSelection}
-									scroll={true}
+									expandable={true}
 								/>
 
 								<Question
@@ -217,6 +217,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 									responses={dataOptions.map((q, i) => ({ id: i, answer: q}))}
 									onSelectResponse={handleFieldChangeFactory<SettingsFormValues>(props, 'dataSharingSelection')}
 									selectedId={props.values.dataSharingSelection}
+									expandable={true}
 								/>
 
 								<Button
