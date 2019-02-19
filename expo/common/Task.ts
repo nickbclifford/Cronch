@@ -13,6 +13,9 @@ export default interface Task {
 	descPlaintext: string;
 }
 
+export const defaultColor = '#34444F';
+export const defaultTextDark = false;
+
 export function createCustomTask(taskName: string): Task {
 	return {
 		_id: taskName,
@@ -28,8 +31,8 @@ export function createCustomTask(taskName: string): Task {
 			},
 			type: ClassType.OTHER,
 			block: Block.OTHER,
-			color: '#34444F',
-			textDark: false
+			color: defaultColor,
+			textDark: defaultTextDark
 		},
 		title: taskName,
 		start: moment().startOf('day'),
