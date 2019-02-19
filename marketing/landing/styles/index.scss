@@ -6,6 +6,8 @@ $gradient: linear-gradient( 135deg, #CE9FFC 10%, #7367F0 100%);
 
 $break-small: 576px;
 
+$break-medium: 1024px;
+
 body {
 	font-family: 'Nunito';
 	overflow: hidden;
@@ -46,18 +48,26 @@ body {
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		.rotato {
-			position: absolute;
-			top: 5em;
-			left: 10em;
-			width: 40em;
-		}
 		.big-title {
 			transform: rotate(5deg);
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+			.rotato {
+				position: absolute;
+				width: 40em;
+				left: -15rem;
+				top: 10rem;
+				z-index: -1;
+			}
+			@media screen and (min-width: $break-medium) {
+				.rotato {
+					left: -30rem;
+					top: -7rem;
+					width: 40rem;
+				}
+			}
 			.logo {
 				display: flex;
 				justify-content: center;
@@ -104,13 +114,11 @@ body {
 					max-height: 6rem;
 					margin-top: 1em;
 					.apple, .android {
-						height: 4rem;
+						width: 8rem;
+						padding: 0.1rem;
 						&:hover {
 							cursor: pointer;
 						}
-					}
-					.android {
-						margin: -0.5rem;
 					}
 				}
 
