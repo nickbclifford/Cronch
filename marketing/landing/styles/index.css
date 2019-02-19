@@ -111,6 +111,7 @@ body {
   flex-direction: column;
   max-height: 6rem;
   margin-top: 1em;
+  margin-left: 1rem;
 }
 .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .apple, .not-bootstrap-container .jumbotron-thing .big-title .download .download-platforms .android {
   width: 8rem;
