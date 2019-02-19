@@ -4,7 +4,7 @@ export interface ResponseInfo {
 }
 
 export interface QuestionInfo {
-	id: number;
+	id?: number;
 	question: string;
 	responses: ResponseInfo[];
 }

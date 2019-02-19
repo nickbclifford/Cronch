@@ -1,6 +1,6 @@
 import bind from 'bind-decorator';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { CheckBox, Icon } from 'react-native-elements';
 
 import { QuestionInfo } from '../common/Questionnaires';
@@ -9,15 +9,36 @@ import { NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
 export interface QuestionProps extends QuestionInfo {
 	selectedId: number | null;
 	onSelectResponse(id: number): void;
+	scroll?: boolean;
+	expandable?: boolean;
+	containerStyle?: StyleProp<ViewStyle>;
 }
 
-export default class Question extends React.Component<QuestionProps> {
+interface QuestionState {
+	expanded: boolean;
+}
+
+export default class Question extends React.Component<QuestionProps, QuestionState> {
+
+	constructor(props: QuestionProps) {
+		super(props);
+		this.state = {
+			expanded: false
+		};
+	}
 
 	@bind
 	private onRadioPress(id: number) {
 		return () => {
 			this.props.onSelectResponse(id);
 		};
+	}
+
+	@bind
+	private onExpandPress() {
+		this.setState({
+			expanded: !this.state.expanded
+		});
 	}
 
 	render() {
@@ -50,24 +71,62 @@ export default class Question extends React.Component<QuestionProps> {
 				key={response.id.toString()}
 			/>
 		));
-		return (
-			<View style={styles.container}>
+
+		const expandChevron = this.state.expanded ?
+			(
+			<Icon
+				name='chevron-down'
+				type='font-awesome'
+				size={20}
+				color={PRIMARY[700]}
+				containerStyle={{ paddingRight: 20 }}
+			/>
+			) :
+			(
+			<Icon
+				name='chevron-up'
+				type='font-awesome'
+				size={20}
+				color={PRIMARY[700]}
+				containerStyle={{ paddingRight: 20 }}
+			/>
+			);
+
+		const questionTitle = (
+			<TouchableOpacity style={styles.questionTitle} onPress={this.onExpandPress}>
 				<Text style={[typography.h2, nunito.bold, styles.text]}>{this.props.question}</Text>
-				{responseRadios}
+				{expandChevron}
+			</TouchableOpacity>
+		);
+
+		return (
+			<View style={[styles.container, this.props.containerStyle]}>
+				{questionTitle}
+				<View style={styles.options}>
+					{this.state.expanded && responseRadios}
+				</View>
 			</View>
 		);
 	}
-
 }
 
 const styles = StyleSheet.create({
 	container: {
-		width: '100%',
+		maxWidth: '100%',
 		display: 'flex',
 		justifyContent: 'space-between'
 	},
-	text: {
+	questionTitle: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
 		marginBottom: 32
+	},
+	text: {
+		flexShrink: 2
+	},
+	options: {
 	},
 	option: {
 		margin: 0,

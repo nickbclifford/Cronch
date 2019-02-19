@@ -2,7 +2,7 @@ import bind from 'bind-decorator';
 import { Formik, FormikProps } from 'formik';
 import { number } from 'prop-types';
 import * as React from 'react';
-import { Alert, Picker, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Alert, Picker, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button, CheckBox } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 
@@ -84,12 +84,6 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 			console.error(err);
 		});
 	}
-
-	questionNames = [
-		"Don't send teachers data at all",
-		'Send data to teachers anonymously',
-		'Send data to teachers as yourself'
-	];
 
 	// @bind
 	// private async setAlarmMode(n: number) {
@@ -174,36 +168,64 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	// }
 
 	render() {
+		const dataOptions = [
+			"Don't send teachers data at all",
+			'Send data to teachers anonymously',
+			'Send data to teachers as yourself'
+		];
+
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
-				<CronchyUser style={styles.avatar} user={MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : null} />
-				<View style={styles.loggedInAsContainer}>
-					<Text style={[typography.body, styles.loggedInAs]}>Logged in as</Text>
-					<Text style={[typography.h0, styles.loggedInUser]}>{MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}</Text>
-				</View>
-				<Button
-					title='Logout'
-					onPress={this.logout}
-					buttonStyle={components.buttonStyle}
-					titleStyle={components.buttonText}
-				/>
-				{/*<Formik
-					initialValues={settingsFormInitialValues}
-					onSubmit={this.saveSettings}
-				>
-					{props => (
-						<View>
-							<Text>Alarm Sound</Text>
-							<Question
-								question='Alarm Sound'
-								responses={alarmList.map(i => i.displayName)}
-								onSelectResponse={props.handleChange.}
-								selectedIndex={props.values.dataSharingSelection}
+				<ScrollView contentContainerStyle={styles.main}>
+					<View style={styles.user}>
+						<CronchyUser style={styles.avatar} user={MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : null} />
+						<View style={styles.loggedInAsAndLogout}>
+							<View style={styles.loggedInAsContainer}>
+								<Text style={[typography.body, styles.loggedInAs]}>Logged in as</Text>
+								<Text style={[typography.h0, styles.loggedInUser]}>{MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}</Text>
+							</View>
+							<Button
+								title='Logout'
+								onPress={this.logout}
+								buttonStyle={components.buttonStyle}
+								titleStyle={components.buttonText}
 							/>
 						</View>
-					)}
-				</Formik>*/}
+					</View>
+					<Formik
+						initialValues={settingsFormInitialValues}
+						onSubmit={this.saveSettings}
+					>
+						{props => (
+							<View style={styles.settingsForm}>
+								<Question
+									containerStyle={styles.alarmPicker}
+									question='Alarm Preferences'
+									responses={alarmList.map((alarm, i) => ({ id: i, answer: alarm.displayName }))}
+									onSelectResponse={handleFieldChangeFactory<SettingsFormValues>(props, 'alarmSelection')}
+									selectedId={props.values.alarmSelection}
+									scroll={true}
+								/>
+
+								<Question
+									containerStyle={styles.dataSharingPicker}
+									question='How should we handle your timer data?'
+									responses={dataOptions.map((q, i) => ({ id: i, answer: q}))}
+									onSelectResponse={handleFieldChangeFactory<SettingsFormValues>(props, 'dataSharingSelection')}
+									selectedId={props.values.dataSharingSelection}
+								/>
+
+								<Button
+									title='Save'
+									onPress={props.handleSubmit as any}
+									buttonStyle={components.buttonStyle}
+									titleStyle={components.buttonText}
+								/>
+							</View>
+						)}
+					</Formik>
+				</ScrollView>
 			</SafeAreaView>
 		);
 	}
@@ -217,8 +239,22 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		alignItems: 'center'
 	},
+	main: {
+		display: 'flex',
+		alignItems: 'center'
+	},
+	user: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+		maxWidth: '100%',
+		width: '100%'
+	},
+	loggedInAsAndLogout: {
+		display: 'flex'
+	},
 	avatar: {
-		width: '50%'
+		width: '35%'
 	},
 	loggedInAsContainer: {
 		marginBottom: 16
@@ -230,6 +266,17 @@ const styles = StyleSheet.create({
 	loggedInUser: {
 		textAlign: 'center',
 		lineHeight: 75
+	},
+	settingsForm: {
+		marginTop: 20,
+		width: '100%'
+	},
+	alarmPicker: {
+		width: '100%'
+	},
+	dataSharingPicker: {},
+	alarmPickerLabel: {
+		alignSelf: 'center'
 	}
 });
 
@@ -250,12 +297,5 @@ const oldStyles = StyleSheet.create({
 	},
 	question: {
 		flex: 1
-	},
-	alarmPicker: {
-		display: 'flex',
-		justifyContent: 'center'
-	},
-	alarmPickerLabel: {
-		alignSelf: 'center'
 	}
 });
