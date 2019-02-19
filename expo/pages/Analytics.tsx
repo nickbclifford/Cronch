@@ -7,6 +7,7 @@ import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
 import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import Sentry from 'sentry-expo';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
@@ -307,7 +308,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			this.setState({ times: timeslots });
 			this.makeWeeklyData();
 			this.makeDailyData();
-		});
+		}).catch(err => Sentry.captureException(err));
 		// this.updateData();
 	}
 
@@ -318,7 +319,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			this.setState({ times: timeslots });
 			this.makeWeeklyData();
 			this.makeDailyData();
-		});
+		}).catch(err => Sentry.captureException(err));
 	}
 
 	@bind

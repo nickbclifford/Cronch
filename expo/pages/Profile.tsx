@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Alert, Picker, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button, CheckBox } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import Sentry from 'sentry-expo';
 
 import { alarmList } from '../common/Alarms';
 import MyMICDS from '../common/MyMICDS';
@@ -58,9 +59,10 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	@bind
 	private logout() {
-		MyMICDS.auth.logout().subscribe(() => {
-			this.props.navigation.navigate('Auth');
-		});
+		MyMICDS.auth.logout().subscribe(
+			() => this.props.navigation.navigate('Auth'),
+			err => Sentry.captureException(err)
+		);
 	}
 
 	// @bind
@@ -81,6 +83,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 		}).catch(err => {
 			// Un-select on error, so the user knows to re-select
 			this.setState({ dataSharingSelection: null });
+			Sentry.captureException(err);
 			console.error(err);
 		});
 	}

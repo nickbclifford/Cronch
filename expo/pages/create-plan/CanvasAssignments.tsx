@@ -3,6 +3,7 @@ import * as React from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
+import Sentry from 'sentry-expo';
 
 import MyMICDS from '../../common/MyMICDS';
 import createNavigationOptions from '../../common/NavigationOptionsFactory';
@@ -36,11 +37,14 @@ export default class CanvasAssignments extends React.Component<NavigationScreenP
 	}
 
 	componentDidMount() {
-		MyMICDS.canvas.getEvents().subscribe(({ hasURL, events }) => {
-			this.setState({
-				assignments: hasURL ? events : []
-			});
-		});
+		MyMICDS.canvas.getEvents().subscribe(
+			({ hasURL, events }) => {
+				this.setState({
+					assignments: hasURL ? events : []
+				});
+			},
+			err => Sentry.captureException(err)
+		);
 	}
 
 	@bind

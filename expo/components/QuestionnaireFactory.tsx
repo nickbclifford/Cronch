@@ -112,9 +112,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: NEUTRAL[100],
-		borderWidth: 2,
-		borderColor: 'purple'
+		backgroundColor: NEUTRAL[100]
 	},
 	question: {
 		width: '100%'

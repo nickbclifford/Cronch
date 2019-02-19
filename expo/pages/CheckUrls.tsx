@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Alert, ImageBackground, ImageStyle, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import Sentry from 'sentry-expo';
 
 import MyMICDS from '../common/MyMICDS';
 import { components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
@@ -53,6 +54,7 @@ export default class CheckUrls extends React.Component<NavigationScreenProps, Ch
 			},
 			err => {
 				this.setState({ checking: false });
+				Sentry.captureException(err);
 				Alert.alert('Login Error', err.message);
 			}
 		);

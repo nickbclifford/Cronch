@@ -1,13 +1,14 @@
 import bind from 'bind-decorator';
-import { Notifications, Permissions } from 'expo';
+import { Notifications } from 'expo';
 import * as React from 'react';
 import { AsyncStorage, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import Sentry from 'sentry-expo';
 
 import { Expression, Skin } from '../common/AvatarTypes';
 import { getNotificationPermissions, submitNotificationToken } from '../common/NotificationToken';
-import { components, NEUTRAL, nunito, PRIMARY, typography } from '../common/StyleGuide';
+import { components, NEUTRAL, nunito, typography } from '../common/StyleGuide';
 import Cronchy from '../components/Cronchy';
 
 interface AllowNotificationsState {
@@ -29,18 +30,22 @@ export default class AllowNotifications extends React.Component<NavigationScreen
 
 	@bind
 	async askForPermission() {
-		this.setState({ asking: true });
-		console.log('asked');
-		const status = await getNotificationPermissions();
-		clearInterval(this.permissionSpamInterval);
-		if (status !== 'granted') {
-			await AsyncStorage.setItem('deniedNotifications', 'true');
-			return this.continue();
-		}
+		try {
+			this.setState({ asking: true });
+			console.log('asked');
+			const status = await getNotificationPermissions();
+			clearInterval(this.permissionSpamInterval);
+			if (status !== 'granted') {
+				await AsyncStorage.setItem('deniedNotifications', 'true');
+				return this.continue();
+			}
 
-		const token = await Notifications.getExpoPushTokenAsync();
-		await submitNotificationToken(token);
-		this.continue();
+			const token = await Notifications.getExpoPushTokenAsync();
+			await submitNotificationToken(token);
+			this.continue();
+		} catch (err) {
+			Sentry.captureException(err);
+		}
 	}
 
 	@bind

@@ -5,9 +5,12 @@ import { Image } from 'react-native-elements';
 import { NavigationScreenProps } from 'react-navigation';
 import { combineLatest } from 'rxjs';
 import { filter, first } from 'rxjs/operators';
+import Sentry from 'sentry-expo';
 
 import MyMICDS from '../common/MyMICDS';
 import withOnLoginContext, { WithOnLoginContextProps } from '../common/OnLoginContext';
+import { getIfAnsweredQuestionnaire } from '../common/QuestionnaireResponse';
+import questionnaires from '../common/Questionnaires';
 import { NEUTRAL } from '../common/StyleGuide';
 import { getUser } from '../common/User';
 import { getMissingURLs } from '../common/Utils';
@@ -39,36 +42,52 @@ export class Loading extends React.Component<NavigationScreenProps & WithOnLogin
 				// 'Nunito-ExtraBold': require('../assets/Nunito/Nunito-ExtraBold.ttf'),
 				// 'Nunito-Black': require('../assets/Nunito/Nunito-Black.ttf')
 			})
-		).subscribe(async ([mymicdsAuth]) => {
-			if (mymicdsAuth === null) {
-				this.props.navigation.navigate('Auth');
-			} else {
-				combineLatest(
-					MyMICDS.user.$.pipe(
-						filter(user => user !== undefined && user !== null),
-						first()
-					),
-					getUser()
-				).subscribe(
-					([mymicdsUser, { user: cronchUser }]) => {
-						if (cronchUser === null) {
-							MyMICDS.auth.logout().subscribe({
-								error: err => Alert.alert('Logout Error', err.message),
-								complete: () => this.props.navigation.navigate('Auth')
-							});
-						} else {
-							this.props.onLoginContext.loggedIn();
-							const missing = getMissingURLs(mymicdsUser!);
-							if (missing.hasRequired) {
-								this.props.navigation.navigate('App');
+		).subscribe(
+			async ([mymicdsAuth]) => {
+				if (mymicdsAuth === null) {
+					this.props.navigation.navigate('Auth');
+				} else {
+					combineLatest(
+						MyMICDS.user.$.pipe(
+							filter(user => user !== undefined && user !== null),
+							first()
+						),
+						getUser(),
+						getIfAnsweredQuestionnaire(questionnaires.initial.id)
+					).subscribe(
+						([mymicdsUser, { user: cronchUser }, { answered }]) => {
+							if (cronchUser === null) {
+								MyMICDS.auth.logout().subscribe({
+									error: err => {
+										Sentry.captureException(err);
+										Alert.alert('Logout Error', err.message);
+									},
+									complete: () => this.props.navigation.navigate('Auth')
+								});
 							} else {
-								this.props.navigation.navigate('CheckUrls', missing);
+								this.props.onLoginContext.loggedIn();
+								const missing = getMissingURLs(mymicdsUser!);
+
+								if (answered) {
+									if (missing.hasRequired) {
+										this.props.navigation.navigate('App');
+									} else {
+										this.props.navigation.navigate('CheckUrls', missing);
+									}
+								} else {
+									this.props.navigation.navigate('InitialQuestionaire', {
+										redirectAfter: missing.hasRequired ? 'App' : 'CheckUrls',
+										redirectAfterParams: missing
+									});
+								}
 							}
-						}
-					}
-				);
-			}
-		});
+						},
+						err => Sentry.captureException(err)
+					);
+				}
+			},
+			err => Sentry.captureException(err)
+		);
 	}
 
 	render() {

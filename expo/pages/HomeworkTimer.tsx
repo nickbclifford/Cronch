@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Alert, StatusBar, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import Sentry from 'sentry-expo';
 
 import { alarmList } from '../common/Alarms';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
@@ -157,8 +158,9 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				// 	});
 				// }
 			})
-			.catch(e => {
-				Alert.alert('Error getting user', e.message);
+			.catch(err => {
+				Sentry.captureException(err);
+				Alert.alert('Error getting user', err.message);
 			});
 
 		KeepAwake.activate();
@@ -252,6 +254,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				try {
 					soundObject = await this.playAlarm();
 				} catch (err) {
+					Sentry.captureException(err);
 					Alert.alert('Error Playing Sound', err.message);
 				}
 				this.vibratePhone();
@@ -288,6 +291,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				try {
 					soundObject = await this.playAlarm();
 				} catch (err) {
+					Sentry.captureException(err);
 					Alert.alert('Error Playing Sound', err.message);
 				}
 				this.vibratePhone();
@@ -338,8 +342,9 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		})
 		.then(() => {
 			console.log(`Timeslot started for task id ${timeslot.classId}`);
-		}).catch(e => {
-			Alert.alert('Error saving time slot.', e.message);
+		}).catch(err => {
+			err => Sentry.captureException(err);
+			Alert.alert('Error saving time slot.', err.message);
 		});
 	}
 
@@ -351,8 +356,9 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				console.log(`Timeslot ended for task id ${this.state.currentTimeslotId}`);
 				this.setState({ currentTimeslotId: null });
 			})
-			.catch(e => {
-				Alert.alert('Error ending time slot.', e.message);
+			.catch(err => {
+				Sentry.captureException(err);
+				Alert.alert('Error ending time slot.', err.message);
 			});
 		}
 	}
@@ -447,7 +453,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 				if (this.props.assignmentContext.assignments.length === 0) {
 					this.navigateToBattlePlan();
 				}
-			}
+			},
+			err => Sentry.captureException(err)
 		);
 	}
 
