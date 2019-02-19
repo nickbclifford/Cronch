@@ -186,8 +186,8 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 						<View style={styles.loggedInAsAndLogout}>
 							<View style={styles.loggedInAsContainer}>
 								<Text style={[typography.body, styles.loggedInAs]}>Logged in as</Text>
-								<Text style={[typography.h0, styles.loggedInUser]} adjustsFontSizeToFit={true}>
-									{/* {MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''} */}gcarmichael
+								<Text style={[typography.h0, styles.loggedInUser]} adjustsFontSizeToFit={true} numberOfLines={1}>
+									{MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}
 								</Text>
 							</View>
 							<Button
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
 	loggedInUser: {
 		textAlign: 'center',
 		lineHeight: 75,
-		maxWidth: '100%'
+		maxWidth: 200
 	},
 	settingsForm: {
 		marginTop: 20,
