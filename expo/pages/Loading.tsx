@@ -9,6 +9,8 @@ import Sentry from 'sentry-expo';
 
 import MyMICDS from '../common/MyMICDS';
 import withOnLoginContext, { WithOnLoginContextProps } from '../common/OnLoginContext';
+import { getIfAnsweredQuestionnaire } from '../common/QuestionnaireResponse';
+import questionnaires from '../common/Questionnaires';
 import { NEUTRAL } from '../common/StyleGuide';
 import { getUser } from '../common/User';
 import { getMissingURLs } from '../common/Utils';
@@ -50,9 +52,10 @@ export class Loading extends React.Component<NavigationScreenProps & WithOnLogin
 							filter(user => user !== undefined && user !== null),
 							first()
 						),
-						getUser()
+						getUser(),
+						getIfAnsweredQuestionnaire(questionnaires.initial.id)
 					).subscribe(
-						([mymicdsUser, { user: cronchUser }]) => {
+						([mymicdsUser, { user: cronchUser }, { answered }]) => {
 							if (cronchUser === null) {
 								MyMICDS.auth.logout().subscribe({
 									error: err => {
@@ -64,10 +67,18 @@ export class Loading extends React.Component<NavigationScreenProps & WithOnLogin
 							} else {
 								this.props.onLoginContext.loggedIn();
 								const missing = getMissingURLs(mymicdsUser!);
-								if (missing.hasRequired) {
-									this.props.navigation.navigate('App');
+
+								if (answered) {
+									if (missing.hasRequired) {
+										this.props.navigation.navigate('App');
+									} else {
+										this.props.navigation.navigate('CheckUrls', missing);
+									}
 								} else {
-									this.props.navigation.navigate('CheckUrls', missing);
+									this.props.navigation.navigate('InitialQuestionaire', {
+										redirectAfter: missing.hasRequired ? 'App' : 'CheckUrls',
+										redirectAfterParams: missing
+									});
 								}
 							}
 						},
