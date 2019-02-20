@@ -1,28 +1,25 @@
-import React, { Component } from 'react';
-import './App.css';
-import logo from './logo.svg';
+import bind from 'bind-decorator';
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
-class App extends Component {
+import ClassesList from './pages/ClassesList';
+
+export default class App extends React.Component {
+
+	@bind
+	redirectToDefault() {
+		return (
+			<Redirect to='/classes-list' />
+		);
+	}
+
 	render() {
 		return (
-			<div className='App'>
-				<header className='App-header'>
-					<img src={logo} className='App-logo' alt='logo' />
-					<p>
-						Edit <code>src/App.tsx</code> and save to reload.
-					</p>
-					<a
-						className='App-link'
-						href='https://reactjs.org'
-						target='_blank'
-						rel='noopener noreferrer'
-					>
-						Learn React
-					</a>
-				</header>
-			</div>
+			<Switch>
+				<Route exact={true} path='/' render={this.redirectToDefault} />
+				<Route path='/classes-list' component={ClassesList} />
+				<Route render={this.redirectToDefault} />
+			</Switch>
 		);
 	}
 }
-
-export default App;
