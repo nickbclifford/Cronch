@@ -3,6 +3,7 @@ import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import ClassesList from './pages/ClassesList';
+import Login from './pages/Login';
 
 export default class App extends React.Component {
 
@@ -17,6 +18,7 @@ export default class App extends React.Component {
 		return (
 			<Switch>
 				<Route exact={true} path='/' render={this.redirectToDefault} />
+				<Route path='/login' component={Login} />
 				<Route path='/classes-list' component={ClassesList} />
 				<Route render={this.redirectToDefault} />
 			</Switch>
