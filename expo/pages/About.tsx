@@ -16,7 +16,7 @@ export default class About extends React.Component<NavigationScreenProps> {
 				<View style={styles.container}>
 					<Text style={[typography.body, styles.message]}>Bugs? Feature requests? Compliments? Roasts?</Text>
 					<Text style={[typography.h1, nunito.bold, styles.message]}>Email hello@cronch.app</Text>
-					<Text style={[typography.small]}>Version 1.0.0</Text>
+					<Text style={[typography.small]}>Version 1.0.1</Text>
 				</View>
 			</SafeAreaView>
 		);
