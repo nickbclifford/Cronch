@@ -2,6 +2,7 @@ import React from 'react';
 
 import { calculateHourPortions, HourPortions } from '../model/Analytics';
 import { Timeslot } from '../model/Timeslot';
+import styles from './HeatmapDisplay.module.scss';
 
 export interface HeatmapDisplayProps {
 	timeslots: Timeslot[];
@@ -42,16 +43,39 @@ export default class HeatmapDisplay extends React.Component<HeatmapDisplayProps,
 		return hourPortions;
 	}
 
+	private calculateColor(percentage: number) {
+		const minLightness = 23;
+		const maxLightness = 96;
+
+		let lightness = maxLightness;
+		if (Number.isFinite(percentage)) {
+			lightness = (maxLightness - minLightness) * (1 - percentage) + minLightness;
+		}
+
+		const obj = {
+			backgroundColor: `hsl(283, 98%, ${lightness}%)`
+		};
+		return obj;
+	}
+
 	render() {
 		const portions: HourPortions = {};
 		for (let i = 0; i < 23; i++) {
 			portions[i] = this.state.hourPortions[i] || 0;
 		}
 		const hours = Object.keys(portions).map(k => parseInt(k, 10));
+
+		const max = Math.max(...Object.values(portions));
+
 		return (
 			<div>
+				{/*<div key={hour}>{hour}: {portions[hour]}</div>*/}
 				{hours.map(hour => (
-					<div key={hour}>{hour}: {portions[hour]}</div>
+					<div key={hour} className={styles.heatmapHour}>
+						<div className={styles.heatmapLabel}>{hour}</div>
+						<div className={styles.heatmapData} style={this.calculateColor(portions[hour] / max)}></div>
+						<div>{portions[hour].toFixed(2)} hours worked</div>
+					</div>
 				))}
 			</div>
 		);
