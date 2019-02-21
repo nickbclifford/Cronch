@@ -236,14 +236,16 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 									expandable={true}
 								/>
 
-								<Button
-									title='Save Changes'
-									onPress={props.handleSubmit as any}
-									buttonStyle={[components.buttonStyle, styles.submit]}
-									titleStyle={components.buttonText}
-									disabled={!props.dirty}
-									loading={this.state.submittingSettings}
-								/>
+								<View style={styles.submitContainer}>
+									<Button
+										title='Save Changes'
+										onPress={props.handleSubmit as any}
+										buttonStyle={components.buttonStyle}
+										titleStyle={components.buttonText}
+										disabled={!props.dirty}
+										loading={this.state.submittingSettings}
+									/>
+								</View>
 							</View>
 						)}
 					</Formik>
@@ -299,7 +301,8 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		width: '100%',
 		display: 'flex',
-		justifyContent: 'center'
+		justifyContent: 'center',
+		alignItems: 'center'
 	},
 	alarmPicker: {
 		width: '100%'
@@ -308,12 +311,12 @@ const styles = StyleSheet.create({
 	alarmPickerLabel: {
 		alignSelf: 'center'
 	},
-	submit: {
-		width: '100%',
+	submitContainer: {
+		// width: '100%',
 		marginBottom: 40
 	},
 	logoutContainer: {
-		width: '100%',
+		// width: '100%',
 		marginBottom: 40
 	}
 });
