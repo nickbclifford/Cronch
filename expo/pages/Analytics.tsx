@@ -7,11 +7,14 @@ import { Button } from 'react-native-elements';
 import PureChart from 'react-native-pure-chart';
 import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
+import { Subscription } from 'rxjs';
 import Sentry from 'sentry-expo';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
+import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
 import { components, PRIMARY } from '../common/StyleGuide';
+import { defaultColor, defaultTextDark } from '../common/Task';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
 
@@ -32,6 +35,7 @@ interface LineChartDataPoint {
 
 interface AnalyticsState {
 	times: Timeslot[];
+	canvasClasses: CanvasEvent[];
 	classes: string[];
 	weeklyTimes: Timeslot[];
 	weeklyTotal: number;
@@ -46,10 +50,13 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 	static navigationOptions = createNavigationOptions('Analytics');
 
+	canvasEventsSubscription?: Subscription;
+
 	constructor(props: any) {
 		super(props);
 		this.state = {
 			times: [],
+			canvasClasses: [],
 			classes: [],
 			pieChartData: [
 				{
@@ -104,7 +111,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		const weeklyTimes: Timeslot[] = []; // weekly timeslots
 		for (const time of this.state.times) {
-			if (time.end != null && time.start > thisWeek) {
+			if (time.end !== null && time.start > thisWeek) {
 				weeklyTimes.push(time);
 			}
 		}
@@ -145,7 +152,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		let total = 0;
 
 		for (const time of weeklyTimes) {
-			if (time.end != null) {
+			if (time.end !== null) {
 				total += this.calcHourDiff(time.start, time.end);
 			}
 		}
@@ -161,7 +168,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		const dailyTimes: Timeslot[] = []; // daily timeslots
 		for (const time of this.state.times) {
-			if (time.end != null && time.start.getDay() === today.getDay()) {
+			if (time.end !== null && time.start.getDay() === today.getDay()) {
 				dailyTimes.push(time);
 			}
 		}
@@ -169,7 +176,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		let total = 0;
 
 		for (const time of dailyTimes) {
-			if (time.end != null) {
+			if (time.end !== null) {
 				total += this.calcHourDiff(time.start, time.end);
 			}
 		}
@@ -192,26 +199,19 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		for (const cl of classes) {
 			let totalHours = 0;
 			for (const slot of dailyTimes) {
-				if (slot.end != null && slot.classId === cl) {
+				if (slot.end !== null && slot.classId === cl) {
 					const diff = Math.round(this.calcHourDiff(slot.start, slot.end));
 					totalHours += (diff === 0) ? this.calcMinuteDiff(slot.start, slot.end) : diff;
 				}
 			}
 
-			if (cl.startsWith('event-assignment-')) {
-				const classData = this.props.assignmentContext.assignments.find(a => a._id === cl)!.class;
-				chartData.push({
-					label: classData.name,
-					value: +(totalHours).toFixed(2),
-					color: classData.color
-				});
-			} else {
-				chartData.push({
-					label: cl,
-					value: +(totalHours).toFixed(2),
-					color: this.pickRandomColor()
-				});
-			}
+			const { name, color, fromCanvas } = this.getClassNameAndColor(cl);
+
+			chartData.push({
+				label: name,
+				value: +(totalHours).toFixed(2),
+				color: fromCanvas ? color : this.pickRandomColor()
+			});
 		}
 
 		if (chartData.length > 0) {
@@ -231,15 +231,10 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 					biggestClass = i;
 				}
 			}
-			const biggestId = this.state.weeklyTimes[biggestClass].classId;
 
-			if (biggestId.startsWith('event-assignment-')) {
-				return this.props.assignmentContext.assignments
-					.find(a => a._id === biggestId)!
-					.class.name;
-			} else {
-				return biggestId;
-			}
+			const biggestId = this.state.weeklyTimes[biggestClass].classId;
+			const { name } = this.getClassNameAndColor(biggestId);
+			return name;
 		} else {
 			return 'Not Available';
 		}
@@ -298,6 +293,26 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		}
 	}
 
+	private getClassNameAndColor(id: string) {
+		const canvasClass = this.state.canvasClasses.find(a => a._id === id);
+
+		if (canvasClass) {
+			return {
+				fromCanvas: true,
+				name: canvasClass.class.name,
+				color: canvasClass.class.color,
+				textDark: canvasClass.class.textDark
+			};
+		} else {
+			return {
+				fromCanvas: false,
+				name: id,
+				color: defaultColor,
+				textDark: defaultTextDark
+			};
+		}
+	}
+
 	private beautifyMinutes(num: number) {
 		// TODO: get the beautify minutes working
 		return `${Math.round(num)}h`;
@@ -310,6 +325,21 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			this.makeDailyData();
 		}).catch(err => Sentry.captureException(err));
 		// this.updateData();
+
+		this.canvasEventsSubscription = MyMICDS.canvas.getEvents().subscribe(
+			events => {
+				if (events.hasURL && events.events) {
+					this.setState({ canvasClasses: events.events });
+				}
+			},
+			err => Sentry.captureException(err)
+		);
+	}
+
+	componentWillUnmount() {
+		if (this.canvasEventsSubscription) {
+			this.canvasEventsSubscription.unsubscribe();
+		}
 	}
 
 	@bind

@@ -71,17 +71,14 @@ export default class CheckUrls extends React.Component<NavigationScreenProps, Ch
 				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 				<View style={styles.container}>
 					<Text style={[typography.h2, styles.error]}>
-						Looks like you haven't saved your {/**/}
+						Go to <Text onPress={this.navigateToSettings} style={[nunito.bold, styles.link]}>MyMICDS.net/settings</Text> and save your {/**/}
 						<Text style={nunito.bold}>
 							{oxfordCommaList(this.state.missingURLs, 'or')} {/**/}
 							feed{this.state.missingURLs.length > 1 && 's'}
 						</Text>
-						{/**/} on MyMICDS.
 					</Text>
-					<Text onPress={this.navigateToSettings} style={[typography.body, nunito.light, styles.moreInfo]}>
-						To use Cronch, Go to {/* Preserve whitespace in template */}
-						<Text style={[nunito.bold, styles.link]}>MyMICDS.net/settings</Text>  {/*Spce*/}
-						and follow the directions under <Text style={[nunito.bold, styles.link]}>'URL Settings'</Text>
+					<Text onPress={this.navigateToSettings} style={[typography.body, styles.moreInfo]}>
+						Follow the directions under <Text style={[nunito.bold, styles.link]}>'URL Settings'</Text>
 					</Text>
 					<ImageBackground
 						source={require('../assets/mymicds/urls.png')}
@@ -116,8 +113,8 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		height: '100%',
-		paddingLeft: 16,
-		paddingRight: 16,
+		padding: 32,
+		paddingBottom: 16,
 		display: 'flex',
 		flexDirection: 'column',
 		justifyContent: 'flex-start',
@@ -125,12 +122,13 @@ const styles = StyleSheet.create({
 	},
 	error: {
 		flexGrow: 0,
-		marginTop: 16,
+		width: '100%',
 		marginBottom: 16,
 		color: NEUTRAL[100]
 	},
 	moreInfo: {
 		flexGrow: 0,
+		alignSelf: 'flex-start',
 		color: NEUTRAL[300]
 	},
 	link: {
