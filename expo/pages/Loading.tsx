@@ -39,8 +39,6 @@ export class Loading extends React.Component<NavigationScreenProps & WithOnLogin
 				'Nunito-Light': require('../assets/Nunito/Nunito-Light.ttf'),
 				'Nunito-Regular': require('../assets/Nunito/Nunito-Regular.ttf'),
 				'Nunito-Bold': require('../assets/Nunito/Nunito-Bold.ttf')
-				// 'Nunito-ExtraBold': require('../assets/Nunito/Nunito-ExtraBold.ttf'),
-				// 'Nunito-Black': require('../assets/Nunito/Nunito-Black.ttf')
 			})
 		).subscribe(
 			async ([mymicdsAuth]) => {
