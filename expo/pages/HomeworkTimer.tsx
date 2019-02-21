@@ -510,7 +510,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
 							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.workTimeLeft)}</Text>
 							<TimerPicker
-								selectedTimes={{ work: this.state.maxWorkTime, break: this.state.maxBreakTime }}
+								selectedWorkTime={this.state.maxWorkTime}
+								selectedBreakTime={this.state.maxBreakTime}
 								onChangeValue={this.saveTimerMode}
 							/>
 						</View>
@@ -519,7 +520,11 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 						<View style={styles.timerContainer}>
 							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
 							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.breakTimeLeft)}</Text>
-							<Icon name='gear' type='font-awesome' size={50} color={NEUTRAL[300]}/>
+							<TimerPicker
+								selectedWorkTime={this.state.maxWorkTime}
+								selectedBreakTime={this.state.maxBreakTime}
+								onChangeValue={this.saveTimerMode}
+							/>
 						</View>
 					)}
 				</View>

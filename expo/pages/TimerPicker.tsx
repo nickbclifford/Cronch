@@ -6,7 +6,8 @@ import bind from 'bind-decorator';
 import { components, NEUTRAL } from '../common/StyleGuide';
 
 interface TimerPickerProps {
-	selectedTimes: { work: number, break: number };
+	selectedWorkTime: number;
+	selectedBreakTime: number;
 	onChangeValue(selectedTime: { maxWorkTime: number, maxBreakTime: number }): void;
 }
 
@@ -21,11 +22,22 @@ export default class TimerPicker extends React.Component<TimerPickerProps, Timer
 	constructor(props: TimerPickerProps) {
 		super(props);
 		this.state = {
-			work: props.selectedTimes.work,
-			break: props.selectedTimes.break,
+			work: props.selectedWorkTime,
+			break: props.selectedBreakTime,
 			elementHeight: 300,
 			elementWidth: 300
 		};
+	}
+
+	componentDidUpdate(prevProps: TimerPickerProps) {
+		if (this.props.selectedBreakTime !== prevProps.selectedBreakTime ||
+			this.props.selectedWorkTime !== prevProps.selectedWorkTime) {
+			this.setState({
+				work: this.props.selectedWorkTime,
+				break: this.props.selectedBreakTime
+			});
+
+		}
 	}
 
 	@bind
@@ -69,7 +81,7 @@ export default class TimerPicker extends React.Component<TimerPickerProps, Timer
 						onValueChange={this.changeWork}
 					>
 						{new Array(12).fill(0).map((n, i) =>
-							<Picker.Item key={i} label={`${i * 5} m`} value={i * 5 * 60 * 1000}/>
+							<Picker.Item key={i} label={`${(i + 1) * 5} m`} value={(i + 1) * 5 * 60 * 1000}/>
 						)}
 					</Picker>
 
@@ -79,7 +91,7 @@ export default class TimerPicker extends React.Component<TimerPickerProps, Timer
 						onValueChange={this.changeBreak}
 					>
 						{new Array(12).fill(0).map((n, i) =>
-							<Picker.Item key={i} label={`${i * 5} m`} value={i * 5 * 60 * 1000}/>
+							<Picker.Item key={i} label={`${(i + 1) * 5} m`} value={(i + 1) * 5 * 60 * 1000}/>
 						)}
 					</Picker>
 				</View>
