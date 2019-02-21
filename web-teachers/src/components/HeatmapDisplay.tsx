@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactTooltip from 'react-tooltip';
 
 import { calculateHourPortions, HourPortions } from '../model/Analytics';
 import { Timeslot } from '../model/Timeslot';
@@ -67,16 +68,21 @@ export default class HeatmapDisplay extends React.Component<HeatmapDisplayProps,
 
 		const max = Math.max(...Object.values(portions));
 
+		const labels = hours.map(hour => {
+			return `(${hour}:00-${hour + 1}:00) ${portions[hour].toFixed(2)} hours worked`;
+		});
+
 		return (
-			<div>
-				{/*<div key={hour}>{hour}: {portions[hour]}</div>*/}
-				{hours.map(hour => (
-					<div key={hour} className={styles.heatmapHour}>
-						<div className={styles.heatmapLabel}>{hour}</div>
-						<div className={styles.heatmapData} style={this.calculateColor(portions[hour] / max)}></div>
-						<div>{portions[hour].toFixed(2)} hours worked</div>
-					</div>
+			<div className={styles.heatmapContainer}>
+				{hours.map((hour, i) => (
+					<div
+						key={hour}
+						className={styles.heatmapData}
+						style={this.calculateColor(portions[hour] / max)}
+						data-tip={labels[i]}
+					></div>
 				))}
+				<ReactTooltip />
 			</div>
 		);
 	}

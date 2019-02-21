@@ -38,7 +38,9 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 
 	render() {
 		return (
-			<HeatmapDisplay timeslots={this.state.timeslots} />
+			<div>
+				<HeatmapDisplay timeslots={this.state.timeslots} />
+			</div>
 		);
 	}
 }

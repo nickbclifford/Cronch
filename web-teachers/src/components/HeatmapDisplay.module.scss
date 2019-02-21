@@ -1,9 +1,6 @@
-.heatmapHour {
+.heatmapContainer {
 	display: flex;
-}
-
-.heatmapLabel {
-
+	flex-direction: column;
 }
 
 .heatmapData {

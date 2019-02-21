@@ -75,7 +75,7 @@ export default class App extends React.Component<any, AppState> {
 	@bind
 	redirectToDefault() {
 		return (
-			<Redirect to='/classes' />
+			<Redirect to='/heatmap' />
 		);
 	}
 

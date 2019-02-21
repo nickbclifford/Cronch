@@ -6,13 +6,13 @@ import styles from './Navbar.module.scss';
 
 export const routes = [
 	{
-		name: 'Classes List',
-		link: '/classes',
+		name: 'Heatmap',
+		link: '/heatmap',
 		requireAuth: true
 	},
 	{
-		name: 'Heatmap',
-		link: '/heatmap',
+		name: 'Classes List',
+		link: '/classes',
 		requireAuth: true
 	}
 ];
