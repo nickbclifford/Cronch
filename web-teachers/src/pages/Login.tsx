@@ -35,6 +35,11 @@ export default class Login extends React.Component<RouteComponentProps, LoginSta
 	}
 
 	@bind
+	private changeRemember({ target: { checked: remember } }: ChangeEvent<HTMLInputElement>) {
+		this.setState({ remember });
+	}
+
+	@bind
 	private login(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		MyMICDS.auth.login({
@@ -77,7 +82,12 @@ export default class Login extends React.Component<RouteComponentProps, LoginSta
 						required={true}
 					/>
 					<label className={styles.rememberContainer}>
-						<input type='checkbox' className={styles.rememberInput} name='remember' />
+						<input
+							type='checkbox'
+							className={styles.rememberInput}
+							checked={this.state.remember}
+							onChange={this.changeRemember}
+						/>
 						Remember Me
 					</label>
 					<button className={`cronch-button ${styles.login}`}>Login</button>

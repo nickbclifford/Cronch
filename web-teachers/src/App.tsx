@@ -51,14 +51,16 @@ export default class App extends React.Component<any, AppState> {
 			return (
 				<div className={styles.appContainer}>
 					<Navbar />
-					<Switch>
-						<Route exact={true} path='/' render={this.redirectToDefault} />
-						<Route path='/login' component={Login} />
-						<Route path='/logout' component={Logout} />
-						<PrivateRoute path='/classes-list' component={ClassesList} />
-						<PrivateRoute path='/heatmap' component={Heatmap} />
-						<Route render={this.redirectToDefault} />
-					</Switch>
+					<div className={styles.routeContainer}>
+						<Switch>
+							<Route exact={true} path='/' render={this.redirectToDefault} />
+							<Route path='/login' component={Login} />
+							<Route path='/logout' component={Logout} />
+							<PrivateRoute path='/classes-list' component={ClassesList} />
+							<PrivateRoute path='/heatmap' component={Heatmap} />
+							<Route render={this.redirectToDefault} />
+						</Switch>
+					</div>
 				</div>
 			);
 		}

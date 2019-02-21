@@ -1,6 +1,5 @@
-import bind from 'bind-decorator';
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import MyMICDS from '../common/MyMICDS';
 import styles from './Navbar.module.scss';
@@ -8,11 +7,13 @@ import styles from './Navbar.module.scss';
 export const routes = [
 	{
 		name: 'Classes List',
-		link: '/classes-list'
+		link: '/classes-list',
+		requireAuth: true
 	},
 	{
 		name: 'Heatmap',
-		link: '/heatmap'
+		link: '/heatmap',
+		requireAuth: true
 	}
 ];
 
@@ -25,9 +26,14 @@ export default class Navbar extends React.Component {
 					<img src='/favicon/favicon-32x32.png' className={styles.navbarLogo} />
 					<span className={styles.navbarTitle}>Cronchalytics</span>
 				</div>
-				{routes.map(route => (
-					<NavLink className={styles.navbarLink} to={route.link} activeClassName={styles.active}>{route.name}</NavLink>
-				))}
+				<div className={styles.navbarLinks}>
+					{routes.filter(route => MyMICDS.auth.isLoggedIn || !route.requireAuth).map((route, i) => (
+						<NavLink key={i} className={styles.navbarLink} to={route.link} activeClassName={styles.active}>{route.name}</NavLink>
+					))}
+				</div>
+				{MyMICDS.auth.isLoggedIn && (
+					<Link to='/logout' className={`${styles.navbarLink} ${styles.navbarLogout}`}>Logout</Link>
+				)}
 			</nav>
 		);
 	}
