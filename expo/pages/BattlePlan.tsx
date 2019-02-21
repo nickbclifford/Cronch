@@ -71,7 +71,7 @@ class BattlePlan extends React.Component<BattlePlanProps, BattlePlanState> {
 		);
 	}
 
-	componentWillMount() {
+	componentWillUnmount() {
 		if (this.battlePlanSubscription) {
 			this.battlePlanSubscription.unsubscribe();
 		}
