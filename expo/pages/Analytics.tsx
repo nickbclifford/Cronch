@@ -245,7 +245,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			color: this.pickRandomColor()
 		};
 
-		for (let i = 0; i < 32; i++) {
+		for (let i = 1; i <= 31; i++) {
 			// i is day of the month
 			let dayTotal = 0;
 
@@ -254,7 +254,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 					dayTotal += this.calcHourDiff(time.start, time.end);
 				}
 			});
-			thisMonthData.data.push({x: i.toString(), y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal});
+			thisMonthData.data.push({x: `${thisMonth.getMonth()}/${i.toString()}`, y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal});
 		}
 
 		chartData.push(thisMonthData);
@@ -362,13 +362,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	}
 
 	componentWillMount() {
-		getUserTimeslots().then(timeslots => {
-			this.setState({ times: timeslots });
-			this.makeWeeklyData();
-			this.makeDailyData();
-		}).catch(err => Sentry.captureException(err));
-		// this.updateData();
-
+		this.updateData();
 		this.canvasEventsSubscription = MyMICDS.canvas.getEvents().subscribe(
 			events => {
 				if (events.hasURL && events.events) {
@@ -392,6 +386,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			this.setState({ times: timeslots });
 			this.makeWeeklyData();
 			this.makeDailyData();
+			this.makeMonthlyData();
 		}).catch(err => Sentry.captureException(err));
 	}
 
@@ -508,24 +503,35 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 					<View style={styles.verticalContainer}>
 					<Swiper horizontal={false}>
 					<View style={styles.verticalContainer}>
-						<Text style={styles.headerTitle}>Today (in hours)</Text>
+						<Text style={styles.headerTitle}>This month (in hours)</Text>
 						<PureChart
-							type='pie'
-							data={this.state.pieChartData}
+							type='line'
+							data={this.state.lineChartData}
 							width={'100%'}
-							height={400}
+							height={200}
+							showEvenNumberXaxisLabel={false}
 						/>
 						<View style={styles.horizontalContainer}>
+						<View style={styles.verticalContainer}>
 							<View style={styles.verticalContainer}>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Today's Total</Text>
-									<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
-								</View>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Today's Deviation</Text>
-									<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
-								</View>
+								<Text style={styles.title}>Monthly Average</Text>
+								<Text style={styles.text}>Coming soon</Text>
 							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Monthly Deviation</Text>
+								<Text style={styles.text}>Coming soon</Text>
+							</View>
+						</View>
+						<View style={styles.verticalContainer}>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Most Active</Text>
+								<Text style={styles.text}>Coming soon</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Heaviest Night</Text>
+								<Text style={styles.text}>Coming soon</Text>
+							</View>
+						</View>
 						</View>
 					</View>
 					<View style={styles.verticalContainer}>
@@ -561,35 +567,24 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 						</View>
 					</View>
 					<View style={styles.verticalContainer}>
-						<Text style={styles.headerTitle}>This month (in hours)</Text>
+						<Text style={styles.headerTitle}>Today (in hours)</Text>
 						<PureChart
-							type='line'
-							data={this.state.lineChartData}
+							type='pie'
+							data={this.state.pieChartData}
 							width={'100%'}
-							height={200}
-							showEvenNumberXaxisLabel={false}
+							height={400}
 						/>
 						<View style={styles.horizontalContainer}>
-						<View style={styles.verticalContainer}>
 							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Monthly Average</Text>
-								<Text style={styles.text}>Coming soon</Text>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Today's Total</Text>
+									<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
+								</View>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Today's Deviation</Text>
+									<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
+								</View>
 							</View>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Monthly Deviation</Text>
-								<Text style={styles.text}>Coming soon</Text>
-							</View>
-						</View>
-						<View style={styles.verticalContainer}>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Most Active</Text>
-								<Text style={styles.text}>Coming soon</Text>
-							</View>
-							<View style={styles.verticalContainer}>
-								<Text style={styles.title}>Heaviest Night</Text>
-								<Text style={styles.text}>Coming soon</Text>
-							</View>
-						</View>
 						</View>
 					</View>
 					</Swiper>
