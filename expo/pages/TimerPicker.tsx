@@ -16,6 +16,7 @@ interface TimerPickerState {
 	break: number;
 	elementHeight: number;
 	elementWidth: number;
+	close: boolean;
 }
 
 export default class TimerPicker extends React.Component<TimerPickerProps, TimerPickerState> {
@@ -25,7 +26,8 @@ export default class TimerPicker extends React.Component<TimerPickerProps, Timer
 			work: props.selectedWorkTime,
 			break: props.selectedBreakTime,
 			elementHeight: 300,
-			elementWidth: 300
+			elementWidth: 300,
+			close: false
 		};
 	}
 
@@ -58,6 +60,7 @@ export default class TimerPicker extends React.Component<TimerPickerProps, Timer
 	changeValueFactory(selectedTime: { maxWorkTime: number, maxBreakTime: number }) {
 		return () => {
 			this.props.onChangeValue(selectedTime);
+			this.setState({close: true}, () => this.setState({close: false}));
 		};
 	}
 
@@ -107,7 +110,7 @@ export default class TimerPicker extends React.Component<TimerPickerProps, Timer
 			</View>
 		);
 
-		return (
+		return !this.state.close && (
 			<Tooltip
 				popover={pickers}
 				width={this.state.elementWidth + 40}
