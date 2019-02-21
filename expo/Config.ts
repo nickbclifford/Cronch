@@ -1,3 +1,3 @@
 export default {
-	backendUrl: 'https://api.cronch.app'
+	backendUrl: 'https://192.168.1.134:4500'
 };

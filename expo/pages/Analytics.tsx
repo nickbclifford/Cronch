@@ -24,7 +24,7 @@ interface PieChartDataPoint {
 	color: string;
 }
 
-interface LineChartDataPoint {
+interface BarChartDataPoint {
 	seriesName: string;
 	data: Array<{
 		x: string,
@@ -41,9 +41,11 @@ interface AnalyticsState {
 	weeklyTotal: number;
 	dailyTimes: Timeslot[];
 	dailyTotal: number;
+	monthlyTimes: Timeslot[];
 	dailyView: boolean;
 	pieChartData: PieChartDataPoint[];
-	lineChartData: LineChartDataPoint[];
+	barChartData: BarChartDataPoint[];
+	lineChartData: BarChartDataPoint[];
 }
 
 class Analytics extends React.Component<NavigationScreenProps & WithAssignmentContextProps, AnalyticsState> {
@@ -69,8 +71,10 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			weeklyTotal: 0,
 			dailyTimes: [],
 			dailyTotal: 0,
+			barChartData: [],
+			dailyView: true,
 			lineChartData: [],
-			dailyView: true
+			monthlyTimes: []
 		};
 	}
 
@@ -127,9 +131,9 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		// now that we have the available days of the week, we need to create the chartData
 		// we need one series that has each day
-		const chartData: LineChartDataPoint[] = [];
+		const chartData: BarChartDataPoint[] = [];
 
-		const thisWeekData: LineChartDataPoint = {
+		const thisWeekData: BarChartDataPoint = {
 			seriesName: 'Series',
 			data: [],
 			color: this.pickRandomColor()
@@ -159,7 +163,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		total /= weeklyTimes.length; // get an average
 
-		this.setState({ weeklyTimes, weeklyTotal: total, lineChartData: chartData });
+		this.setState({ weeklyTimes, weeklyTotal: total, barChartData: chartData });
 	}
 
 	private makeDailyData() {
@@ -217,6 +221,45 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		if (chartData.length > 0) {
 			this.setState({ pieChartData: chartData });
 		}
+	}
+
+	private makeMonthlyData() {
+		// gets the month reference point
+		const thisMonth = new Date();
+		thisMonth.setDate(1);
+
+		const monthlyTimes: Timeslot[] = []; // this month's timeslots
+		for (const time of this.state.times) {
+			if (time.end !== null && time.start > thisMonth) {
+				monthlyTimes.push(time);
+			}
+		}
+
+		// now that we have the available days of the week, we need to create the chartData
+		// we need one series that has each day
+		const chartData: BarChartDataPoint[] = [];
+
+		const thisMonthData: BarChartDataPoint = {
+			seriesName: 'Series',
+			data: [],
+			color: this.pickRandomColor()
+		};
+
+		for (let i = 0; i < 32; i++) {
+			// i is day of the month
+			let dayTotal = 0;
+
+			monthlyTimes.forEach(time => {
+				if (time.end !== null && time.start.getDate() === i) {
+					dayTotal += this.calcHourDiff(time.start, time.end);
+				}
+			});
+			thisMonthData.data.push({x: i.toString(), y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal});
+		}
+
+		chartData.push(thisMonthData);
+
+		this.setState({ monthlyTimes, lineChartData: chartData });
 	}
 
 	private findMostPracticedSubject(): string {
@@ -412,7 +455,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 							<Text style={styles.headerTitle}>This week (in hours)</Text>
 							<PureChart
 								type='bar'
-								data={this.state.lineChartData}
+								data={this.state.barChartData}
 								width={'100%'}
 								height={200}
 								showEvenNumberXaxisLabel={false}
@@ -489,7 +532,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 						<Text style={styles.headerTitle}>This week (in hours)</Text>
 						<PureChart
 							type='bar'
-							data={this.state.lineChartData}
+							data={this.state.barChartData}
 							width={'100%'}
 							height={200}
 							showEvenNumberXaxisLabel={false}
@@ -515,7 +558,39 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 								<Text style={styles.text}>{this.findHeaviestNight()}</Text>
 							</View>
 						</View>
+						</View>
 					</View>
+					<View style={styles.verticalContainer}>
+						<Text style={styles.headerTitle}>This month (in hours)</Text>
+						<PureChart
+							type='line'
+							data={this.state.lineChartData}
+							width={'100%'}
+							height={200}
+							showEvenNumberXaxisLabel={false}
+						/>
+						<View style={styles.horizontalContainer}>
+						<View style={styles.verticalContainer}>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Monthly Average</Text>
+								<Text style={styles.text}>Coming soon</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Monthly Deviation</Text>
+								<Text style={styles.text}>Coming soon</Text>
+							</View>
+						</View>
+						<View style={styles.verticalContainer}>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Most Active</Text>
+								<Text style={styles.text}>Coming soon</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Heaviest Night</Text>
+								<Text style={styles.text}>Coming soon</Text>
+							</View>
+						</View>
+						</View>
 					</View>
 					</Swiper>
 					<Button
