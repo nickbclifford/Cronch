@@ -2,17 +2,11 @@ import 'normalize.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import WebFont from 'webfontloader';
 import App from './App';
-import './index.css';
+import './styles/style-guide.scss';
+import './styles/typographic-scale.scss';
 
 import * as serviceWorker from './serviceWorker';
-
-WebFont.load({
-	google: {
-		families: ['Nunito:300,400,700', 'sans-serif']
-	}
-});
 
 ReactDOM.render((
 	<BrowserRouter>
