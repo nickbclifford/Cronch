@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import Timeslot from '../models/Timeslot';
-import { APIError, errorResponse, requireLoggedIn, successResponse } from '../utils';
+import { APIError, errorResponse, requireLoggedIn, requireScope, successResponse } from '../utils';
 
 const router = Router();
 
@@ -43,6 +43,12 @@ router.post('/end', requireLoggedIn, (req, res) => {
 			return timeslot.save();
 		})
 		.then(() => successResponse(res))
+		.catch(err => errorResponse(res, err));
+});
+
+router.get('/all', requireScope('faculty'), (_, res) => {
+	Timeslot.findAll()
+		.then(timeslots => successResponse(res, { timeslots }))
 		.catch(err => errorResponse(res, err));
 });
 

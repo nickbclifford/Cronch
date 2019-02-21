@@ -1,0 +1,102 @@
+:root {
+
+	/**
+	 * Color Palette
+	 */
+
+	--primary-100: #F9EBFF;
+	--primary-300: #E6AFFB;
+	--primary-500: #CC76EE;
+	--primary-700: #7C16A5;
+	--primary-900: #540174;
+
+	--neutral-100: #F7F7F7;
+	--neutral-300: #E4E4E4;
+	--neutral-500: #81848C;
+	--neutral-700: #616366;
+	--neutral-900: #202226;
+
+	--info-100: #E6FFFE;
+	--info-300: #78E5DB;
+	--info-500: #35AEA3;
+	--info-700: #177169;
+	--info-900: #0F4443;
+
+	--success-100: #E2FCEC;
+	--success-300: #86D1A3;
+	--success-500: #2EC26F;
+	--success-700: #269651;
+	--success-900: #0F5036;
+
+	--warning-100: #FFFCF4;
+	--warning-300: #FFE49C;
+	--warning-500: #F5CB5B;
+	--warning-700: #BE9017;
+	--warning-900: #54420B;
+
+	--danger-100: #FCE8E8;
+	--danger-300: #F49895;
+	--danger-500: #DE2E28;
+	--danger-700: #95120E;
+	--danger-900: #571413;
+
+}
+
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	height: 100%;
+}
+
+body {
+	font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+		'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+		sans-serif;
+	color: var(--neutral-900);
+	background-color: var(--neutral-100);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0;
+}
+
+/**
+ * Components
+ */
+
+:root {
+	--cronch-input-width: 20rem;
+	--cronch-border-radius: 5px;
+}
+
+.container {
+	width: 100%;
+	max-width: 50rem;
+	margin: 0 auto;
+	padding: 2rem;
+}
+
+.cronch-text-input {
+	width: 100%;
+	max-width: var(--cronch-input-width);
+	padding: 0.5rem;
+	background-color: var(--neutral-300);
+	color: var(--neutral-900);
+	border-radius: var(--cronch-border-radius);
+	border: none;
+}
+
+.cronch-button {
+	padding: 0.75rem 3rem;
+	background-color: var(--primary-700);
+	color: var(--neutral-100);
+	border-radius: calc(0.75rem + 1rem);
+	text-transform: uppercase;
+	border: none;
+}
