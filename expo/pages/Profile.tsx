@@ -1,5 +1,5 @@
 import bind from 'bind-decorator';
-import { Formik, FormikProps } from 'formik';
+import { Formik, FormikActions, FormikProps } from 'formik';
 import { number } from 'prop-types';
 import * as React from 'react';
 import { Alert, Picker, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
@@ -19,6 +19,7 @@ import Question from '../components/Question';
 
 // TODO: What's the deal with this component's state?
 interface ProfileState {
+	submittingSettings: boolean;
 }
 
 interface SettingsFormValues {
@@ -39,7 +40,10 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	constructor(props: any) {
 		super(props);
-		this.state = { };
+		this.state = {
+			submittingSettings: false
+		};
+
 	}
 
 	async componentDidMount() {
@@ -71,18 +75,27 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	// }
 
 	@bind
-	private saveSettings(values: SettingsFormValues) {
+	private saveSettings(values: SettingsFormValues, actions: FormikActions<SettingsFormValues>) {
+		this.setState({
+			submittingSettings: true
+		});
 		changeUserInfo({
 			dataSharing: values.dataSharingSelection || 0,
 			alarmSelection: values.alarmSelection || 0
 		}).then(() => {
-			Alert.alert(
-				'Info',
-				'Data sharing option updated!'
-			);
+			this.setState({
+				submittingSettings: false
+			});
+			// Alert.alert(
+			// 	'Info',
+			// 	'Settings updated!'
+			// );
 		}).catch(err => {
 			// Un-select on error, so the user knows to re-select
-			this.setState({ dataSharingSelection: null });
+			this.setState({
+				submittingSettings: false
+			});
+			actions.resetForm();
 			Sentry.captureException(err);
 			console.error(err);
 		});
@@ -190,6 +203,14 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 								</Text>
 						</View>
 					</View>
+					<View style={styles.logoutContainer}>
+						<Button
+							title='Logout'
+							onPress={this.logout}
+							buttonStyle={components.buttonStyle}
+							titleStyle={components.buttonText}
+						/>
+					</View>
 					<Divider style={{ width: '100%' }}/>
 					<Formik
 						initialValues={settingsFormInitialValues}
@@ -220,19 +241,14 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 									onPress={props.handleSubmit as any}
 									buttonStyle={[components.buttonStyle, styles.submit]}
 									titleStyle={components.buttonText}
+									disabled={!props.dirty}
+									loading={this.state.submittingSettings}
 								/>
 							</View>
 						)}
 					</Formik>
 					<Divider style={{ width: '100%' }}/>
-					<View style={styles.logoutContainer}>
-						<Button
-							title='Logout'
-							onPress={this.logout}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-					</View>
+
 				</ScrollView>
 			</SafeAreaView>
 		);
@@ -298,7 +314,7 @@ const styles = StyleSheet.create({
 	},
 	logoutContainer: {
 		width: '100%',
-		marginTop: 'auto'
+		marginBottom: 40
 	}
 });
 
