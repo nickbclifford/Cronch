@@ -5,6 +5,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import withAnalyticsContext, { WithAnalyticsContextProps } from '../common/AnalyticsContext';
 import HeatmapDisplay from '../components/HeatmapDisplay';
 import { Timeslot } from '../model/Timeslot';
+import styles from './Heatmap.module.scss';
 
 interface HeatmapState {
 	timeslots: Timeslot[];
@@ -14,16 +15,7 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 
 	constructor(props: any) {
 		super(props);
-		this.state = { timeslots: [
-			// {
-			// 	id: 123,
-			// 	start: moment().startOf('day').hour(11).minute(45),
-			// 	end: moment().startOf('day').hour(11).minute(50),
-			// 	// end: moment().startOf('day').hour(13).minute(45),
-			// 	classId: 'buh',
-			// 	user: 'yuh'
-			// }
-		] };
+		this.state = { timeslots: [] };
 	}
 
 	componentDidMount() {
@@ -38,8 +30,11 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 
 	render() {
 		return (
-			<div>
-				<HeatmapDisplay timeslots={this.state.timeslots} />
+			<div className='container'>
+				<h1 className={styles.header}>Heatmap</h1>
+				<div>
+					<HeatmapDisplay timeslots={this.state.timeslots} />
+				</div>
 			</div>
 		);
 	}
