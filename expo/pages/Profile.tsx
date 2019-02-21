@@ -1,9 +1,9 @@
 import bind from 'bind-decorator';
-import { Formik, FormikActions, FormikProps } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import { number } from 'prop-types';
 import * as React from 'react';
-import { Alert, Picker, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { Button, CheckBox, Divider } from 'react-native-elements';
+import { Alert, Picker, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Button, CheckBox } from 'react-native-elements';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import Sentry from 'sentry-expo';
 
@@ -19,7 +19,6 @@ import Question from '../components/Question';
 
 // TODO: What's the deal with this component's state?
 interface ProfileState {
-	submittingSettings: boolean;
 }
 
 interface SettingsFormValues {
@@ -40,10 +39,7 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 
 	constructor(props: any) {
 		super(props);
-		this.state = {
-			submittingSettings: false
-		};
-
+		this.state = { };
 	}
 
 	async componentDidMount() {
@@ -75,31 +71,28 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	// }
 
 	@bind
-	private saveSettings(values: SettingsFormValues, actions: FormikActions<SettingsFormValues>) {
-		this.setState({
-			submittingSettings: true
-		});
+	private saveSettings(values: SettingsFormValues) {
 		changeUserInfo({
 			dataSharing: values.dataSharingSelection || 0,
 			alarmSelection: values.alarmSelection || 0
 		}).then(() => {
-			this.setState({
-				submittingSettings: false
-			});
-			// Alert.alert(
-			// 	'Info',
-			// 	'Settings updated!'
-			// );
+			Alert.alert(
+				'Info',
+				'Data sharing option updated!'
+			);
 		}).catch(err => {
 			// Un-select on error, so the user knows to re-select
-			this.setState({
-				submittingSettings: false
-			});
-			actions.resetForm();
+			this.setState({ dataSharingSelection: null });
 			Sentry.captureException(err);
 			console.error(err);
 		});
 	}
+
+	questionNames = [
+		"Don't send teachers data at all",
+		'Send data to teachers anonymously',
+		'Send data to teachers as yourself'
+	];
 
 	// @bind
 	// private async setAlarmMode(n: number) {
@@ -184,72 +177,36 @@ export default class Profile extends React.Component<NavigationScreenProps, Prof
 	// }
 
 	render() {
-		const dataOptions = [
-			"Don't send teachers data at all",
-			'Send data to teachers anonymously',
-			'Send data to teachers as yourself'
-		];
-
 		return (
 			<SafeAreaView style={styles.safeArea}>
 				<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
-				<ScrollView contentContainerStyle={styles.mainContainer}>
-					<View style={styles.user}>
-						<CronchyUser style={styles.avatar} user={MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : null} />
-						<View style={styles.loginText}>
-								<Text style={[typography.body, styles.loggedInAs]}>Logged in as</Text>
-								<Text style={[typography.h0, styles.loggedInUser]} adjustsFontSizeToFit={true} numberOfLines={1}>
-									{MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}
-								</Text>
+				<CronchyUser style={styles.avatar} user={MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : null} />
+				<View style={styles.loggedInAsContainer}>
+					<Text style={[typography.body, styles.loggedInAs]}>Logged in as</Text>
+					<Text style={[typography.h0, styles.loggedInUser]}>{MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}</Text>
+				</View>
+				<Button
+					title='Logout'
+					onPress={this.logout}
+					buttonStyle={components.buttonStyle}
+					titleStyle={components.buttonText}
+				/>
+				{/*<Formik
+					initialValues={settingsFormInitialValues}
+					onSubmit={this.saveSettings}
+				>
+					{props => (
+						<View>
+							<Text>Alarm Sound</Text>
+							<Question
+								question='Alarm Sound'
+								responses={alarmList.map(i => i.displayName)}
+								onSelectResponse={props.handleChange.}
+								selectedIndex={props.values.dataSharingSelection}
+							/>
 						</View>
-					</View>
-					<View style={styles.logoutContainer}>
-						<Button
-							title='Logout'
-							onPress={this.logout}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-					</View>
-					<Divider style={{ width: '100%' }}/>
-					<Formik
-						initialValues={settingsFormInitialValues}
-						onSubmit={this.saveSettings}
-					>
-						{props => (
-							<View style={styles.settingsForm}>
-								<Question
-									containerStyle={styles.alarmPicker}
-									question='Alarm Preferences'
-									responses={alarmList.map((alarm, i) => ({ id: i, answer: alarm.displayName }))}
-									onSelectResponse={handleFieldChangeFactory<SettingsFormValues>(props, 'alarmSelection')}
-									selectedId={props.values.alarmSelection}
-									expandable={true}
-								/>
-
-								<Question
-									containerStyle={styles.dataSharingPicker}
-									question='How should we handle your timer data?'
-									responses={dataOptions.map((q, i) => ({ id: i, answer: q}))}
-									onSelectResponse={handleFieldChangeFactory<SettingsFormValues>(props, 'dataSharingSelection')}
-									selectedId={props.values.dataSharingSelection}
-									expandable={true}
-								/>
-
-								<Button
-									title='Save Changes'
-									onPress={props.handleSubmit as any}
-									buttonStyle={[components.buttonStyle, styles.submit]}
-									titleStyle={components.buttonText}
-									disabled={!props.dirty}
-									loading={this.state.submittingSettings}
-								/>
-							</View>
-						)}
-					</Formik>
-					<Divider style={{ width: '100%' }}/>
-
-				</ScrollView>
+					)}
+				</Formik>*/}
 			</SafeAreaView>
 		);
 	}
@@ -263,28 +220,11 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		alignItems: 'center'
 	},
-	mainContainer: {
-		display: 'flex',
-		alignItems: 'center',
-		// justifyContent: 'flex-start',
-		minHeight: '100%'
-	},
-	user: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'center',
-		maxWidth: '100%',
-		width: '100%',
-		marginBottom: 20,
-		marginTop: 20
-	},
-	loginText: {
-		display: 'flex',
-		justifyContent: 'center',
-		marginLeft: 40
-	},
 	avatar: {
-		width: '35%'
+		width: '50%'
+	},
+	loggedInAsContainer: {
+		marginBottom: 16
 	},
 	loggedInAs: {
 		textAlign: 'center',
@@ -292,29 +232,7 @@ const styles = StyleSheet.create({
 	},
 	loggedInUser: {
 		textAlign: 'center',
-		lineHeight: 75,
-		maxWidth: 200
-	},
-	settingsForm: {
-		marginTop: 20,
-		width: '100%',
-		display: 'flex',
-		justifyContent: 'center'
-	},
-	alarmPicker: {
-		width: '100%'
-	},
-	dataSharingPicker: {},
-	alarmPickerLabel: {
-		alignSelf: 'center'
-	},
-	submit: {
-		width: '100%',
-		marginBottom: 40
-	},
-	logoutContainer: {
-		width: '100%',
-		marginBottom: 40
+		lineHeight: 75
 	}
 });
 
@@ -335,5 +253,12 @@ const oldStyles = StyleSheet.create({
 	},
 	question: {
 		flex: 1
+	},
+	alarmPicker: {
+		display: 'flex',
+		justifyContent: 'center'
+	},
+	alarmPickerLabel: {
+		alignSelf: 'center'
 	}
 });

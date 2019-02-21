@@ -72,8 +72,8 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		this.state = {
 			maxBreakTime: 15 * 60 * 1000,
 			maxWorkTime: 45 * 60 * 1000,
-			workTimeLeft: 0.1 * 60 * 1000,
-			breakTimeLeft: 0.1 * 60 * 1000,
+			workTimeLeft: 45 * 60 * 1000,
+			breakTimeLeft: 15 * 60 * 1000,
 			// workTimeLeft: 10 * 1000,
 			// breakTimeLeft: 10 * 1000,
 			onBreak: false,
@@ -136,13 +136,14 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 			.then(res => {
 				if (!res.user) { return new Error('User does not exist'); }
 
+				console.log(res.user);
 				this.user = res.user;
 
 				// YUH
-				this.setState({
-					alarmSelection: res.user.alarmSelection,
-					modeSelection: res.user.timerSelection
-				});
+				// this.setState({
+				// 	alarmSelection: res.user.alarmSelection,
+				// 	modeSelection: res.user.timerSelection
+				// });
 			})
 			.then(() => getUserTimers())
 			.then(timers => {
@@ -228,7 +229,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		} as any);
 
 		const soundObject = new Audio.Sound();
-		const soundFile = alarmList[this.state.alarmSelection].file;
+		const soundFile = alarmList[0].file;
 		await soundObject.loadAsync(soundFile);
 		await soundObject.setIsLoopingAsync(true);
 		await soundObject.setPositionAsync(0);
