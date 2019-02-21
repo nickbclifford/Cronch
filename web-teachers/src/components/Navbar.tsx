@@ -7,7 +7,7 @@ import styles from './Navbar.module.scss';
 export const routes = [
 	{
 		name: 'Classes List',
-		link: '/classes-list',
+		link: '/classes',
 		requireAuth: true
 	},
 	{

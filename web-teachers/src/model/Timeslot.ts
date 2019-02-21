@@ -11,7 +11,11 @@ export interface Timeslot {
 	user: string;
 }
 
-export interface RawTimeslot {
+interface RawTimeslots {
+	timeslots: RawTimeslot[];
+}
+
+interface RawTimeslot {
 	id: number;
 	start: string;
 	end: string | null;
@@ -20,10 +24,11 @@ export interface RawTimeslot {
 }
 
 export function getAllTimeslots() {
-	return fetchWithJwt<RawTimeslot[] | null>('/timeslot/all', {
+	return fetchWithJwt<RawTimeslots | null>('/timeslot/all', {
 		method: 'GET'
 	}).pipe(
-		map(timeslots => {
+		map(({ timeslots }) => {
+			console.log('timeslot', timeslots);
 			return timeslots.map(convertJSONDates);
 		})
 	);

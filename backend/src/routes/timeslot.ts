@@ -46,6 +46,12 @@ router.post('/end', requireLoggedIn, (req, res) => {
 		.catch(err => errorResponse(res, err));
 });
 
+router.get('/all', requireScope('faculty'), (_, res) => {
+	Timeslot.findAll()
+		.then(timeslots => successResponse(res, { timeslots }))
+		.catch(err => errorResponse(res, err));
+});
+
 router.get('/:id', requireLoggedIn, (req, res) => {
 	const id = parseInt(req.params.id, 10);
 	if (isNaN(id)) { errorResponse(res, new APIError('Invalid timeslot ID', 400)); return; }
@@ -58,12 +64,6 @@ router.get('/:id', requireLoggedIn, (req, res) => {
 				successResponse(res, timeslot.toJSON());
 			}
 		})
-		.catch(err => errorResponse(res, err));
-});
-
-router.get('/all', requireScope('faculty'), (_, res) => {
-	Timeslot.find()
-		.then(timeslots => successResponse(res, { timeslots }))
 		.catch(err => errorResponse(res, err));
 });
 

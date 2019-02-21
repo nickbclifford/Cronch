@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import config from './config';
@@ -27,6 +28,7 @@ import { jwtMiddleware } from './utils';
 	// Initialize Express
 	const app = express();
 
+	app.use(cors());
 	app.use(json());
 	app.use(jwtMiddleware);
 

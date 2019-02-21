@@ -1,6 +1,6 @@
 import { map, switchMap } from 'rxjs/operators';
 
-import Config from '../../Config';
+import Config from '../Config';
 import MyMICDS from './MyMICDS';
 
 export interface APIResponse<T> {
@@ -18,7 +18,7 @@ export function fetchWithJwt<T>(route: string, options: RequestInit) {
 			if (jwt) {
 				defaultHeaders.Authorization = `Bearer ${jwt}`;
 			}
-			const injectedOptions = Object.assign(options, defaultHeaders);
+			const injectedOptions = Object.assign(options, { headers: defaultHeaders });
 			return fetch(Config.backendUrl + route, injectedOptions);
 		}),
 		switchMap(body => body.json()),
@@ -30,5 +30,14 @@ export function fetchWithJwt<T>(route: string, options: RequestInit) {
 			}
 		})
 	);
+}
 
+export function pickProps<T, K extends keyof T>(obj: T, keys: K[]) {
+	const newObj: Partial<Pick<T, K>> = {};
+
+	for (const key of keys) {
+		newObj[key] = obj[key];
+	}
+
+	return newObj as Pick<T, K>;
 }

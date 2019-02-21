@@ -1,27 +1,27 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import MyMICDS, { GetUniqueEventsResponse } from '../common/MyMICDS';
+import withAnalyticsContext, { WithAnalyticsContextProps } from '../common/AnalyticsContext';
 import styles from './ClassList.module.scss';
 
 interface ClassesListState {
 	classes: string[];
-	uniqueEvents: GetUniqueEventsResponse['events'];
 }
 
-export default class ClassesList extends React.Component<RouteComponentProps, ClassesListState> {
+class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsContextProps, ClassesListState> {
 
 	constructor(props: any) {
 		super(props);
-		this.state = { classes: [], uniqueEvents: {} };
+		this.state = { classes: [] };
 	}
 
 	componentDidMount() {
-		MyMICDS.canvas.getUniqueEvents().subscribe(({ events: uniqueEvents }) => {
-			this.setState({
-				classes: Object.keys(uniqueEvents).sort(),
-				uniqueEvents
-			});
+		this.props.analyticsContext.uniqueClasses.subscribe(classes => {
+			if (classes) {
+				this.setState({ classes });
+			} else {
+				this.setState({ classes: [] });
+			}
 		});
 	}
 
@@ -40,3 +40,5 @@ export default class ClassesList extends React.Component<RouteComponentProps, Cl
 		);
 	}
 }
+
+export default withAnalyticsContext(ClassesList);
