@@ -62,6 +62,10 @@ body {
 	background-color: var(--neutral-100);
 }
 
+h1, h2, h3, h4, h5, h6 {
+	margin: 0;
+}
+
 /**
  * Components
  */
@@ -69,6 +73,13 @@ body {
 :root {
 	--cronch-input-width: 20rem;
 	--cronch-border-radius: 5px;
+}
+
+.container {
+	width: 100%;
+	max-width: 50rem;
+	margin: 0 auto;
+	padding: 2rem;
 }
 
 .cronch-text-input {

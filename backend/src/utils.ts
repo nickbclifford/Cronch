@@ -31,6 +31,7 @@ declare global {
 		// noinspection JSUnusedGlobalSymbols
 		interface Request {
 			authorizedUser: string | null;
+			authorizedPayload: { [key: string]: any };
 		}
 	}
 }
@@ -55,6 +56,7 @@ export const jwtMiddleware: RequestHandler = (req, res, next) => {
 	// Finally, do all the important verification stuff
 	promisify(verify)(header.substring(7), config.mymicdsJwtSecret).then((payload: { [key: string]: any }) => {
 		req.authorizedUser = payload.user;
+		req.authorizedPayload = payload;
 		next();
 	}).catch(() => {
 		errorResponse(res, new APIError('Invalid authorization token', 401));
@@ -69,3 +71,15 @@ export const requireLoggedIn: RequestHandler = (req, res, next) => {
 
 	next();
 };
+
+export function requireScope(scope: string): RequestHandler {
+	return (req, res, next) => {
+		if (req.authorizedPayload && req.authorizedPayload.scopes
+			&& (req.authorizedPayload.scopes[scope] || req.authorizedPayload.scopes.admin)) {
+			next();
+		} else {
+			errorResponse(res, new APIError('Unauthorized', 401));
+			return;
+		}
+	};
+}

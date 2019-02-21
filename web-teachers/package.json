@@ -13,6 +13,7 @@
     "@types/webfontloader": "^1.6.29",
     "bind-decorator": "^1.0.11",
     "classnames": "^2.2.6",
+    "moment": "^2.24.0",
     "node-sass": "^4.11.0",
     "normalize.css": "^8.0.1",
     "react": "^16.8.2",
