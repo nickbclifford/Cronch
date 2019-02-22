@@ -2,7 +2,7 @@ import bind from 'bind-decorator';
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { filter, first } from 'rxjs/operators';
+import { filter, first, tap } from 'rxjs/operators';
 
 import styles from './App.module.scss';
 import { AnalyticsContext, AnalyticsContextType } from './common/AnalyticsContext';
@@ -43,9 +43,14 @@ export default class App extends React.Component<any, AppState> {
 
 		MyMICDS.auth.$.pipe(
 			filter(auth => auth !== undefined),
+			tap(() => {
+				if (this.state.loading) {
+					this.setState({ loading: false });
+				}
+			}),
+			filter(auth => auth !== null),
 			first()
 		).subscribe(() => {
-			this.setState({ loading: false });
 			setTimeout(this.setupAnalytics);
 		});
 
@@ -59,6 +64,7 @@ export default class App extends React.Component<any, AppState> {
 			({ events: uniqueEvents }) => {
 				this.state.uniqueClasses.next(Object.keys(uniqueEvents).sort());
 				this.state.uniqueClassAssignments.next(uniqueEvents);
+				console.log('unique events', uniqueEvents);
 			},
 			err => alert(`Error getting Canvas events! ${err.message}`)
 		);
@@ -93,7 +99,7 @@ export default class App extends React.Component<any, AppState> {
 					'uniqueClassTimeslots'
 				])}>
 					<div className={styles.appContainer}>
-						<Navbar />
+						<Navbar className={styles.navbar} />
 						<div className={styles.routeContainer}>
 							<Switch>
 								<Route exact={true} path='/' render={this.redirectToDefault} />

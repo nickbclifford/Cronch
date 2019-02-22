@@ -17,11 +17,15 @@ export const routes = [
 	}
 ];
 
-export default class Navbar extends React.Component {
+export interface NavbarProps {
+	className: string;
+}
+
+export default class Navbar extends React.Component<NavbarProps> {
 
 	render() {
 		return (
-			<nav className={styles.navbar}>
+			<nav className={`${styles.navbar} ${this.props.className ? this.props.className : ''}`}>
 				<div className={styles.navbarBrand}>
 					<img src='/favicon/favicon-32x32.png' className={styles.navbarLogo} />
 					<span className={styles.navbarTitle}>Cronchalytics</span>

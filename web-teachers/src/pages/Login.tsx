@@ -70,7 +70,8 @@ export default class Login extends React.Component<RouteComponentProps, LoginSta
 							value={this.state.user}
 							onChange={this.changeUser}
 							placeholder='Username'
-							required={true} />
+							required={true}
+						/>
 						<div className={styles.usernameGroupLabel}>@micds.org</div>
 					</div>
 					<input

@@ -4,10 +4,13 @@
 	flex-direction: column;
 }
 
+.navbar {
+	z-index: 1;
+}
+
 .routeContainer {
 	flex-grow: 1;
 	flex-shrink: 1;
 	position: relative;
-	z-index: -1;
 	margin-top: 3.75rem;
 }
