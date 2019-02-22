@@ -5,8 +5,13 @@ export interface UniqueClassesTimeslots {
 	[uniqueClass: string]: Timeslot[];
 }
 
-export interface AssignmentIdToCanvasNameMap {
-	[assignmentId: string]: string;
+export interface AssignmentIdToCanvasInfo {
+	[assignmentId: string]: CanvasIdInfo;
+}
+
+export interface CanvasIdInfo {
+	eventName: string;
+	className: string;
 }
 
 export type UniqueClassAssignments = GetUniqueEventsResponse['events'];

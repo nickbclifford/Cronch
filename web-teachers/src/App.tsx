@@ -10,7 +10,7 @@ import MyMICDS from './common/MyMICDS';
 import { pickProps } from './common/Utils';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
-import { UniqueClassAssignments, UniqueClassesTimeslots } from './model/Analytics';
+import { AssignmentIdToCanvasInfo, UniqueClassAssignments, UniqueClassesTimeslots } from './model/Analytics';
 import { getAllTimeslots, Timeslot } from './model/Timeslot';
 
 import ClassesList from './pages/ClassesList';
@@ -28,10 +28,12 @@ export default class App extends React.Component<any, AppState> {
 		super(props);
 		this.state = {
 			loading: true,
-			uniqueClasses: new BehaviorSubject<string[] | null>(null),
 			uniqueClassAssignments: new BehaviorSubject<UniqueClassAssignments | null>(null),
 			timeslots: new BehaviorSubject<Timeslot[] | null>(null),
-			uniqueClassTimeslots: new BehaviorSubject<UniqueClassesTimeslots | null>(null)
+			assignmentIdToClass: new BehaviorSubject<AssignmentIdToCanvasInfo | null>(null),
+			// uniqueClasses: new BehaviorSubject<string[] | null>(null),
+			classesWithTimeslots: new BehaviorSubject<string[] | null>(null),
+			assignmentsWithTimeslots: new BehaviorSubject<string[] | null>(null)
 		};
 	}
 
@@ -50,21 +52,42 @@ export default class App extends React.Component<any, AppState> {
 			}),
 			filter(auth => auth !== null),
 			first()
-		).subscribe(() => {
-			setTimeout(this.setupAnalytics);
-		});
+		).subscribe(this.setupAnalytics);
 
-		/** @todo Do analytics once we have both MyMICDS and timeslot data */
-		// combineLatest()
+		// Calculate other data once we have both MyMICDS and timeslot data
+		combineLatest(
+			this.state.uniqueClassAssignments,
+			this.state.timeslots
+		).subscribe(
+			([uniqueClasses, timeslots]) => {
+				// for
+			}
+		);
 	}
 
 	@bind
 	private setupAnalytics() {
 		MyMICDS.canvas.getUniqueEvents().subscribe(
 			({ events: uniqueEvents }) => {
-				this.state.uniqueClasses.next(Object.keys(uniqueEvents).sort());
+				const uniqueCanvasClasses = Object.keys(uniqueEvents).sort();
 				this.state.uniqueClassAssignments.next(uniqueEvents);
-				console.log('unique events', uniqueEvents);
+				// console.log('unique events', uniqueEvents);
+
+				const map: AssignmentIdToCanvasInfo = {};
+
+				for (const canvasClass of uniqueCanvasClasses) {
+					const assignments = uniqueEvents[canvasClass];
+					console.log('assignments', assignments);
+					for (const assignment of assignments) {
+						map[assignment._id] = {
+							eventName: assignment.name,
+							className: canvasClass
+						};
+					}
+				}
+
+				this.state.assignmentIdToClass.next(map);
+				console.log('MAP', map);
 			},
 			err => alert(`Error getting Canvas events! ${err.message}`)
 		);
@@ -93,10 +116,11 @@ export default class App extends React.Component<any, AppState> {
 		} else {
 			return (
 				<AnalyticsContext.Provider value={pickProps(this.state, [
-					'uniqueClasses',
 					'uniqueClassAssignments',
 					'timeslots',
-					'uniqueClassTimeslots'
+					'assignmentIdToClass',
+					'classesWithTimeslots',
+					'assignmentsWithTimeslots'
 				])}>
 					<div className={styles.appContainer}>
 						<Navbar className={styles.navbar} />

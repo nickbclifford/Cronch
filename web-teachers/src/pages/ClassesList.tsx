@@ -16,13 +16,13 @@ class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsCon
 	}
 
 	componentDidMount() {
-		this.props.analyticsContext.uniqueClasses.subscribe(classes => {
-			if (classes) {
-				this.setState({ classes });
-			} else {
-				this.setState({ classes: [] });
-			}
-		});
+		// this.props.analyticsContext.uniqueClasses.subscribe(classes => {
+		// 	if (classes) {
+		// 		this.setState({ classes });
+		// 	} else {
+		// 		this.setState({ classes: [] });
+		// 	}
+		// });
 	}
 
 	render() {
