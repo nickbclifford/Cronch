@@ -9,31 +9,46 @@ import styles from './Heatmap.module.scss';
 
 interface HeatmapState {
 	timeslots: Timeslot[];
+	timeslotsByWeekday: Timeslot[][];
 }
 
 class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContextProps, HeatmapState> {
 
 	constructor(props: any) {
 		super(props);
-		this.state = { timeslots: [] };
+		this.state = { timeslots: [], timeslotsByWeekday: [] };
 	}
 
 	componentDidMount() {
 		this.props.analyticsContext.timeslots.subscribe(timeslots => {
 			if (timeslots) {
-				this.setState({ timeslots });
+				const timeslotsByWeekday: Timeslot[][] = [[], [], [], [], [], [], []];
+
+				timeslots.map(timeslot => {
+					const dayOfWeek = moment(timeslot.start).weekday();
+					timeslotsByWeekday[dayOfWeek].push(timeslot);
+				});
+
+				this.setState({ timeslots, timeslotsByWeekday });
 			} else {
-				this.setState({ timeslots: [] });
+				this.setState({ timeslots: [], timeslotsByWeekday: [] });
 			}
+
+			console.log(this.state.timeslotsByWeekday);
 		});
 	}
 
 	render() {
 		return (
 			<div className='container'>
-				<h1 className={styles.header}>Heatmap</h1>
-				<div>
-					<HeatmapDisplay timeslots={this.state.timeslots} />
+				<h1 className={styles.header}>Heatmap By Day in Week</h1>
+				<div className={styles.heatmapsContainer}>
+					{this.state.timeslotsByWeekday.map((weekdayTimeslots, i) => 
+						<div className={styles.heatmap}>
+							<HeatmapDisplay key={i} timeslots={weekdayTimeslots} />
+							<h3>{moment(weekdayTimeslots[0].start).format('ddd')}</h3>
+						</div>
+					)}
 				</div>
 			</div>
 		);
