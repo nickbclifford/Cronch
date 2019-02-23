@@ -342,7 +342,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 				}
 			}
 
-			return this.state.monthlyTimes[biggestClass].start.getDate().toString();
+			return 'The ' + this.beautifyDate(this.state.monthlyTimes[biggestClass].start.getDate());
 		} else {
 			return 'Not Available';
 		}
@@ -480,6 +480,29 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		}
 	}
 
+	private beautifyDate(num: number): string {
+		let suffix = '';
+		if (num.toString().length > 1) {
+			// two digits
+			const sDigit = parseInt(num.toString().charAt(1).toString(), 10);
+			switch (sDigit) {
+				case 1: suffix = 'st'; break;
+				case 2: suffix = 'nd'; break;
+				case 3: suffix = 'rd'; break;
+				default: suffix = 'th'; break;
+			}
+		} else {
+			switch (num) {
+				case 1: suffix = 'st'; break;
+				case 2: suffix = 'nd'; break;
+				case 3: suffix = 'rd'; break;
+				default: suffix = 'th'; break;
+			}
+		}
+
+		return `${num}${suffix}`;
+	}
+
 	componentWillMount() {
 		this.canvasEventsSubscription = MyMICDS.canvas.getEvents().subscribe(
 			events => {
@@ -519,15 +542,13 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 	render() {
 		if (Platform.OS === 'android') {
-			if (this.state.dailyView) {
-				// daily view
-				return;
-			} else {
-				// weekly view
-				return;
-			}
+			return(
+				<SafeAreaView style={styles.safeArea}>
+					<Text>Android support coming soon</Text>
+				</SafeAreaView>
+			);
 		} else {
-			return (
+			return(
 				<SafeAreaView style={styles.safeArea}>
 					<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 					<View style={styles.verticalContainer}>
