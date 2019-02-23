@@ -19,7 +19,7 @@ class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsCon
 		this.props.analyticsContext.canvasEventsWithData.subscribe(
 			canvasEvents => {
 				if (canvasEvents) {
-					this.setState({ classes: Object.keys(canvasEvents).sort() });
+					this.setState({ classes: Object.keys(canvasEvents).sort().reverse() });
 				} else {
 					this.setState({ classes: [] });
 				}

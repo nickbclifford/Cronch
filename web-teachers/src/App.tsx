@@ -70,10 +70,8 @@ export default class App extends React.Component<any, AppState> {
 					return;
 				}
 
-				const uniqueCanvasClasses = Object.keys(uniqueEvents).sort();
-
 				const assignmentIdMap: EventIdToUniqueEvent = {};
-				for (const canvasClass of uniqueCanvasClasses) {
+				for (const canvasClass of Object.keys(uniqueEvents)) {
 					const assignments = uniqueEvents[canvasClass];
 
 					for (const assignment of assignments) {
@@ -95,12 +93,66 @@ export default class App extends React.Component<any, AppState> {
 					}
 
 					if (!eventsWithData[canvasInfo.className][canvasInfo._id]) {
-						const canvasInfoWithTimeslot = Object.assign({}, canvasInfo, { timeslots: [] });
-						eventsWithData[canvasInfo.className][canvasInfo._id] = canvasInfoWithTimeslot;
+						const extraInfo = {
+							timeslots: [],
+							stats: {
+								min: 0,
+								max: 0,
+								average: 0,
+								userDurations: {}
+							}
+						};
+						eventsWithData[canvasInfo.className][canvasInfo._id] = Object.assign({}, canvasInfo, extraInfo);
 					}
 
 					eventsWithData[canvasInfo.className][canvasInfo._id].timeslots.push(timeslot);
 				}
+
+				// Calculate stats
+
+				let mostUsers = 0;
+				let mostClass = null;
+				let mostEvent = null;
+
+				for (const className of Object.keys(eventsWithData)) {
+					for (const eventId of Object.keys(eventsWithData[className])) {
+
+						const event = eventsWithData[className][eventId];
+
+						let totalDuration = 0;
+						const userDurations: { [user: string]: number } = {};
+						for (const timeslot of event.timeslots) {
+							if (!timeslot.end) {
+								continue;
+							}
+
+							if (!userDurations[timeslot.user]) {
+								userDurations[timeslot.user] = 0;
+							}
+							const duration = timeslot.end.diff(timeslot.start);
+							totalDuration += duration;
+							userDurations[timeslot.user] += duration;
+						}
+
+						const durations = Object.values(userDurations);
+
+						event.stats.min = Math.min(...durations);
+						event.stats.max = Math.max(...durations);
+						event.stats.average = totalDuration / durations.length;
+						event.stats.userDurations = userDurations;
+
+						// Debug to find out which event to demo
+						if (durations.length > mostUsers) {
+							mostUsers = durations.length;
+							mostClass = className;
+							mostEvent = event.name;
+						}
+					}
+				}
+
+				console.log('Most event', mostUsers, mostClass, mostEvent);
+				console.log('events with data', eventsWithData);
+
 				this.state.canvasEventsWithData.next(eventsWithData);
 			}
 		);
