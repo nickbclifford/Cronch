@@ -2,7 +2,7 @@ import moment from 'moment';
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import withAnalyticsContext, { WithAnalyticsContextProps } from '../common/AnalyticsContext';
 import { UniqueEventWithData } from '../model/Analytics';
@@ -27,7 +27,13 @@ class ClassAnalytics extends React.Component<RouteComponentProps<ClassAnalyticsR
 
 	constructor(props: any) {
 		super(props);
-		this.state = { loading: true, className: null, events: [], data: null, options: null };
+		this.state = {
+			loading: true,
+			className: null,
+			events: [],
+			data: null,
+			options: null
+		};
 	}
 
 	componentDidMount() {

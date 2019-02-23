@@ -10,10 +10,7 @@ import MyMICDS from './common/MyMICDS';
 import { pickProps } from './common/Utils';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
-import {
-	CanvasEventsWithData,
-	EventIdToUniqueEvent
-} from './model/Analytics';
+import { CanvasEventsWithData, EventIdToUniqueEvent, MostData } from './model/Analytics';
 import { getAllTimeslots, Timeslot } from './model/Timeslot';
 
 import ClassAnalytics from './pages/ClassAnalytics';
@@ -34,7 +31,8 @@ export default class App extends React.Component<any, AppState> {
 		this.state = {
 			loading: true,
 			timeslots: new BehaviorSubject<Timeslot[] | null>(null),
-			canvasEventsWithData: new BehaviorSubject<CanvasEventsWithData | null>(null)
+			canvasEventsWithData: new BehaviorSubject<CanvasEventsWithData | null>(null),
+			mostData: new BehaviorSubject<MostData | null>(null)
 		};
 	}
 
@@ -111,8 +109,8 @@ export default class App extends React.Component<any, AppState> {
 				// Calculate stats
 
 				let mostUsers = 0;
-				let mostClass = null;
-				let mostEvent = null;
+				let mostClass = '';
+				let mostEvent = '';
 
 				for (const className of Object.keys(eventsWithData)) {
 					for (const eventId of Object.keys(eventsWithData[className])) {
@@ -154,6 +152,11 @@ export default class App extends React.Component<any, AppState> {
 				console.log('events with data', eventsWithData);
 
 				this.state.canvasEventsWithData.next(eventsWithData);
+				this.state.mostData.next({
+					userCount: mostUsers,
+					className: mostClass,
+					eventName: mostEvent
+				});
 			}
 		);
 
@@ -176,7 +179,8 @@ export default class App extends React.Component<any, AppState> {
 				<AnalyticsContext.Provider
 					value={pickProps(this.state, [
 						'timeslots',
-						'canvasEventsWithData'
+						'canvasEventsWithData',
+						'mostData'
 					])}
 				>
 					<div className={styles.appContainer}>

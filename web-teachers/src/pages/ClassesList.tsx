@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 import withAnalyticsContext, { WithAnalyticsContextProps } from '../common/AnalyticsContext';
 import listStyles from './ClassList.module.scss';
 
 interface ClassesListState {
 	classes: string[];
+	starClassName: string | null;
 }
 
 class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsContextProps, ClassesListState> {
@@ -15,16 +16,22 @@ class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsCon
 
 	constructor(props: any) {
 		super(props);
-		this.state = { classes: [] };
+		this.state = { classes: [], starClassName: null };
 	}
 
 	componentDidMount() {
-		this.analyticsSubscription = this.props.analyticsContext.canvasEventsWithData.subscribe(
-			canvasEvents => {
-				if (canvasEvents) {
-					this.setState({ classes: Object.keys(canvasEvents).sort().reverse() });
+		this.analyticsSubscription = combineLatest(
+			this.props.analyticsContext.canvasEventsWithData,
+			this.props.analyticsContext.mostData
+		).subscribe(
+			([canvasEvents, mostData]) => {
+				if (canvasEvents && mostData) {
+					this.setState({
+						classes: Object.keys(canvasEvents).sort().reverse(),
+						starClassName: mostData.className
+					});
 				} else {
-					this.setState({ classes: [] });
+					this.setState({ classes: [], starClassName: null });
 				}
 			},
 			err => alert(`Get Classes Error! ${err.message}`)
@@ -45,7 +52,7 @@ class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsCon
 					{this.state.classes.filter(c => c !== '').map(uniqueClass => (
 						<Link key={uniqueClass} to={`/classes/${uniqueClass}`} className={listStyles.link}>
 							<div className={listStyles.itemContainer}>
-								<h4 className={listStyles.className}>{uniqueClass === '' ? 'No Class' : uniqueClass}</h4>
+								<h4 className={listStyles.className}>{uniqueClass === '' ? 'No Class' : uniqueClass}{uniqueClass === this.state.starClassName ? '*' : ''}</h4>
 							</div>
 						</Link>
 					))}

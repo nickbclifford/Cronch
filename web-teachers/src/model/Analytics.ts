@@ -25,6 +25,12 @@ export interface HourPortions {
 	[hour: number]: number;
 }
 
+export interface MostData {
+	userCount: number;
+	className: string;
+	eventName: string;
+}
+
 export function calculateHourPortions(timeslot: Timeslot) {
 	const hours: HourPortions = {};
 
