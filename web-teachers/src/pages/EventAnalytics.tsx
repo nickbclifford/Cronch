@@ -1,5 +1,6 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { Subscription } from 'rxjs';
 
 import withAnalyticsContext, { WithAnalyticsContextProps } from '../common/AnalyticsContext';
 import { UniqueEventWithData } from '../model/Analytics';
@@ -16,13 +17,15 @@ interface EventAnalyticsState {
 
 class EventAnalytics extends React.Component<RouteComponentProps<EventAnalyticsRouteParams> & WithAnalyticsContextProps, EventAnalyticsState> {
 
+	analyticsSubscription: Subscription | null = null;
+
 	constructor(props: any) {
 		super(props);
 		this.state = { event: null };
 	}
 
 	componentDidMount() {
-		this.props.analyticsContext.canvasEventsWithData.subscribe(
+		this.analyticsSubscription = this.props.analyticsContext.canvasEventsWithData.subscribe(
 			canvasEvents => {
 				if (canvasEvents) {
 					const className = this.props.match.params.className;
@@ -45,6 +48,12 @@ class EventAnalytics extends React.Component<RouteComponentProps<EventAnalyticsR
 			},
 			err => alert(`Get Assignment Error! ${err.message}`)
 		);
+	}
+
+	componentWillUnmount() {
+		if (this.analyticsSubscription) {
+			this.analyticsSubscription.unsubscribe();
+		}
 	}
 
 	render() {
