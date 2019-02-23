@@ -14,7 +14,7 @@ import stats from 'stats-lite';
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { components, PRIMARY } from '../common/StyleGuide';
+import { ColorPalette, components } from '../common/StyleGuide';
 import { defaultColor, defaultTextDark } from '../common/Task';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
@@ -22,6 +22,13 @@ import { getUserTimeslots } from '../common/User';
 enum ViewMode {
 	DAILY, WEEKLY, MONTHLY
 }
+
+export const PRIMARY = [
+	'#E6AFFB',
+	'#CC76EE',
+	'#7C16A5',
+	'#540174'
+];
 
 interface PieChartDataPoint {
 	label: string;
@@ -92,8 +99,8 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	}
 
 	private pickRandomColor() {
-		const colors: string[] = Object.values(PRIMARY);
-		return colors[Math.floor(Math.random() * colors.length)];
+		// const colors: string[] = Object.values(PRIMARY);
+		return PRIMARY[Math.floor(Math.random() * PRIMARY.length)];
 	}
 
 	private convertDay(day: number) {
@@ -202,10 +209,8 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			}
 
 			// color: fromCanvas ? color : this.pickRandomColor()
-			console.log(totalHours);
 
 			if (totalHours > 0.01) {
-				console.log('fired');
 				// only push if there's sufficient data
 				const { name, color, fromCanvas } = this.getClassNameAndColor(cl);
 				chartData.push({
@@ -215,8 +220,6 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 				});
 			}
 		}
-
-		console.log(chartData);
 
 		if (chartData.length > 0) {
 			this.setState({ dailyChartData: chartData });
@@ -487,6 +490,10 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			},
 			err => Sentry.captureException(err)
 		);
+	}
+
+	componentDidMount() {
+		this.updateData();
 	}
 
 	componentWillUnmount() {
