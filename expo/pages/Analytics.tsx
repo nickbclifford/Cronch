@@ -19,6 +19,10 @@ import { defaultColor, defaultTextDark } from '../common/Task';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
 
+enum ViewMode {
+	DAILY, WEEKLY, MONTHLY
+}
+
 interface PieChartDataPoint {
 	label: string;
 	value: number;
@@ -141,14 +145,17 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		chartData.push(thisWeekData);
 
-		let weeklyRaw: number[] = [];
-		this.state.monthlyTimes.forEach((day: Timeslot) => {
-			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
-				weeklyRaw.push(this.calcHourDiff(day.start, day.end));
-			}
-		})
+		let total = 0;
 
-		this.setState({ weeklyTimes, weeklyTotal: stats.mean(weeklyRaw), weeklyChartData: chartData });
+		for (const time of weeklyTimes) {
+			if (time.end !== null) {
+				total += this.calcHourDiff(time.start, time.end);
+			}
+		}
+
+		total /= weeklyTimes.length; // get an average
+
+		this.setState({ weeklyTimes, weeklyTotal: total, weeklyChartData: chartData });
 	}
 
 	private makeDailyData() {
