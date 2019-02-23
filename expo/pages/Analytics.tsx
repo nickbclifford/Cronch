@@ -195,20 +195,28 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		for (const cl of classes) {
 			let totalHours = 0;
 			for (const slot of dailyTimes) {
-				if (slot.end !== null && slot.classId === cl) {
-					const diff = Math.round(this.calcHourDiff(slot.start, slot.end));
-					totalHours += (diff === 0) ? this.calcHourDiff(slot.start, slot.end) : diff;
+				if (slot.end && slot.classId === cl) {
+					// totalHours += (diff === 0) ? this.calcHourDiff(slot.start, slot.end) : diff;
+					totalHours += this.calcHourDiff(slot.start, slot.end);
 				}
 			}
 
-			const { name, color, fromCanvas } = this.getClassNameAndColor(cl);
+			// color: fromCanvas ? color : this.pickRandomColor()
+			console.log(totalHours);
 
-			chartData.push({
-				label: name,
-				value: +(totalHours).toFixed(2),
-				color: fromCanvas ? color : this.pickRandomColor()
-			});
+			if (totalHours > 0.01) {
+				console.log('fired');
+				// only push if there's sufficient data
+				const { name, color, fromCanvas } = this.getClassNameAndColor(cl);
+				chartData.push({
+					label: name,
+					value: parseFloat((totalHours).toFixed(2)),
+					color: this.pickRandomColor()
+				});
+			}
 		}
+
+		console.log(chartData);
 
 		if (chartData.length > 0) {
 			this.setState({ dailyChartData: chartData });
@@ -474,11 +482,11 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			events => {
 				if (events.hasURL && events.events) {
 					this.setState({ canvasClasses: events.events });
+					this.updateData();
 				}
 			},
 			err => Sentry.captureException(err)
 		);
-		this.updateData();
 	}
 
 	componentWillUnmount() {
