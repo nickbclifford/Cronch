@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
@@ -61,7 +62,7 @@ export default class HeatmapDisplay extends React.Component<HeatmapDisplayProps,
 
 	render() {
 		const portions: HourPortions = {};
-		for (let i = 0; i < 23; i++) {
+		for (let i = 0; i < 24; i++) {
 			portions[i] = this.state.hourPortions[i] || 0;
 		}
 		const hours = Object.keys(portions).map(k => parseInt(k, 10));
@@ -69,18 +70,26 @@ export default class HeatmapDisplay extends React.Component<HeatmapDisplayProps,
 		const max = Math.max(...Object.values(portions));
 
 		const labels = hours.map(hour => {
+			const suffix = hour < 13 ? 'am' : 'pm';
+			return `${(hour + 11) % 12 + 1} ${suffix}`;
+		});
+
+		const tooltips = hours.map(hour => {
 			return `(${hour}:00-${hour + 1}:00) ${portions[hour].toFixed(2)} hours worked`;
+			// return `${portions[hour].toFixed(2)} hours worked`;
 		});
 
 		return (
 			<div className={styles.heatmapContainer}>
 				{hours.map((hour, i) => (
-					<div
-						key={hour}
-						className={styles.heatmapData}
-						style={this.calculateColor(portions[hour] / max)}
-						data-tip={labels[i]}
-					></div>
+					<div key={hour} className={styles.heatmapDataContainer}>
+						<div className={styles.heatmapLabel}>{labels[i]}</div>
+						<div
+							className={styles.heatmapData}
+							style={this.calculateColor(portions[hour] / max)}
+							data-tip={tooltips[i]}
+						></div>
+					</div>
 				))}
 				<ReactTooltip />
 			</div>
