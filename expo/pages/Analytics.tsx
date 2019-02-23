@@ -9,6 +9,7 @@ import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { Subscription } from 'rxjs';
 import Sentry from 'sentry-expo';
+import stats from 'stats-lite';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
@@ -86,10 +87,6 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		return moment.duration(moment(end).diff(start)).as('hours');
 	}
 
-	private calcMinuteDiff(start: Date, end: Date): number {
-		return moment.duration(moment(end).diff(start)).as('minutes');
-	}
-
 	private pickRandomColor() {
 		const colors: string[] = Object.values(PRIMARY);
 		return colors[Math.floor(Math.random() * colors.length)];
@@ -120,15 +117,6 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			}
 		}
 
-		// need to get available days of the week
-		/*let availableDates: number[] = [];
-		weeklyTimes.forEach(time => {
-			if (availableDates.indexOf(time.start.getDay()) === -1) {
-				// new day found, push it
-				availableDates.push(time.start.getDay());
-			}
-		})*/
-
 		// now that we have the available days of the week, we need to create the chartData
 		// we need one series that has each day
 		const chartData: BarChartDataPoint[] = [];
@@ -153,17 +141,14 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		chartData.push(thisWeekData);
 
-		let total = 0;
-
-		for (const time of weeklyTimes) {
-			if (time.end !== null) {
-				total += this.calcHourDiff(time.start, time.end);
+		let weeklyRaw: number[] = [];
+		this.state.monthlyTimes.forEach((day: Timeslot) => {
+			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
+				weeklyRaw.push(this.calcHourDiff(day.start, day.end));
 			}
-		}
+		})
 
-		total /= weeklyTimes.length; // get an average
-
-		this.setState({ weeklyTimes, weeklyTotal: total, weeklyChartData: chartData });
+		this.setState({ weeklyTimes, weeklyTotal: stats.mean(weeklyRaw), weeklyChartData: chartData });
 	}
 
 	private makeDailyData() {
@@ -343,6 +328,16 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	}
 
 	private findMonthDeviation(): number {
+		let monthlyRaw: number[] = [];
+		this.state.monthlyTimes.forEach((day: Timeslot) => {
+			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
+				monthlyRaw.push(this.calcHourDiff(day.start, day.end));
+			}
+		})
+
+		return stats.stdev(monthlyRaw);
+		
+		/*
 		let tempTotal = 0;
 		// find monthly total
 		let total = 0;
@@ -364,10 +359,10 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			return 0;
 		} else {
 			return parseFloat(deviation.toFixed(2));
-		}
+		}*/
 	}
 
-	private findWeekDeviation(): number {
+	private findWeeklyDeviation(): number {
 		let tempTotal = 0;
 		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
 		for (const val of this.state.weeklyTimes) {
@@ -402,6 +397,16 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	}
 
 	private findMonthlyAverage(): number {
+		let monthlyRaw: number[] = [];
+		this.state.monthlyTimes.forEach((day: Timeslot) => {
+			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
+				monthlyRaw.push(this.calcHourDiff(day.start, day.end));
+			}
+		})
+
+		return stats.mean(monthlyRaw);
+
+		/*
 		// find monthly total
 		let total = 0;
 		this.state.monthlyTimes.forEach((day: Timeslot) => {
@@ -417,6 +422,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		} else {
 			return parseFloat(average.toFixed(2));
 		}
+		*/
 	}
 
 	private getClassNameAndColor(id: string) {
@@ -552,7 +558,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 							</View>
 							<View style={styles.verticalContainer}>
 								<Text style={styles.title}>Weekly Deviation</Text>
-								<Text style={styles.text}>{this.beautifyTime(this.findWeekDeviation())}</Text>
+								<Text style={styles.text}>{this.beautifyTime(this.findWeeklyDeviation())}</Text>
 							</View>
 						</View>
 						<View style={styles.verticalContainer}>

@@ -33,6 +33,7 @@
     "rxjs": "^6.3.3",
     "schedule": "^0.4.0",
     "sentry-expo": "^1.11.2",
+    "stats-lite": "^2.2.0",
     "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
