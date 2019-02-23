@@ -9,14 +9,26 @@ import Swiper from 'react-native-swiper';
 import { NavigationScreenProps, SafeAreaView } from 'react-navigation';
 import { Subscription } from 'rxjs';
 import Sentry from 'sentry-expo';
+import stats from 'stats-lite';
 
 import withAssignmentContext, { WithAssignmentContextProps } from '../common/AssignmentContext';
 import MyMICDS, { CanvasEvent } from '../common/MyMICDS';
 import createNavigationOptions from '../common/NavigationOptionsFactory';
-import { components, PRIMARY } from '../common/StyleGuide';
+import { ColorPalette, components } from '../common/StyleGuide';
 import { defaultColor, defaultTextDark } from '../common/Task';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
+
+enum ViewMode {
+	DAILY, WEEKLY, MONTHLY
+}
+
+export const PRIMARY = [
+	'#E6AFFB',
+	'#CC76EE',
+	'#7C16A5',
+	'#540174'
+];
 
 interface PieChartDataPoint {
 	label: string;
@@ -24,7 +36,7 @@ interface PieChartDataPoint {
 	color: string;
 }
 
-interface LineChartDataPoint {
+interface BarChartDataPoint {
 	seriesName: string;
 	data: Array<{
 		x: string,
@@ -36,14 +48,16 @@ interface LineChartDataPoint {
 interface AnalyticsState {
 	times: Timeslot[];
 	canvasClasses: CanvasEvent[];
-	classes: string[];
+	dailyClasses: string[];
 	weeklyTimes: Timeslot[];
 	weeklyTotal: number;
 	dailyTimes: Timeslot[];
 	dailyTotal: number;
+	monthlyTimes: Timeslot[];
 	dailyView: boolean;
-	pieChartData: PieChartDataPoint[];
-	lineChartData: LineChartDataPoint[];
+	dailyChartData: PieChartDataPoint[];
+	weeklyChartData: BarChartDataPoint[];
+	monthlyChartData: BarChartDataPoint[];
 }
 
 class Analytics extends React.Component<NavigationScreenProps & WithAssignmentContextProps, AnalyticsState> {
@@ -57,8 +71,8 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		this.state = {
 			times: [],
 			canvasClasses: [],
-			classes: [],
-			pieChartData: [
+			dailyClasses: [],
+			dailyChartData: [
 				{
 					value: 50,
 					label: 'No Work!',
@@ -69,8 +83,10 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			weeklyTotal: 0,
 			dailyTimes: [],
 			dailyTotal: 0,
-			lineChartData: [],
-			dailyView: true
+			weeklyChartData: [],
+			dailyView: true,
+			monthlyChartData: [],
+			monthlyTimes: []
 		};
 	}
 
@@ -82,13 +98,9 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		return moment.duration(moment(end).diff(start)).as('hours');
 	}
 
-	private calcMinuteDiff(start: Date, end: Date): number {
-		return moment.duration(moment(end).diff(start)).as('minutes');
-	}
-
 	private pickRandomColor() {
-		const colors: string[] = Object.values(PRIMARY);
-		return colors[Math.floor(Math.random() * colors.length)];
+		// const colors: string[] = Object.values(PRIMARY);
+		return PRIMARY[Math.floor(Math.random() * PRIMARY.length)];
 	}
 
 	private convertDay(day: number) {
@@ -116,20 +128,11 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			}
 		}
 
-		// need to get available days of the week
-		/*let availableDates: number[] = [];
-		weeklyTimes.forEach(time => {
-			if (availableDates.indexOf(time.start.getDay()) === -1) {
-				// new day found, push it
-				availableDates.push(time.start.getDay());
-			}
-		})*/
-
 		// now that we have the available days of the week, we need to create the chartData
 		// we need one series that has each day
-		const chartData: LineChartDataPoint[] = [];
+		const chartData: BarChartDataPoint[] = [];
 
-		const thisWeekData: LineChartDataPoint = {
+		const thisWeekData: BarChartDataPoint = {
 			seriesName: 'Series',
 			data: [],
 			color: this.pickRandomColor()
@@ -159,7 +162,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		total /= weeklyTimes.length; // get an average
 
-		this.setState({ weeklyTimes, weeklyTotal: total, lineChartData: chartData });
+		this.setState({ weeklyTimes, weeklyTotal: total, weeklyChartData: chartData });
 	}
 
 	private makeDailyData() {
@@ -192,31 +195,77 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			}
 		}
 
-		this.setState({ classes });
+		this.setState({ dailyClasses: classes });
 
 		const chartData: PieChartDataPoint[] = [];
 		// create the chartData for the day
 		for (const cl of classes) {
 			let totalHours = 0;
 			for (const slot of dailyTimes) {
-				if (slot.end !== null && slot.classId === cl) {
-					const diff = Math.round(this.calcHourDiff(slot.start, slot.end));
-					totalHours += (diff === 0) ? this.calcMinuteDiff(slot.start, slot.end) : diff;
+				if (slot.end && slot.classId === cl) {
+					// totalHours += (diff === 0) ? this.calcHourDiff(slot.start, slot.end) : diff;
+					totalHours += this.calcHourDiff(slot.start, slot.end);
 				}
 			}
 
-			const { name, color, fromCanvas } = this.getClassNameAndColor(cl);
+			// color: fromCanvas ? color : this.pickRandomColor()
 
-			chartData.push({
-				label: name,
-				value: +(totalHours).toFixed(2),
-				color: fromCanvas ? color : this.pickRandomColor()
-			});
+			if (totalHours > 0.01) {
+				// only push if there's sufficient data
+				const { name, color, fromCanvas } = this.getClassNameAndColor(cl);
+				chartData.push({
+					label: name,
+					value: parseFloat((totalHours).toFixed(2)),
+					color: this.pickRandomColor()
+				});
+			}
 		}
 
 		if (chartData.length > 0) {
-			this.setState({ pieChartData: chartData });
+			this.setState({ dailyChartData: chartData });
 		}
+	}
+
+	private makeMonthlyData() {
+		// gets the month reference point
+		const thisMonth = new Date();
+		thisMonth.setDate(1);
+
+		const monthlyTimes: Timeslot[] = []; // this month's timeslots
+		for (const time of this.state.times) {
+			if (time.end !== null && time.start > thisMonth) {
+				monthlyTimes.push(time);
+			}
+		}
+
+		// now that we have the available days of the week, we need to create the chartData
+		// we need one series that has each day
+		const chartData: BarChartDataPoint[] = [];
+
+		const thisMonthData: BarChartDataPoint = {
+			seriesName: 'Series',
+			data: [],
+			color: this.pickRandomColor()
+		};
+
+		for (let i = 1; i <= 31; i++) {
+			// i is day of the month
+			let dayTotal = 0;
+
+			monthlyTimes.forEach(time => {
+				if (time.end !== null && time.start.getDate() === i) {
+					dayTotal += this.calcHourDiff(time.start, time.end);
+				}
+			});
+			thisMonthData.data.push({
+				x: `${thisMonth.getMonth()}/${i.toString()}`,
+				y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal
+			});
+		}
+
+		chartData.push(thisMonthData);
+
+		this.setState({ monthlyTimes, monthlyChartData: chartData });
 	}
 
 	private findMostPracticedSubject(): string {
@@ -240,7 +289,28 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		}
 	}
 
-	private findHeaviestNight(): string {
+	private findMonthlyMostPracticedSubject(): string {
+		if (this.state.monthlyTimes.length > 0) {
+			let biggestClass = 0;
+
+			for (let i = 0; i < this.state.monthlyTimes.length; i++) {
+				if (this.state.monthlyTimes[i].end !== null &&
+					this.calcHourDiff(this.state.monthlyTimes[i].start, this.state.monthlyTimes[i].end!) >
+					this.calcHourDiff(this.state.monthlyTimes[biggestClass].start, this.state.monthlyTimes[biggestClass].end!)) {
+					// new class found, update index
+					biggestClass = i;
+				}
+			}
+
+			const biggestId = this.state.monthlyTimes[biggestClass].classId;
+			const { name } = this.getClassNameAndColor(biggestId);
+			return name;
+		} else {
+			return 'Not Available';
+		}
+	}
+
+	private findWeeklyHeaviestNight(): string {
 		if (this.state.weeklyTimes.length > 0) {
 			let biggestClass = 0;
 
@@ -259,7 +329,61 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		}
 	}
 
-	private findWeekDeviation() {
+	private findMonthlyHeaviestNight(): string {
+		if (this.state.monthlyTimes.length > 0) {
+			let biggestClass = 0;
+
+			for (let i = 0; i < this.state.monthlyTimes.length; i++) {
+				if (this.state.monthlyTimes[i].end !== null &&
+					this.calcHourDiff(this.state.monthlyTimes[i].start, this.state.monthlyTimes[i].end!) >
+					this.calcHourDiff(this.state.monthlyTimes[biggestClass].start, this.state.monthlyTimes[biggestClass].end!)) {
+					// new class found, update index
+					biggestClass = i;
+				}
+			}
+
+			return 'The ' + this.beautifyDate(this.state.monthlyTimes[biggestClass].start.getDate());
+		} else {
+			return 'Not Available';
+		}
+	}
+
+	private findMonthDeviation(): number {
+		const monthlyRaw: number[] = [];
+		this.state.monthlyTimes.forEach((day: Timeslot) => {
+			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
+				monthlyRaw.push(this.calcHourDiff(day.start, day.end));
+			}
+		});
+
+		return stats.stdev(monthlyRaw);
+
+		/*
+		let tempTotal = 0;
+		// find monthly total
+		let total = 0;
+		this.state.monthlyTimes.forEach((day) => {
+			if (day.end) {
+				total += this.calcHourDiff(day.start, day.end);
+			}
+		})
+
+		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
+		for (const val of this.state.weeklyTimes) {
+			if (val.end !== null) {
+				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
+			}
+		}
+
+		const deviation = (Math.sqrt(tempTotal / (this.state.weeklyTimes.length - 1)));
+		if (isNaN(deviation)) {
+			return 0;
+		} else {
+			return parseFloat(deviation.toFixed(2));
+		}*/
+	}
+
+	private findWeeklyDeviation(): number {
 		let tempTotal = 0;
 		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
 		for (const val of this.state.weeklyTimes) {
@@ -270,13 +394,13 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 		const deviation = (Math.sqrt(tempTotal / (this.state.weeklyTimes.length - 1)));
 		if (isNaN(deviation)) {
-			return 'None';
+			return 0;
 		} else {
-			return deviation.toFixed(2) + 'h';
+			return parseFloat(deviation.toFixed(2));
 		}
 	}
 
-	private findDayDeviation() {
+	private findDayDeviation(): number {
 		let tempTotal = 0;
 		const average = this.state.dailyTotal / this.state.dailyTimes.length;
 		for (const val of this.state.dailyTimes) {
@@ -285,12 +409,41 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			}
 		}
 
-		const deviation = (Math.sqrt(tempTotal / (this.state.dailyTimes.length - 1)));
+		const deviation = (Math.sqrt(tempTotal / (this.state.dailyTimes.length)));
 		if (isNaN(deviation)) {
-			return 'None';
+			return 0;
 		} else {
-			return deviation.toFixed(2) + 'h';
+			return parseFloat(deviation.toFixed(2));
 		}
+	}
+
+	private findMonthlyAverage(): number {
+		const monthlyRaw: number[] = [];
+		this.state.monthlyTimes.forEach((day: Timeslot) => {
+			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
+				monthlyRaw.push(this.calcHourDiff(day.start, day.end));
+			}
+		});
+
+		return stats.mean(monthlyRaw);
+
+		/*
+		// find monthly total
+		let total = 0;
+		this.state.monthlyTimes.forEach((day: Timeslot) => {
+			if (day.end) {
+				total += this.calcHourDiff(day.start, day.end);
+			}
+		})
+
+		const average = total / this.state.monthlyTimes.length;
+
+		if (isNaN(average)) {
+			return 0;
+		} else {
+			return parseFloat(average.toFixed(2));
+		}
+		*/
 	}
 
 	private getClassNameAndColor(id: string) {
@@ -313,27 +466,57 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		}
 	}
 
-	private beautifyMinutes(num: number) {
-		// TODO: get the beautify minutes working
-		return `${Math.round(num)}h`;
+	/**
+	 * Makes time more human readable
+	 * @param num number in hours that is fixed at 2 demicalpoints
+	 */
+	private beautifyTime(num: number) {
+		// split time by decimal
+		const dec = num.toString().split('.');
+		if (dec[1]) {
+			return `${Math.round(num)}h ${Math.round(num * 60)}m`;
+		} else {
+			return `${Math.round(num)}h`;
+		}
+	}
+
+	private beautifyDate(num: number): string {
+		let suffix = '';
+		if (num.toString().length > 1) {
+			// two digits
+			const sDigit = parseInt(num.toString().charAt(1).toString(), 10);
+			switch (sDigit) {
+				case 1: suffix = 'st'; break;
+				case 2: suffix = 'nd'; break;
+				case 3: suffix = 'rd'; break;
+				default: suffix = 'th'; break;
+			}
+		} else {
+			switch (num) {
+				case 1: suffix = 'st'; break;
+				case 2: suffix = 'nd'; break;
+				case 3: suffix = 'rd'; break;
+				default: suffix = 'th'; break;
+			}
+		}
+
+		return `${num}${suffix}`;
 	}
 
 	componentWillMount() {
-		getUserTimeslots().then(timeslots => {
-			this.setState({ times: timeslots });
-			this.makeWeeklyData();
-			this.makeDailyData();
-		}).catch(err => Sentry.captureException(err));
-		// this.updateData();
-
 		this.canvasEventsSubscription = MyMICDS.canvas.getEvents().subscribe(
 			events => {
 				if (events.hasURL && events.events) {
 					this.setState({ canvasClasses: events.events });
+					this.updateData();
 				}
 			},
 			err => Sentry.captureException(err)
 		);
+	}
+
+	componentDidMount() {
+		this.updateData();
 	}
 
 	componentWillUnmount() {
@@ -344,11 +527,11 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 	@bind
 	private updateData() {
-		// showEvenNumberXaxisLabel={false}
 		getUserTimeslots().then(timeslots => {
 			this.setState({ times: timeslots });
 			this.makeWeeklyData();
 			this.makeDailyData();
+			this.makeMonthlyData();
 		}).catch(err => Sentry.captureException(err));
 	}
 
@@ -359,137 +542,54 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 	render() {
 		if (Platform.OS === 'android') {
-			if (this.state.dailyView) {
-				// daily view
-				return (
-					<SafeAreaView style={styles.safeArea}>
-						<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
-						<View style={styles.verticalContainer}>
-						<View style={styles.verticalContainer}>
-							<Text style={styles.headerTitle}>Today (in hours)</Text>
-							<PureChart
-								type='pie'
-								data={this.state.pieChartData}
-								width={'100%'}
-								height={400}
-							/>
-							<View style={styles.horizontalContainer}>
-								<View style={styles.verticalContainer}>
-									<View style={styles.verticalContainer}>
-										<Text style={styles.title}>Today's Total</Text>
-										<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
-									</View>
-									<View style={styles.verticalContainer}>
-										<Text style={styles.title}>Today's Deviation</Text>
-										<Text style={styles.text}>{this.findDayDeviation()}</Text>
-									</View>
-								</View>
-							</View>
-						</View>
-						<Button
-							title='Weekly'
-							onPress={this.swapView}
-							containerStyle={styles.updateButton}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-						<Button
-							title='Update'
-							onPress={this.updateData}
-							containerStyle={styles.updateButton}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-						</View>
-					</SafeAreaView>
-				);
-			} else {
-				// weekly view
-				return (
-					<SafeAreaView style={styles.safeArea}>
-						<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
-						<View style={styles.verticalContainer}>
-							<Text style={styles.headerTitle}>This week (in hours)</Text>
-							<PureChart
-								type='bar'
-								data={this.state.lineChartData}
-								width={'100%'}
-								height={200}
-								showEvenNumberXaxisLabel={false}
-							/>
-							<View style={styles.horizontalContainer}>
-							<View style={styles.verticalContainer}>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Weekly Average</Text>
-									<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
-								</View>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Weekly Deviation</Text>
-									<Text style={styles.text}>{this.findWeekDeviation()}</Text>
-								</View>
-							</View>
-							<View style={styles.verticalContainer}>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Most Active</Text>
-									<Text style={styles.text}>{this.findMostPracticedSubject()}</Text>
-								</View>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Heaviest Night</Text>
-									<Text style={styles.text}>{this.findHeaviestNight()}</Text>
-								</View>
-							</View>
-						</View>
-						<Button
-							title='Daily'
-							onPress={this.swapView}
-							containerStyle={styles.updateButton}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-						<Button
-							title='Update'
-							onPress={this.updateData}
-							containerStyle={styles.updateButton}
-							buttonStyle={components.buttonStyle}
-							titleStyle={components.buttonText}
-						/>
-						</View>
-					</SafeAreaView>
-				);
-			}
-
+			return(
+				<SafeAreaView style={styles.safeArea}>
+					<Text>Android support coming soon</Text>
+				</SafeAreaView>
+			);
 		} else {
-			return (
+			return(
 				<SafeAreaView style={styles.safeArea}>
 					<StatusBar barStyle='light-content' backgroundColor={PRIMARY[500]} animated={true} />
 					<View style={styles.verticalContainer}>
 					<Swiper horizontal={false}>
 					<View style={styles.verticalContainer}>
-						<Text style={styles.headerTitle}>Today (in hours)</Text>
+						<Text style={styles.headerTitle}>This Month (in hours)</Text>
 						<PureChart
-							type='pie'
-							data={this.state.pieChartData}
+							type='line'
+							data={this.state.monthlyChartData}
 							width={'100%'}
-							height={400}
+							height={200}
+							showEvenNumberXaxisLabel={false}
 						/>
 						<View style={styles.horizontalContainer}>
+						<View style={styles.verticalContainer}>
 							<View style={styles.verticalContainer}>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Today's Total</Text>
-									<Text style={styles.text}>{this.beautifyMinutes(this.state.dailyTotal)}</Text>
-								</View>
-								<View style={styles.verticalContainer}>
-									<Text style={styles.title}>Today's Deviation</Text>
-									<Text style={styles.text}>{`${this.findDayDeviation()}H`}</Text>
-								</View>
+								<Text style={styles.title}>Monthly Average</Text>
+								<Text style={styles.text}>{this.beautifyTime(this.findMonthlyAverage())}</Text>
 							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Monthly Deviation</Text>
+								<Text style={styles.text}>{this.beautifyTime(this.findMonthDeviation())}</Text>
+							</View>
+						</View>
+						<View style={styles.verticalContainer}>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Most Active</Text>
+								<Text style={styles.text}>{this.findMonthlyMostPracticedSubject()}</Text>
+							</View>
+							<View style={styles.verticalContainer}>
+								<Text style={styles.title}>Heaviest Night</Text>
+								<Text style={styles.text}>{this.findMonthlyHeaviestNight()}</Text>
+							</View>
+						</View>
 						</View>
 					</View>
 					<View style={styles.verticalContainer}>
-						<Text style={styles.headerTitle}>This week (in hours)</Text>
+						<Text style={styles.headerTitle}>This Week (in hours)</Text>
 						<PureChart
 							type='bar'
-							data={this.state.lineChartData}
+							data={this.state.weeklyChartData}
 							width={'100%'}
 							height={200}
 							showEvenNumberXaxisLabel={false}
@@ -498,11 +598,11 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 						<View style={styles.verticalContainer}>
 							<View style={styles.verticalContainer}>
 								<Text style={styles.title}>Weekly Average</Text>
-								<Text style={styles.text}>{this.beautifyMinutes(this.state.weeklyTotal)}</Text>
+								<Text style={styles.text}>{this.beautifyTime(this.state.weeklyTotal)}</Text>
 							</View>
 							<View style={styles.verticalContainer}>
 								<Text style={styles.title}>Weekly Deviation</Text>
-								<Text style={styles.text}>{`${this.findWeekDeviation()}H`}</Text>
+								<Text style={styles.text}>{this.beautifyTime(this.findWeeklyDeviation())}</Text>
 							</View>
 						</View>
 						<View style={styles.verticalContainer}>
@@ -512,10 +612,31 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 							</View>
 							<View style={styles.verticalContainer}>
 								<Text style={styles.title}>Heaviest Night</Text>
-								<Text style={styles.text}>{this.findHeaviestNight()}</Text>
+								<Text style={styles.text}>{this.findWeeklyHeaviestNight()}</Text>
 							</View>
 						</View>
+						</View>
 					</View>
+					<View style={styles.verticalContainer}>
+						<Text style={styles.headerTitle}>Today (in hours)</Text>
+						<PureChart
+							type='pie'
+							data={this.state.dailyChartData}
+							width={'100%'}
+							height={400}
+						/>
+						<View style={styles.horizontalContainer}>
+							<View style={styles.verticalContainer}>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Today's Total</Text>
+									<Text style={styles.text}>{this.beautifyTime(this.state.dailyTotal)}</Text>
+								</View>
+								<View style={styles.verticalContainer}>
+									<Text style={styles.title}>Today's Deviation</Text>
+									<Text style={styles.text}>{this.beautifyTime(this.findDayDeviation())}</Text>
+								</View>
+							</View>
+						</View>
 					</View>
 					</Swiper>
 					<Button
