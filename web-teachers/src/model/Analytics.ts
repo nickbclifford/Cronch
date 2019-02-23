@@ -1,20 +1,19 @@
-import { GetUniqueEventsResponse } from '../common/MyMICDS';
+import { UniqueEvent } from '../common/MyMICDS';
 import { Timeslot } from './Timeslot';
 
-export interface UniqueClassesTimeslots {
-	[uniqueClass: string]: Timeslot[];
+export interface UniqueEventWithTimeslots extends UniqueEvent {
+	timeslots: Timeslot[];
 }
 
-export interface AssignmentIdToCanvasInfo {
-	[assignmentId: string]: CanvasIdInfo;
+export interface CanvasEventsWithTimeslots {
+	[className: string]: {
+		[eventName: string]: UniqueEventWithTimeslots;
+	};
 }
 
-export interface CanvasIdInfo {
-	eventName: string;
-	className: string;
+export interface EventIdToUniqueEvent {
+	[assignmentId: string]: UniqueEvent;
 }
-
-export type UniqueClassAssignments = GetUniqueEventsResponse['events'];
 
 export interface HourPortions {
 	[hour: number]: number;

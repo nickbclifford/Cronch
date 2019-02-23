@@ -10,7 +10,10 @@ import MyMICDS from './common/MyMICDS';
 import { pickProps } from './common/Utils';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
-import { AssignmentIdToCanvasInfo, UniqueClassAssignments, UniqueClassesTimeslots } from './model/Analytics';
+import {
+	CanvasEventsWithTimeslots,
+	EventIdToUniqueEvent
+} from './model/Analytics';
 import { getAllTimeslots, Timeslot } from './model/Timeslot';
 
 import ClassesList from './pages/ClassesList';
@@ -28,12 +31,8 @@ export default class App extends React.Component<any, AppState> {
 		super(props);
 		this.state = {
 			loading: true,
-			uniqueClassAssignments: new BehaviorSubject<UniqueClassAssignments | null>(null),
 			timeslots: new BehaviorSubject<Timeslot[] | null>(null),
-			assignmentIdToClass: new BehaviorSubject<AssignmentIdToCanvasInfo | null>(null),
-			// uniqueClasses: new BehaviorSubject<string[] | null>(null),
-			classesWithTimeslots: new BehaviorSubject<string[] | null>(null),
-			assignmentsWithTimeslots: new BehaviorSubject<string[] | null>(null)
+			canvasEventsWithTimeslots: new BehaviorSubject<CanvasEventsWithTimeslots | null>(null)
 		};
 	}
 
@@ -53,50 +52,60 @@ export default class App extends React.Component<any, AppState> {
 			filter(auth => auth !== null),
 			first()
 		).subscribe(this.setupAnalytics);
-
-		// Calculate other data once we have both MyMICDS and timeslot data
-		combineLatest(
-			this.state.uniqueClassAssignments,
-			this.state.timeslots
-		).subscribe(
-			([uniqueClasses, timeslots]) => {
-				// for
-			}
-		);
 	}
 
 	@bind
 	private setupAnalytics() {
-		MyMICDS.canvas.getUniqueEvents().subscribe(
-			({ events: uniqueEvents }) => {
+
+		// Calculate other data once we have both MyMICDS and timeslot data
+		combineLatest(
+			MyMICDS.canvas.getUniqueEvents(),
+			getAllTimeslots()
+		).subscribe(
+			([{ events: uniqueEvents }, timeslots]) => {
+				this.state.timeslots.next(timeslots);
+				if (!uniqueEvents || !timeslots) {
+					return;
+				}
+
 				const uniqueCanvasClasses = Object.keys(uniqueEvents).sort();
-				this.state.uniqueClassAssignments.next(uniqueEvents);
 				// console.log('unique events', uniqueEvents);
 
-				const map: AssignmentIdToCanvasInfo = {};
-
+				const assignmentIdMap: EventIdToUniqueEvent = {};
 				for (const canvasClass of uniqueCanvasClasses) {
 					const assignments = uniqueEvents[canvasClass];
-					console.log('assignments', assignments);
+
 					for (const assignment of assignments) {
-						map[assignment._id] = {
-							eventName: assignment.name,
-							className: canvasClass
-						};
+						assignmentIdMap[assignment._id] = assignment;
 					}
 				}
 
-				this.state.assignmentIdToClass.next(map);
-				console.log('MAP', map);
-			},
-			err => alert(`Error getting Canvas events! ${err.message}`)
-		);
+				// Calculate the timeslots associated with a assignment
+				const eventsWithTimeslots: CanvasEventsWithTimeslots = {};
+				// const map: AssignmentIdToTimeslots = {};
+				for (const timeslot of timeslots) {
+					const canvasInfo = assignmentIdMap[timeslot.classId];
+					if (!canvasInfo) {
+						console.log('No canvas info for', timeslot.classId);
+						continue;
+					}
 
-		getAllTimeslots().subscribe(
-			timeslots => {
-				this.state.timeslots.next(timeslots);
-			},
-			err => alert(`Error getting Cronch timeslots! ${err.message}`)
+					// { canvasClass, canvasEvent }
+
+					if (!eventsWithTimeslots[canvasInfo.className]) {
+						eventsWithTimeslots[canvasInfo.className] = {};
+					}
+
+					if (!eventsWithTimeslots[canvasInfo.className][canvasInfo.name]) {
+						const canvasInfoWithTimeslot = Object.assign({}, canvasInfo, { timeslots: [] });
+						eventsWithTimeslots[canvasInfo.className][canvasInfo.name] = canvasInfoWithTimeslot;
+					}
+
+					eventsWithTimeslots[canvasInfo.className][canvasInfo.name].timeslots.push(timeslot);
+				}
+				this.state.canvasEventsWithTimeslots.next(eventsWithTimeslots);
+				console.log('events with timeslots', eventsWithTimeslots);
+			}
 		);
 
 	}
@@ -115,13 +124,12 @@ export default class App extends React.Component<any, AppState> {
 			);
 		} else {
 			return (
-				<AnalyticsContext.Provider value={pickProps(this.state, [
-					'uniqueClassAssignments',
-					'timeslots',
-					'assignmentIdToClass',
-					'classesWithTimeslots',
-					'assignmentsWithTimeslots'
-				])}>
+				<AnalyticsContext.Provider
+					value={pickProps(this.state, [
+						'timeslots',
+						'canvasEventsWithTimeslots'
+					])}
+				>
 					<div className={styles.appContainer}>
 						<Navbar className={styles.navbar} />
 						<div className={styles.routeContainer}>

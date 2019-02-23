@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BehaviorSubject } from 'rxjs';
 
-import { AssignmentIdToCanvasInfo, UniqueClassAssignments, UniqueClassesTimeslots } from '../model/Analytics';
+import { CanvasEventsWithTimeslots } from '../model/Analytics';
 import { Timeslot } from '../model/Timeslot';
 import withContextFactory from './HigherOrderConsumerFactory';
 
@@ -10,24 +10,14 @@ export interface WithAnalyticsContextProps {
 }
 
 export interface AnalyticsContextType {
-	// The OG data
-	uniqueClassAssignments: BehaviorSubject<UniqueClassAssignments | null>;
 	timeslots: BehaviorSubject<Timeslot[] | null>;
-	// Stuff calculated from it
-	assignmentIdToClass: BehaviorSubject<AssignmentIdToCanvasInfo | null>;
-	// uniqueClasses: BehaviorSubject<string[] | null>;
-	classesWithTimeslots: BehaviorSubject<string[] | null>;
-	assignmentsWithTimeslots: BehaviorSubject<string[] | null>;
+	canvasEventsWithTimeslots: BehaviorSubject<CanvasEventsWithTimeslots | null>;
 }
 
 // tslint:disable-next-line:variable-name
 export const AnalyticsContext = React.createContext<AnalyticsContextType>({
-	uniqueClassAssignments: new BehaviorSubject<UniqueClassAssignments | null>(null),
 	timeslots: new BehaviorSubject<Timeslot[] | null>(null),
-	assignmentIdToClass: new BehaviorSubject<AssignmentIdToCanvasInfo | null>(null),
-	// uniqueClasses: new BehaviorSubject<string[] | null>(null),
-	classesWithTimeslots: new BehaviorSubject<string[] | null>(null),
-	assignmentsWithTimeslots: new BehaviorSubject<string[] | null>(null)
+	canvasEventsWithTimeslots: new BehaviorSubject<CanvasEventsWithTimeslots | null>(null)
 });
 
 export default withContextFactory(AnalyticsContext, 'analyticsContext');
