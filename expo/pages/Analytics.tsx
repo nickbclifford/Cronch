@@ -246,7 +246,10 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 					dayTotal += this.calcHourDiff(time.start, time.end);
 				}
 			});
-			thisMonthData.data.push({x: `${thisMonth.getMonth()}/${i.toString()}`, y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal});
+			thisMonthData.data.push({
+				x: `${thisMonth.getMonth()}/${i.toString()}`,
+				y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal
+			});
 		}
 
 		chartData.push(thisMonthData);
@@ -335,15 +338,15 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	}
 
 	private findMonthDeviation(): number {
-		let monthlyRaw: number[] = [];
+		const monthlyRaw: number[] = [];
 		this.state.monthlyTimes.forEach((day: Timeslot) => {
 			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
 				monthlyRaw.push(this.calcHourDiff(day.start, day.end));
 			}
-		})
+		});
 
 		return stats.stdev(monthlyRaw);
-		
+
 		/*
 		let tempTotal = 0;
 		// find monthly total
@@ -404,12 +407,12 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	}
 
 	private findMonthlyAverage(): number {
-		let monthlyRaw: number[] = [];
+		const monthlyRaw: number[] = [];
 		this.state.monthlyTimes.forEach((day: Timeslot) => {
 			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
 				monthlyRaw.push(this.calcHourDiff(day.start, day.end));
 			}
-		})
+		});
 
 		return stats.mean(monthlyRaw);
 
@@ -457,19 +460,16 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	 * @param num number in hours that is fixed at 2 demicalpoints
 	 */
 	private beautifyTime(num: number) {
-		// TODO: get the beautify minutes working
 		// split time by decimal
 		const dec = num.toString().split('.');
 		if (dec[1]) {
 			return `${Math.round(num)}h ${Math.round(num * 60)}m`;
-		}
-		else {
+		} else {
 			return `${Math.round(num)}h`;
-		}		
+		}
 	}
 
 	componentWillMount() {
-		this.updateData();
 		this.canvasEventsSubscription = MyMICDS.canvas.getEvents().subscribe(
 			events => {
 				if (events.hasURL && events.events) {
@@ -478,6 +478,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 			},
 			err => Sentry.captureException(err)
 		);
+		this.updateData();
 	}
 
 	componentWillUnmount() {
