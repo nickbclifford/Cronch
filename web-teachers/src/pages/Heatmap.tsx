@@ -46,7 +46,7 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 					{this.state.timeslotsByWeekday.map((weekdayTimeslots, i) => 
 						<div className={styles.heatmap}>
 							<HeatmapDisplay key={i} timeslots={weekdayTimeslots} />
-							<h3>{moment(weekdayTimeslots[0].start).format('ddd')}</h3>
+							<h3 className={styles.heatmapLabel}>{moment(weekdayTimeslots[0].start).format('ddd')}</h3>
 						</div>
 					)}
 				</div>
