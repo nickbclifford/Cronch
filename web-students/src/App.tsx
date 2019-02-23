@@ -6,6 +6,7 @@ import { theme } from './common/styles';
 import Navbar from './components/Navbar';
 import About from './pages/About';
 import BattlePlan from './pages/BattlePlan';
+import Landing from './pages/Landing';
 import Profile from './pages/Profile';
 import Timer from './pages/Timer';
 
@@ -15,7 +16,8 @@ const App = () => (
 		<BrowserRouter>
 			<div>
 				<Navbar />
-				<Route exact={true} path='/' component={BattlePlan} />
+				<Route exact={true} path='/' component={Landing} />
+				<Route path='/battle-plan' component={BattlePlan} />
 				<Route path='/timer' component={Timer} />
 				<Route path='/about' component={About} />
 				<Route path='/profile' component={Profile} />

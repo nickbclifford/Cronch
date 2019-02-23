@@ -15,7 +15,7 @@ class Profile extends React.Component<RouteComponentProps> {
 	render() {
 		return (
 			<div>
-				<p>logged in as some dude idk</p>
+				<p>Logged in as {MyMICDS.auth.snapshot ? MyMICDS.auth.snapshot.user : ''}</p>
 				<Button onClick={this.logout}>Logout</Button>
 			</div>
 		);

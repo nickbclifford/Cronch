@@ -10,13 +10,12 @@ import LoginDialog from './LoginDialog';
 import './Navbar.scss';
 
 const tabNameRoutes = [
-	['Battle Plan', '/'],
+	['Battle Plan', '/battle-plan'],
 	['Timer', '/timer'],
 	['About', '/about']
 ];
 
 interface NavbarState {
-	value: string;
 	loginOpen: boolean;
 	loggedIn: boolean;
 }
@@ -24,7 +23,6 @@ interface NavbarState {
 class Navbar extends Component<RouteComponentProps, NavbarState> {
 
 	state = {
-		value: '/',
 		loginOpen: false,
 		loggedIn: false
 	};
@@ -39,7 +37,6 @@ class Navbar extends Component<RouteComponentProps, NavbarState> {
 	@bind
 	private handleTabChange(event: React.ChangeEvent<{}>, value: string) {
 		this.props.history.push(value);
-		this.setState({ value });
 	}
 
 	@bind
@@ -61,12 +58,19 @@ class Navbar extends Component<RouteComponentProps, NavbarState> {
 	}
 
 	render() {
+		const currentRoute = this.props.location.pathname;
+
 		return (
 			<>
 				<AppBar position='static'>
 					<Toolbar className='Toolbar'>
 						<Typography color='inherit' variant='h5'>Cronch</Typography>
-						<Tabs className='Tabs' centered={true} value={this.state.value} onChange={this.handleTabChange}>
+						<Tabs
+							className='Tabs'
+							centered={true}
+							value={tabNameRoutes.map(r => r[1]).includes(currentRoute) ? currentRoute : false}
+							onChange={this.handleTabChange}
+						>
 							{tabNameRoutes.map(([title, route], key) => <Tab key={key} label={title} value={route}/>)}
 						</Tabs>
 						{
