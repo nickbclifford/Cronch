@@ -1,13 +1,13 @@
 import { UniqueEvent } from '../common/MyMICDS';
 import { Timeslot } from './Timeslot';
 
-export interface UniqueEventWithTimeslots extends UniqueEvent {
+export interface UniqueEventWithData extends UniqueEvent {
 	timeslots: Timeslot[];
 }
 
-export interface CanvasEventsWithTimeslots {
+export interface CanvasEventsWithData {
 	[className: string]: {
-		[eventName: string]: UniqueEventWithTimeslots;
+		[eventName: string]: UniqueEventWithData;
 	};
 }
 

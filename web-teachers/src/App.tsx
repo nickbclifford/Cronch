@@ -11,12 +11,14 @@ import { pickProps } from './common/Utils';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import {
-	CanvasEventsWithTimeslots,
+	CanvasEventsWithData,
 	EventIdToUniqueEvent
 } from './model/Analytics';
 import { getAllTimeslots, Timeslot } from './model/Timeslot';
 
+import ClassAnalytics from './pages/ClassAnalytics';
 import ClassesList from './pages/ClassesList';
+import EventAnalytics from './pages/EventAnalytics';
 import Heatmap from './pages/Heatmap';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
@@ -32,7 +34,7 @@ export default class App extends React.Component<any, AppState> {
 		this.state = {
 			loading: true,
 			timeslots: new BehaviorSubject<Timeslot[] | null>(null),
-			canvasEventsWithTimeslots: new BehaviorSubject<CanvasEventsWithTimeslots | null>(null)
+			canvasEventsWithData: new BehaviorSubject<CanvasEventsWithData | null>(null)
 		};
 	}
 
@@ -69,7 +71,6 @@ export default class App extends React.Component<any, AppState> {
 				}
 
 				const uniqueCanvasClasses = Object.keys(uniqueEvents).sort();
-				// console.log('unique events', uniqueEvents);
 
 				const assignmentIdMap: EventIdToUniqueEvent = {};
 				for (const canvasClass of uniqueCanvasClasses) {
@@ -81,30 +82,26 @@ export default class App extends React.Component<any, AppState> {
 				}
 
 				// Calculate the timeslots associated with a assignment
-				const eventsWithTimeslots: CanvasEventsWithTimeslots = {};
-				// const map: AssignmentIdToTimeslots = {};
+				const eventsWithData: CanvasEventsWithData = {};
 				for (const timeslot of timeslots) {
 					const canvasInfo = assignmentIdMap[timeslot.classId];
 					if (!canvasInfo) {
-						console.log('No canvas info for', timeslot.classId);
+						// console.log('No canvas info for', timeslot.classId);
 						continue;
 					}
 
-					// { canvasClass, canvasEvent }
-
-					if (!eventsWithTimeslots[canvasInfo.className]) {
-						eventsWithTimeslots[canvasInfo.className] = {};
+					if (!eventsWithData[canvasInfo.className]) {
+						eventsWithData[canvasInfo.className] = {};
 					}
 
-					if (!eventsWithTimeslots[canvasInfo.className][canvasInfo.name]) {
+					if (!eventsWithData[canvasInfo.className][canvasInfo._id]) {
 						const canvasInfoWithTimeslot = Object.assign({}, canvasInfo, { timeslots: [] });
-						eventsWithTimeslots[canvasInfo.className][canvasInfo.name] = canvasInfoWithTimeslot;
+						eventsWithData[canvasInfo.className][canvasInfo._id] = canvasInfoWithTimeslot;
 					}
 
-					eventsWithTimeslots[canvasInfo.className][canvasInfo.name].timeslots.push(timeslot);
+					eventsWithData[canvasInfo.className][canvasInfo._id].timeslots.push(timeslot);
 				}
-				this.state.canvasEventsWithTimeslots.next(eventsWithTimeslots);
-				console.log('events with timeslots', eventsWithTimeslots);
+				this.state.canvasEventsWithData.next(eventsWithData);
 			}
 		);
 
@@ -127,7 +124,7 @@ export default class App extends React.Component<any, AppState> {
 				<AnalyticsContext.Provider
 					value={pickProps(this.state, [
 						'timeslots',
-						'canvasEventsWithTimeslots'
+						'canvasEventsWithData'
 					])}
 				>
 					<div className={styles.appContainer}>
@@ -137,8 +134,10 @@ export default class App extends React.Component<any, AppState> {
 								<Route exact={true} path='/' render={this.redirectToDefault} />
 								<Route path='/login' component={Login} />
 								<Route path='/logout' component={Logout} />
-								<PrivateRoute path='/classes' component={ClassesList} />
 								<PrivateRoute path='/heatmap' component={Heatmap} />
+								<PrivateRoute path='/classes/:className/:eventId' component={EventAnalytics} />
+								<PrivateRoute path='/classes/:className' component={ClassAnalytics} />
+								<PrivateRoute path='/classes' component={ClassesList} />
 								<Route render={this.redirectToDefault} />
 							</Switch>
 						</div>

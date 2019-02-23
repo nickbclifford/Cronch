@@ -1,8 +1,8 @@
 import React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 
 import withAnalyticsContext, { WithAnalyticsContextProps } from '../common/AnalyticsContext';
-import styles from './ClassList.module.scss';
+import listStyles from './ClassList.module.scss';
 
 interface ClassesListState {
 	classes: string[];
@@ -16,7 +16,7 @@ class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsCon
 	}
 
 	componentDidMount() {
-		this.props.analyticsContext.canvasEventsWithTimeslots.subscribe(
+		this.props.analyticsContext.canvasEventsWithData.subscribe(
 			canvasEvents => {
 				if (canvasEvents) {
 					this.setState({ classes: Object.keys(canvasEvents).sort() });
@@ -31,12 +31,14 @@ class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsCon
 	render() {
 		return (
 			<div className='container'>
-				<h1 className={styles.header}>Classes List</h1>
+				<h1 className={listStyles.header}>Classes List</h1>
 				<div>
-					{this.state.classes.map(uniqueClass => (
-						<div key={uniqueClass} className={styles.classContainer}>
-							<h4>{uniqueClass === '' ? 'No Class' : uniqueClass}</h4>
-						</div>
+					{this.state.classes.filter(c => c !== '').map(uniqueClass => (
+						<Link key={uniqueClass} to={`/classes/${uniqueClass}`} className={listStyles.link}>
+							<div className={listStyles.itemContainer}>
+								<h4 className={listStyles.className}>{uniqueClass === '' ? 'No Class' : uniqueClass}</h4>
+							</div>
+						</Link>
 					))}
 				</div>
 			</div>
