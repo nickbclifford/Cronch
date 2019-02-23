@@ -49,9 +49,7 @@ class ClassAnalytics extends React.Component<RouteComponentProps<ClassAnalyticsR
 					for (const eventId of eventIds) {
 						events.push(canvasEvents[className][eventId]);
 					}
-
 					events.sort((a, b) => a.end.valueOf() - b.end.valueOf());
-					console.log('events for class', events);
 
 					// Calculate line graph data
 					const data = [];
