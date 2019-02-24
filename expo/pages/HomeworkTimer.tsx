@@ -14,10 +14,11 @@ import flipped$ from '../common/PhoneAcrobatics';
 import { components, NEUTRAL, PRIMARY, typography } from '../common/StyleGuide';
 import Task from '../common/Task';
 import { createTimeslot, endTimeslot, Timeslot } from '../common/Timeslot';
-import { getUser, getUserTimers, User } from '../common/User';
+import { changeUserInfo, getUser, getUserTimers, User } from '../common/User';
 import { Omit } from '../common/Utils';
 import Circle from '../components/Circle';
 import DisplayAssignment from '../components/DisplayAssignment';
+import TimerPicker from './TimerPicker';
 
 export interface TimerState {
 	maxWorkTime: number;
@@ -144,18 +145,21 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 					modeSelection: res.user.timerSelection
 				});
 			})
-			.then(() => getUserTimers())
-			.then(timers => {
-				console.log(timers);
-				const selectedTimer = timers[this.user.timerSelection];
+			// .then(() => getUserTimers())
+			// .then(timers => {
+			.then(() => {
+				// console.log(timers);
+				// const selectedTimer = timers[this.user.timerSelection];
+
+				const maxWorkTime = Math.floor(this.user.timerSelection / 100) * (5 * 60 * 1000);
+				const maxBreakTime = this.user.timerSelection % 100 * (5 * 60 * 1000);
 
 				// YUH
 				// if (selectedTimer) {
-				// 	this.setTimerMode({
-				// 		maxBreakTime: selectedTimer.break,
-				// 		maxWorkTime: selectedTimer.work,
-				// 		modeSelection: this.user.timerSelection
-				// 	});
+				this.setTimerMode({
+					maxBreakTime,
+					maxWorkTime
+				});
 				// }
 			})
 			.catch(err => {
@@ -202,17 +206,37 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 	}
 
 	@bind
-	private setTimerMode(mode: { maxWorkTime: number, maxBreakTime: number, modeSelection: number }) {
+	private setTimerMode(mode: { maxWorkTime: number, maxBreakTime: number }) {
 		this.setState({
 			maxWorkTime: mode.maxWorkTime,
 			maxBreakTime: mode.maxBreakTime,
 			workTimeLeft: mode.maxWorkTime,
 			breakTimeLeft: mode.maxBreakTime,
 			onBreak: false,
-			paused: !this.state.flipped,
-			modeSelection: mode.modeSelection
+			paused: !this.state.flipped
 		});
 	}
+
+	@bind
+	private saveTimerMode(mode: { maxWorkTime: number, maxBreakTime: number }) {
+		const modeSelection = mode.maxWorkTime / (5 * 60 * 1000) * 100 + mode.maxBreakTime / (5 * 60 * 1000);
+
+		changeUserInfo({
+			timerSelection: modeSelection
+		}).then(() => {
+			this.setTimerMode({
+				maxWorkTime: mode.maxWorkTime,
+				maxBreakTime: mode.maxBreakTime
+			});
+		}).catch(e => {
+			Alert.alert('Error saving timer', e.message);
+		});
+	}
+
+	// @bind
+	// private setTimerModeFactory(mode: { maxWorkTime: number, maxBreakTime: number, modeSelection: number }) {
+	// 	return () => this.setTimerMode(mode);
+	// }
 
 	@bind
 	private async playAlarm() {
@@ -343,7 +367,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 		.then(() => {
 			console.log(`Timeslot started for task id ${timeslot.classId}`);
 		}).catch(err => {
-			err => Sentry.captureException(err);
+			Sentry.captureException(err);
 			Alert.alert('Error saving time slot.', err.message);
 		});
 	}
@@ -485,12 +509,22 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 						<View style={styles.timerContainer}>
 							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
 							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.workTimeLeft)}</Text>
+							<TimerPicker
+								selectedWorkTime={this.state.maxWorkTime}
+								selectedBreakTime={this.state.maxBreakTime}
+								onChangeValue={this.saveTimerMode}
+							/>
 						</View>
 					)}
 					{this.state.onBreak && (
 						<View style={styles.timerContainer}>
 							<Text style={[typography.h1, styles.timerLabel]}>Time Left</Text>
 							<Text style={[typography.h0, styles.timerTime]}>{this.formatTime(this.state.breakTimeLeft)}</Text>
+							<TimerPicker
+								selectedWorkTime={this.state.maxWorkTime}
+								selectedBreakTime={this.state.maxBreakTime}
+								onChangeValue={this.saveTimerMode}
+							/>
 						</View>
 					)}
 				</View>
@@ -501,7 +535,7 @@ export class HomeworkTimer extends React.Component<NavigationScreenProps & WithA
 								name='refresh'
 								type='font-awesome'
 								size={20}
-								color={NEUTRAL[700]}
+								color={NEUTRAL[500]}
 							/>
 							<Text style={[typography.small, styles.flippy]}>Place your phone face-down to start the timer!</Text>
 						</View>
@@ -627,7 +661,8 @@ const styles = StyleSheet.create({
 	},
 	timerLabel: {
 		textAlign: 'center',
-		color: NEUTRAL[300]
+		color: NEUTRAL[300],
+		height: 50
 	},
 	timerTime: {
 		textAlign: 'center',
