@@ -118,12 +118,12 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 	private makeWeeklyData() {
 		// gets the weekly reference point
-		const thisWeek = new Date();
-		thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
+		const thisWeek = moment();
+		// thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
 
 		const weeklyTimes: Timeslot[] = []; // weekly timeslots
 		for (const time of this.state.times) {
-			if (time.end !== null && time.start > thisWeek) {
+			if (time.end && (moment().date() - time.start.getDate() <= 7)) {
 				weeklyTimes.push(time);
 			}
 		}
@@ -228,12 +228,11 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 	private makeMonthlyData() {
 		// gets the month reference point
-		const thisMonth = new Date();
-		thisMonth.setDate(1);
+		const thisMonth = moment();
 
 		const monthlyTimes: Timeslot[] = []; // this month's timeslots
 		for (const time of this.state.times) {
-			if (time.end !== null && time.start > thisMonth) {
+			if (time.end !== null && time.start.getMonth() === thisMonth.month()) {
 				monthlyTimes.push(time);
 			}
 		}
@@ -258,7 +257,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 				}
 			});
 			thisMonthData.data.push({
-				x: `${thisMonth.getMonth()}/${i.toString()}`,
+				x: `${thisMonth.month() + 1}/${i.toString()}`,
 				y: (dayTotal > 0) ? parseFloat(dayTotal.toFixed(2)) : dayTotal
 			});
 		}
@@ -474,9 +473,9 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		// split time by decimal
 		const dec = num.toString().split('.');
 		if (dec[1]) {
-			return `${Math.round(num)}h ${Math.round(num * 60)}m`;
+			return `${Math.floor(num)}h ${Math.floor((parseInt(dec[1].substring(0, 2), 10) / 2 * 60) / 100)}m`;
 		} else {
-			return `${Math.round(num)}h`;
+			return `${Math.floor(num)}h`;
 		}
 	}
 
