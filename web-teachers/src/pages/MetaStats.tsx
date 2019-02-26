@@ -10,8 +10,9 @@ import classStyles from './ClassAnalytics.module.scss';
 
 interface MetaStatsState {
 	timeslots: Timeslot[];
-	stats: { count: number, average: number, max: number } | null;
+	timeslotStats: { count: number, average: number, max: number } | null;
 	timeslotData: any;
+	userStats: { count: number, average: number, max: number } | null;
 	userData: any;
 	options: any;
 }
@@ -22,7 +23,14 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 
 	constructor(props: any) {
 		super(props);
-		this.state = { timeslots: [], stats: null, timeslotData: null, userData: null, options: null };
+		this.state = {
+			timeslots: [],
+			timeslotStats: null,
+			timeslotData: null,
+			userData: null,
+			userStats: null,
+			options: null
+		};
 	}
 
 	componentDidMount() {
@@ -32,6 +40,7 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 				// Calculate line graph data
 				const startEndCount: { [timestamp: number]: number } = {};
 				const userCount: { [timestamp: number]: string[] } = {};
+				const uniqueUsers: string[] = [];
 
 				for (const timeslot of timeslots) {
 					if (!timeslot.end) {
@@ -55,6 +64,10 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 					}
 
 					// Add user to count
+					if (!uniqueUsers.includes(timeslot.user)) {
+						uniqueUsers.push(timeslot.user);
+					}
+
 					if (!userCount[start]) {
 						userCount[start] = [];
 					}
@@ -92,7 +105,7 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 					return stats;
 				}, { count: 0, total: 0, max: 0 });
 
-				const stats = {
+				const timeslotStats = {
 					count,
 					average: total / count,
 					max
@@ -100,17 +113,34 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 
 				// Format user data for Chart.js
 				const userData = [];
+				let userDailyTotal = 0;
+				let userDayMax = 0;
 				for (const date of Object.keys(userCount).map(k => parseInt(k, 10))) {
+					const count = userCount[date].length;
 					userData.push({
 						x: moment(date),
-						y: userCount[date].length
+						y: count
 					});
+					userDailyTotal += count;
+					if (userDayMax < count) {
+						userDayMax = count;
+					}
 				}
 				userData.sort((a, b) => a.x.valueOf() - b.x.valueOf());
 
+				const firstDate = userData[0].x;
+				const lastDate = userData[userData.length - 1].x;
+				const userDays = lastDate.diff(firstDate, 'day');
+
+				const userStats = {
+					count: uniqueUsers.length,
+					average: userDailyTotal / userDays,
+					max: userDayMax
+				};
+
 				this.setState({
 					timeslots,
-					stats,
+					timeslotStats,
 					timeslotData: {
 						datasets: [{
 							label: 'Timeslots Created',
@@ -123,6 +153,7 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 							data: timeslotData
 						}]
 					},
+					userStats,
 					userData: {
 						datasets: [{
 							label: 'Users',
@@ -165,25 +196,23 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 		return (
 			<div className='container'>
 				<h1 className='cronch-header'>Meta Stats</h1>
-				{this.state.stats && (
-					<div className={classStyles.classStats}>
-						<div className={classStyles.classStat}>
-							<p className={classStyles.statLabel}>Total Timeslots</p>
-							<h3 className={classStyles.statNumber}>{this.state.stats.count}</h3>
-						</div>
-						<div className={classStyles.classStat}>
-							<p className={classStyles.statLabel}>Average Timeslot Time</p>
-							<h3 className={classStyles.statNumber}>{this.state.stats.average.toFixed(0)}m</h3>
-						</div>
-						<div className={classStyles.classStat}>
-							<p className={classStyles.statLabel}>Maximum Timeslot Time</p>
-							<h3 className={classStyles.statNumber}>{this.state.stats.max}m</h3>
-						</div>
-					</div>
-				)}
-				{this.state.timeslotData && this.state.options && (
+				{this.state.timeslotStats && this.state.timeslotData && this.state.options && (
 					<>
 						<h2 className='cronch-header'>Timeslots Created</h2>
+						<div className={classStyles.classStats}>
+							<div className={classStyles.classStat}>
+								<p className={classStyles.statLabel}>Total Timeslots</p>
+								<h3 className={classStyles.statNumber}>{this.state.timeslotStats.count}</h3>
+							</div>
+							<div className={classStyles.classStat}>
+								<p className={classStyles.statLabel}>Average Timeslot Time</p>
+								<h3 className={classStyles.statNumber}>{this.state.timeslotStats.average.toFixed(0)}m</h3>
+							</div>
+							<div className={classStyles.classStat}>
+								<p className={classStyles.statLabel}>Maximum Timeslot Time</p>
+								<h3 className={classStyles.statNumber}>{this.state.timeslotStats.max}m</h3>
+							</div>
+						</div>
 						<div className='cronch-chart-container'>
 							<Line
 								data={this.state.timeslotData}
@@ -192,9 +221,23 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 						</div>
 					</>
 				)}
-				{this.state.timeslotData && this.state.options && (
+				{this.state.userStats && this.state.timeslotData && this.state.options && (
 					<>
 						<h2 className='cronch-header'>Users</h2>
+						<div className={classStyles.classStats}>
+							<div className={classStyles.classStat}>
+								<p className={classStyles.statLabel}>Total Users</p>
+								<h3 className={classStyles.statNumber}>{this.state.userStats.count}</h3>
+							</div>
+							<div className={classStyles.classStat}>
+								<p className={classStyles.statLabel}>Average Users per Day</p>
+								<h3 className={classStyles.statNumber}>{this.state.userStats.average.toFixed(0)}</h3>
+							</div>
+							<div className={classStyles.classStat}>
+								<p className={classStyles.statLabel}>Maximum Users in Single Day</p>
+								<h3 className={classStyles.statNumber}>{this.state.userStats.max}</h3>
+							</div>
+						</div>
 						<div className='cronch-chart-container'>
 							<Line
 								data={this.state.userData}
