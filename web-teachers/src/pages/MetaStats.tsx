@@ -11,7 +11,8 @@ import classStyles from './ClassAnalytics.module.scss';
 interface MetaStatsState {
 	timeslots: Timeslot[];
 	stats: { count: number, average: number, max: number } | null;
-	data: any;
+	timeslotData: any;
+	userData: any;
 	options: any;
 }
 
@@ -21,7 +22,7 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 
 	constructor(props: any) {
 		super(props);
-		this.state = { timeslots: [], data: null, options: null, stats: null };
+		this.state = { timeslots: [], stats: null, timeslotData: null, userData: null, options: null };
 	}
 
 	componentDidMount() {
@@ -30,6 +31,8 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 
 				// Calculate line graph data
 				const startEndCount: { [timestamp: number]: number } = {};
+				const userCount: { [timestamp: number]: string[] } = {};
+
 				for (const timeslot of timeslots) {
 					if (!timeslot.end) {
 						continue;
@@ -38,6 +41,7 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 					const start = timeslot.start.clone().startOf('day').valueOf();
 					const end = timeslot.end.clone().startOf('day').valueOf();
 
+					// Add to start count
 					if (!startEndCount[start]) {
 						startEndCount[start] = 0;
 					}
@@ -49,17 +53,34 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 						}
 						startEndCount[end]++;
 					}
+
+					// Add user to count
+					if (!userCount[start]) {
+						userCount[start] = [];
+					}
+					if (!userCount[start].includes(timeslot.user)) {
+						userCount[start].push(timeslot.user);
+					}
+
+					if (start !== end) {
+						if (!userCount[end]) {
+							userCount[end] = [];
+						}
+						if (!userCount[end].includes(timeslot.user)) {
+							userCount[end].push(timeslot.user);
+						}
+					}
 				}
 
-				const data = [];
+				// Format timeslot data for Chart.js
+				const timeslotData = [];
 				for (const date of Object.keys(startEndCount).map(k => parseInt(k, 10))) {
-					data.push({
+					timeslotData.push({
 						x: moment(date),
 						y: startEndCount[date]
 					});
 				}
-
-				data.sort((a, b) => a.x.valueOf() - b.x.valueOf());
+				timeslotData.sort((a, b) => a.x.valueOf() - b.x.valueOf());
 
 				const { count, total, max } = timeslots.reduce((stats, timeslot) => {
 					if (timeslot.end) {
@@ -77,10 +98,20 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 					max
 				};
 
+				// Format user data for Chart.js
+				const userData = [];
+				for (const date of Object.keys(userCount).map(k => parseInt(k, 10))) {
+					userData.push({
+						x: moment(date),
+						y: userCount[date].length
+					});
+				}
+				userData.sort((a, b) => a.x.valueOf() - b.x.valueOf());
+
 				this.setState({
 					timeslots,
 					stats,
-					data: {
+					timeslotData: {
 						datasets: [{
 							label: 'Timeslots Created',
 							backgroundColor: [
@@ -89,10 +120,25 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 							borderColor: [
 								'rgba(84, 1, 116, 0.5)'
 							],
-							data
+							data: timeslotData
+						}]
+					},
+					userData: {
+						datasets: [{
+							label: 'Users',
+							backgroundColor: [
+								'rgba(124, 22, 165, 0.2)'
+							],
+							borderColor: [
+								'rgba(84, 1, 116, 0.5)'
+							],
+							data: userData
 						}]
 					},
 					options: {
+						legend: {
+							display: false
+						},
 						scales: {
 							xAxes: [{
 								type: 'time',
@@ -135,11 +181,27 @@ class MetaStats extends React.Component<RouteComponentProps & WithAnalyticsConte
 						</div>
 					</div>
 				)}
-				{this.state.data && this.state.options && (
-					<Line
-						data={this.state.data}
-						options={this.state.options}
-					/>
+				{this.state.timeslotData && this.state.options && (
+					<>
+						<h2 className='cronch-header'>Timeslots Created</h2>
+						<div className='cronch-chart-container'>
+							<Line
+								data={this.state.timeslotData}
+								options={this.state.options}
+							/>
+						</div>
+					</>
+				)}
+				{this.state.timeslotData && this.state.options && (
+					<>
+						<h2 className='cronch-header'>Users</h2>
+						<div className='cronch-chart-container'>
+							<Line
+								data={this.state.userData}
+								options={this.state.options}
+							/>
+						</div>
+					</>
 				)}
 			</div>
 		);

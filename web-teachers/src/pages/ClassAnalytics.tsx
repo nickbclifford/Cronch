@@ -126,7 +126,7 @@ class ClassAnalytics extends React.Component<RouteComponentProps<ClassAnalyticsR
 
 		return (
 			<div className='container'>
-				<h1 className={listStyles.header}>Class Analytics{this.state.className ? ` for ${this.state.className}` : ''}</h1>
+				<h1 className='cronch-header'>Class Analytics{this.state.className ? ` for ${this.state.className}` : ''}</h1>
 				{this.state.loading && (
 					<p>Loading...</p>
 				)}
@@ -147,14 +147,14 @@ class ClassAnalytics extends React.Component<RouteComponentProps<ClassAnalyticsR
 							</div>
 						</div>
 						{this.state.data && this.state.options && (
-							<div className={styles.chartContainer}>
+							<div className='cronch-chart-container'>
 								<Line
 									data={this.state.data}
 									options={this.state.options}
 								/>
 							</div>
 						)}
-						<h2 className={listStyles.header}>Assignments</h2>
+						<h2 className='cronch-header'>Assignments</h2>
 						{this.state.events.map(event => (
 							<Link key={event._id} to={`/classes/${event.className}/${event._id}`} className={listStyles.link}>
 								<div className={listStyles.itemContainer}>
