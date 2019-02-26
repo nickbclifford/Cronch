@@ -59,7 +59,7 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 	render() {
 		return (
 			<div className='container'>
-				<h1 className='cronch-header'>Heatmap By Day in Week</h1>
+				<h1 className='cronch-header'>Heatmap By Weekday</h1>
 				<div className={styles.heatmapsContainer}>
 					{this.state.timeslotsByWeekday.map((weekdayTimeslots, i) =>
 						<div key={i} className={styles.heatmap}>
