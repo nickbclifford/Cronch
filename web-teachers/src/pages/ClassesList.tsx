@@ -47,7 +47,7 @@ class ClassesList extends React.Component<RouteComponentProps & WithAnalyticsCon
 	render() {
 		return (
 			<div className='container'>
-				<h1 className={listStyles.header}>Classes List</h1>
+				<h1 className='cronch-header'>Classes List</h1>
 				<div>
 					{this.state.classes.filter(c => c !== '').map(uniqueClass => (
 						<Link key={uniqueClass} to={`/classes/${uniqueClass}`} className={listStyles.link}>

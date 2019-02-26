@@ -14,6 +14,11 @@ export const routes = [
 		name: 'Classes List',
 		link: '/classes',
 		requireAuth: true
+	},
+	{
+		name: 'Meta',
+		link: '/meta',
+		requireAuth: true
 	}
 ];
 

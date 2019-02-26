@@ -19,6 +19,7 @@ import EventAnalytics from './pages/EventAnalytics';
 import Heatmap from './pages/Heatmap';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
+import MetaStats from './pages/MetaStats';
 
 interface AppState extends AnalyticsContextType {
 	loading: boolean;
@@ -194,6 +195,7 @@ export default class App extends React.Component<any, AppState> {
 								<PrivateRoute path='/classes/:className/:eventId' component={EventAnalytics} />
 								<PrivateRoute path='/classes/:className' component={ClassAnalytics} />
 								<PrivateRoute path='/classes' component={ClassesList} />
+								<PrivateRoute path='/meta' component={MetaStats} />
 								<Route render={this.redirectToDefault} />
 							</Switch>
 						</div>
