@@ -1,4 +1,3 @@
-import moment from 'moment';
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
@@ -8,26 +7,48 @@ import styles from './HeatmapDisplay.module.scss';
 
 export interface HeatmapDisplayProps {
 	timeslots: Timeslot[];
+	getLocalMax?: (max: number) => void;
+	setMax?: number;
 }
 
 interface HeatmapDisplayState {
 	hourPortions: HourPortions;
+	localMax: number;
 }
 
 export default class HeatmapDisplay extends React.Component<HeatmapDisplayProps, HeatmapDisplayState> {
 
 	constructor(props: any) {
 		super(props);
-		this.state = { hourPortions: {} };
+		this.state = { hourPortions: {}, localMax: 0 };
 	}
 
 	componentDidMount() {
-		this.setState({ hourPortions: this.calculateHeatmap(this.props.timeslots) });
+		this.updateHeatmapState(this.props.timeslots);
 	}
 
 	componentDidUpdate(prevProps: HeatmapDisplayProps) {
-		if (JSON.stringify(prevProps.timeslots) !== JSON.stringify(this.props.timeslots)) {
-			this.setState({ hourPortions: this.calculateHeatmap(this.props.timeslots) });
+		if (JSON.stringify(prevProps) !== JSON.stringify(this.props)) {
+			this.updateHeatmapState(this.props.timeslots);
+		}
+	}
+
+	private updateHeatmapState(timeslots: Timeslot[]) {
+		const rawPortions = this.calculateHeatmap(timeslots);
+
+		const portions: HourPortions = {};
+		for (let i = 0; i < 24; i++) {
+			portions[i] = rawPortions[i] || 0;
+		}
+
+		this.setState({ hourPortions: portions });
+
+		const localMax = Math.max(...Object.values(portions));
+		if (Number.isFinite(localMax) && localMax !== this.state.localMax) {
+			this.setState({ localMax });
+			if (this.props.getLocalMax) {
+				this.props.getLocalMax(localMax);
+			}
 		}
 	}
 
@@ -61,32 +82,30 @@ export default class HeatmapDisplay extends React.Component<HeatmapDisplayProps,
 	}
 
 	render() {
-		const portions: HourPortions = {};
-		for (let i = 0; i < 24; i++) {
-			portions[i] = this.state.hourPortions[i] || 0;
-		}
-		const hours = Object.keys(portions).map(k => parseInt(k, 10));
+		const hours = Object.keys(this.state.hourPortions).map(k => parseInt(k, 10));
 
-		const max = Math.max(...Object.values(portions));
+		const max = this.props.setMax || this.state.localMax;
 
 		const labels = hours.map(hour => {
-			const suffix = hour < 13 ? 'am' : 'pm';
+			const suffix = hour < 12 ? 'am' : 'pm';
 			return `${(hour + 11) % 12 + 1} ${suffix}`;
 		});
 
 		const tooltips = hours.map(hour => {
-			return `(${hour}:00-${hour + 1}:00) ${portions[hour].toFixed(2)} hours worked`;
+			return `(${hour}:00-${hour + 1}:00) ${this.state.hourPortions[hour].toFixed(2)} hours worked`;
 			// return `${portions[hour].toFixed(2)} hours worked`;
 		});
+
+		ReactTooltip.rebuild();
 
 		return (
 			<div className={styles.heatmapContainer}>
 				{hours.map((hour, i) => (
 					<div key={hour} className={styles.heatmapDataContainer}>
-						<div className={styles.heatmapLabel}>{labels[i]}</div>
+						{i % 2 === 0 && (<div className={styles.heatmapLabel}>{labels[i]}</div>)}
 						<div
 							className={styles.heatmapData}
-							style={this.calculateColor(portions[hour] / max)}
+							style={this.calculateColor(this.state.hourPortions[hour] / max)}
 							data-tip={tooltips[i]}
 						></div>
 					</div>

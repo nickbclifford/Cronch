@@ -1,3 +1,4 @@
+import bind from 'bind-decorator';
 import moment from 'moment';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
@@ -11,6 +12,7 @@ import styles from './Heatmap.module.scss';
 interface HeatmapState {
 	timeslots: Timeslot[];
 	timeslotsByWeekday: Timeslot[][];
+	maxWeeklyValues: number[];
 }
 
 class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContextProps, HeatmapState> {
@@ -19,7 +21,7 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 
 	constructor(props: any) {
 		super(props);
-		this.state = { timeslots: [], timeslotsByWeekday: [] };
+		this.state = { timeslots: [], timeslotsByWeekday: [], maxWeeklyValues: [] };
 	}
 
 	componentDidMount() {
@@ -36,8 +38,6 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 			} else {
 				this.setState({ timeslots: [], timeslotsByWeekday: [] });
 			}
-
-			console.log(this.state.timeslotsByWeekday);
 		});
 	}
 
@@ -47,6 +47,15 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 		}
 	}
 
+	@bind
+	private setMax(index: number) {
+		return (max: number) => {
+			const maxWeeklyValues = this.state.maxWeeklyValues;
+			maxWeeklyValues[index] = max;
+			this.setState({ maxWeeklyValues });
+		};
+	}
+
 	render() {
 		return (
 			<div className='container'>
@@ -54,7 +63,7 @@ class Heatmap extends React.Component<RouteComponentProps & WithAnalyticsContext
 				<div className={styles.heatmapsContainer}>
 					{this.state.timeslotsByWeekday.map((weekdayTimeslots, i) =>
 						<div key={i} className={styles.heatmap}>
-							<HeatmapDisplay timeslots={weekdayTimeslots} />
+							<HeatmapDisplay timeslots={weekdayTimeslots} getLocalMax={this.setMax(i)} setMax={Math.max(...this.state.maxWeeklyValues)} />
 							<h3 className={styles.heatmapLabel}>{moment(weekdayTimeslots[0].start).format('ddd')}</h3>
 						</div>
 					)}

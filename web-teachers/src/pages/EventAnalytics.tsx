@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React from 'react';
-import { Bar, Scatter } from 'react-chartjs-2';
+import { Scatter } from 'react-chartjs-2';
 import { RouteComponentProps } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 
@@ -57,8 +57,6 @@ class EventAnalytics extends React.Component<RouteComponentProps<EventAnalyticsR
 						}
 						durationToAmount[duration]++;
 					}
-
-					console.log('duration to amount', durationToAmount);
 
 					const data = [];
 					for (const duration of Object.keys(durationToAmount).map(i => parseInt(i, 10))) {
@@ -130,7 +128,7 @@ class EventAnalytics extends React.Component<RouteComponentProps<EventAnalyticsR
 		if (event) {
 			average = moment.duration(event.stats.average).asMinutes().toFixed(2);
 			min = moment.duration(event.stats.min).asMinutes().toFixed(2);
-			max = moment.duration(event.stats.average).asMinutes().toFixed(2);
+			max = moment.duration(event.stats.max).asMinutes().toFixed(2);
 		}
 
 		return (
