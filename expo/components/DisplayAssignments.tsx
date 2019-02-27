@@ -99,7 +99,7 @@ export default class DisplayAssignments extends React.Component<DisplayAssignmen
 
 	private sortAssignments(assignments: Task[]) {
 		return assignments
-			.filter(a => a.end.valueOf() > Date.now())
+			.filter(a => a.end.isSameOrAfter(moment().startOf('day')))
 			.sort((a, b) => a.end.unix() - b.end.unix());
 	}
 
