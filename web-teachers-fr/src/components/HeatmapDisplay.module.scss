@@ -1,0 +1,22 @@
+.heatmapContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	padding: 0.5rem;
+	background-color: var(--neutral-300);
+	border-radius: var(--cronch-border-radius);
+}
+
+.heatmapDataContainer {
+	display: flex;
+}
+
+.heatmapLabel {
+	margin-right: 0.5rem;
+	font-size: 0.75rem;
+}
+
+.heatmapData {
+	width: 2rem;
+	height: 1rem;
+}

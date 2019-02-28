@@ -1,0 +1,8 @@
+{
+	"extends": ["tslint-react", "@mymicds/configs/tslint"],
+	"rules": {
+		"no-console": false,
+		"jsx-no-multiline-js": false,
+		"variable-name": [true, "check-format", "allow-pascal-case"]
+	}
+}

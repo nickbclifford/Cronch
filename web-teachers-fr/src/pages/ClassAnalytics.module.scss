@@ -1,0 +1,22 @@
+.classStats {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 2rem;
+	padding: 1rem;
+	background-color: var(--primary-700);
+	border-radius: var(--cronch-border-radius);
+}
+
+.classStat {
+
+}
+
+.statLabel {
+	margin: 0;
+	letter-spacing: 0.03rem;
+	color: var(--neutral-300);
+}
+
+.statNumber {
+	color: var(--neutral-100);
+}
