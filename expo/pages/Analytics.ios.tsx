@@ -19,10 +19,6 @@ import { defaultColor, defaultTextDark } from '../common/Task';
 import { Timeslot } from '../common/Timeslot';
 import { getUserTimeslots } from '../common/User';
 
-enum ViewMode {
-	DAILY, WEEKLY, MONTHLY
-}
-
 export const PRIMARY = [
 	'#E6AFFB',
 	'#CC76EE',
@@ -95,7 +91,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 	}
 
 	private calcHourDiff(start: Date, end: Date): number {
-		return moment.duration(moment(end).diff(start)).as('hours');
+		return moment(end).diff(moment(start), 'hours', true);
 	}
 
 	private pickRandomColor() {
@@ -118,12 +114,26 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 
 	private makeWeeklyData() {
 		// gets the weekly reference point
-		const thisWeek = moment();
-		// thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
+		const thisWeek = new Date();
+
+		// need to find the last Sunday
+		const potentialSundays: Timeslot[] = [];
+		this.state.times.forEach((time: Timeslot) => {
+			if (moment(time.start).isoWeekday() === 7) {
+				// found a sunday
+				potentialSundays.push(time);
+			}
+		});
+		let greatestSunday: Date = potentialSundays[0].start;
+		potentialSundays.forEach((sunday: Timeslot) => {
+			if (sunday.start > greatestSunday) {
+				greatestSunday = sunday.start;
+			}
+		});
 
 		const weeklyTimes: Timeslot[] = []; // weekly timeslots
 		for (const time of this.state.times) {
-			if (time.end && (moment().date() - time.start.getDate() <= 7)) {
+			if (time.start > greatestSunday) {
 				weeklyTimes.push(time);
 			}
 		}
@@ -220,6 +230,8 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 				});
 			}
 		}
+
+		console.log('h');
 
 		if (chartData.length > 0) {
 			this.setState({ dailyChartData: chartData });
@@ -356,30 +368,6 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		});
 
 		return stats.stdev(monthlyRaw);
-
-		/*
-		let tempTotal = 0;
-		// find monthly total
-		let total = 0;
-		this.state.monthlyTimes.forEach((day) => {
-			if (day.end) {
-				total += this.calcHourDiff(day.start, day.end);
-			}
-		})
-
-		const average = this.state.weeklyTotal / this.state.weeklyTimes.length;
-		for (const val of this.state.weeklyTimes) {
-			if (val.end !== null) {
-				tempTotal += Math.pow(this.calcHourDiff(val.start, val.end) - average, 2);
-			}
-		}
-
-		const deviation = (Math.sqrt(tempTotal / (this.state.weeklyTimes.length - 1)));
-		if (isNaN(deviation)) {
-			return 0;
-		} else {
-			return parseFloat(deviation.toFixed(2));
-		}*/
 	}
 
 	private findWeeklyDeviation(): number {
@@ -425,24 +413,21 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 		});
 
 		return stats.mean(monthlyRaw);
+	}
 
-		/*
-		// find monthly total
-		let total = 0;
-		this.state.monthlyTimes.forEach((day: Timeslot) => {
-			if (day.end) {
-				total += this.calcHourDiff(day.start, day.end);
+	private findWeeklyAverage(): number {
+		const weeklyRaw: number[] = [];
+		this.state.weeklyTimes.forEach((day: Timeslot) => {
+			if (day.end && this.calcHourDiff(day.start, day.end) > 0) {
+				weeklyRaw.push(this.calcHourDiff(day.start, day.end));
 			}
-		})
+		});
 
-		const average = total / this.state.monthlyTimes.length;
-
-		if (isNaN(average)) {
-			return 0;
+		if (weeklyRaw.length > 0) {
+			return stats.mean(weeklyRaw);
 		} else {
-			return parseFloat(average.toFixed(2));
+			return 0;
 		}
-		*/
 	}
 
 	private getClassNameAndColor(id: string) {
@@ -597,7 +582,7 @@ class Analytics extends React.Component<NavigationScreenProps & WithAssignmentCo
 						<View style={styles.verticalContainer}>
 							<View style={styles.verticalContainer}>
 								<Text style={styles.title}>Weekly Average</Text>
-								<Text style={styles.text}>{this.beautifyTime(this.state.weeklyTotal)}</Text>
+								<Text style={styles.text}>{this.beautifyTime(this.findWeeklyAverage())}</Text>
 							</View>
 							<View style={styles.verticalContainer}>
 								<Text style={styles.title}>Weekly Deviation</Text>
